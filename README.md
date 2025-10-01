@@ -14,5 +14,7 @@
 
      These groups focus on collective participation. They value features that help them stay connected during events, and ensure that everyone can easily join in
       
-    
-    
+* #### Societes
+   - Description
+
+     Societies want to be able to display and advertise their events to the users. They want to easily be able to display and add their events to the interactive map, ensuring all users gain exposure to their society's events and can easily sign up.
