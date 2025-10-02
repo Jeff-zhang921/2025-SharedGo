@@ -1,9 +1,12 @@
 # 2025-SharedGo
 
 ## Contents
+* [Project Description](#project-Description)
 * [Stakeholders](#stakeholders)
 * [User Stories](#user-stories)
 * [Team members](#team-members)
+
+## Project Description
 
 ## Stakeholders
 * #### Event organizers
