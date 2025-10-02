@@ -2,7 +2,7 @@
 
 ## Contents
 * [Stakeholders](#stakeholders)
-
+* [User Stories](#user-stories)
 
 ## Stakeholders
 * #### Family and Friends Group
@@ -14,3 +14,5 @@
    - Description
 
      Societies want to be able to display and advertise their events to the users. They want to easily be able to add their events to the interactive map, ensuring all users gain exposure to their events and can easily sign up.
+
+## User Stories
