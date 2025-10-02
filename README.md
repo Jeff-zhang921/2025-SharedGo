@@ -34,3 +34,4 @@
 |  -------------- |-----------------------|-----------------------|
 |  Jingxiang Zhang | 2606056 | ub24928@bristol.ac.uk |
 |  Soko Sengesamba | 2509140 | az23290@bristol.ac.uk |
+|  Minzhe Hu       | 2594564 | qp24108@bristol.ac.uk |
