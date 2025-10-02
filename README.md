@@ -33,3 +33,4 @@
 | Name | Student id | University Email      
 |  -------------- |-----------------------|-----------------------|
 |  Jingxiang Zhang | 2606056 | ub24928@bristol.ac.uk |
+|  Soko Sengesamba | 2509140 | az23290@bristol.ac.uk |
