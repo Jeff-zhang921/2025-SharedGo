@@ -30,14 +30,22 @@
 
      Societies want to be able to display and advertise their events to the users. They want to easily be able to add their events to the interactive map, ensuring all users gain exposure to their events and can easily sign up.
 
+ * #### The Client
+    - Description
+
+      As our point of contact, the client ensures that the projects expands in the intended direction, as per the application's purpose and envisioned end-goal. This includes regular meetings, checking not only progress, but also understanding. This means that the result can be successfully reached, with everyone involved, learning and comprehending along the way.
+
 
 ## User Stories
-* As an even host, I want to make it easy to set up, manage and advertise events so that others can join. 
+* As an even host, I want to make it easy to set up, manage and advertise events so that others can join.
+
+* As the client, I want all (direct & indirect) users to have a way of setting-up informal meet-ups. The goal is "to build the most loved real-time activity map". I would like the app to positively impact direct use-cases, for groups, societies, event organisers, and the list goes on!
 
 
 ## Team Members
 | Name | Student id | University Email      
 |  -------------- |-----------------------|-----------------------|
-|  Jingxiang Zhang | 2606056 | ub24928@bristol.ac.uk |
-|  Soko Sengesamba | 2509140 | az23290@bristol.ac.uk |
-|  Minzhe Hu       | 2594564 | qp24108@bristol.ac.uk |
+|  Jingxiang Zhang  | 2606056 | ub24928@bristol.ac.uk |
+|  Soko Sengesamba  | 2509140 | az23290@bristol.ac.uk |
+|  Minzhe Hu        | 2594564 | qp24108@bristol.ac.uk |
+| Thibault Crosnier | 2519193 | pv24925@bristol.ac.uk |
