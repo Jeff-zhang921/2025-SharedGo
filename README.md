@@ -42,6 +42,12 @@
 * As the client, I want all (direct & indirect) users to have a way of setting-up informal meet-ups. The goal is "to build the most loved real-time activity map". I would like the app to positively impact direct use-cases, for groups, societies, event organisers, and the list goes on!
 
 
+## TeckStack
+|Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
+|----------|-------------|----------------|-------------------|-------------|----|
+|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
+
+
 ## Team Members
 | Name | Student id | University Email      
 |  -------------- |-----------------------|-----------------------|
