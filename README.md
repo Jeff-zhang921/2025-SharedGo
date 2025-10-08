@@ -47,10 +47,8 @@
 ## TeckStack
 |Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
 |----------|-------------|----------------|-------------------|-------------|----|
-|PWA<br><br>| | | | | |
-|Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>|Frontend tech for UI/UX and location features: React (JS library for reusable UI components); TypeScript (typed superset of JS for reliability); Geocoding (converts addresses ↔ geographic coordinates for location functionality)|High|Medium (A little familiar with JavaScript/React,TypeScript needs to be learned; Geocoding needs to be learned, but have relatively sufficient overall experience in front-end technology)|Regularly update React, TypeScript, and geocoding-related packages for compatibility/security.  Monitor external geocoding APIs for usage limits, outages, or pricing changes|Dependencies on third-party frontend libraries (breaking changes in updates). Geocoding APIs may have rate limits/outages. Compatibility risks between React/TypeScript tools|
-|Backend •Node.js+Express<br>•SuperTest<br><br>| | | | | |
-|Database<br><br>•Postgresql| | | | | |
+|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql| | | | | |
+
 
 
 
