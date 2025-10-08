@@ -6,7 +6,7 @@
 * [User Stories](#user-stories)
 * [Tech Stack](#teckstack)
 * [Team members](#team-members)
-
+* 
 
 ## Project Description
 
@@ -47,8 +47,8 @@
 ## TeckStack
 |Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
 |----------|-------------|----------------|-------------------|-------------|----|
-|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql|
-|A
+|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
+
 
 ## Team Members
 | Name | Student id | University Email      
