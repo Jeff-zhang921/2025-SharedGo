@@ -53,35 +53,30 @@
 
 ## Flow Steps
 * #### Indivisual user
-     <ol>
-     <li>Register and log in</li>
-     <li>Grant location access to see nearby events</li>
-     <li>Browse events by filter (interest and time)</li>
-     <li>Tap an event pin to see details</li>
-     <li>Click "join"</li>
-     <li>Recieve confirmation</li>
-     <li>Added to the schedule and access group chat</li>
-     </ol>
+     1. Register and log in
+     2. Grant location access to see nearby events
+     3. Browse events by filter (interest and time)
+     4. Tap an event pin to see details
+     5. Click "join"
+     6. Recieve confirmation
+     7. Added to the schedule and access group chat
+     
         
 * #### Host
-     <ol>
-     <li>Log in with verified host account</li>
-     <li>Click "create event"</li>
-     <li>Fill in event details (title, time, location, capacity)</li>
-     <li>Click "publish"</li>
-     <li>Event appers on the map, chat is created</li>
-     </ol>
+     1. Log in with verified host account
+     2. Click "create event"
+     3. Fill in event details (title, time, location, capacity)
+     4. Click "publish"
+     5. Event appers on the map, chat is created
 
 * #### Friend group & Societies
-     <ol>
-     <li>CLick "create private event"</li>
-     <li>Fills in event details (title, time, location, capacity)</li>
-     <li>Chooses friends from contacts/app list to invite</li>
-     <li>Click "create & send invites"</li>
-     <li>Event is created but only visible to invited users</li>
-     <li>Invited users receive notification</li>
-     <li>Accepted users added to group chat</li>
-     </ol>
+     1. CLick "create private event"
+     2. Fills in event details (title, time, location, capacity)
+     3. Chooses friends from contacts/app list to invite
+     4. Click "create & send invites"
+     5. Event is created but only visible to invited users
+     6. Invited users receive notification
+     7. Accepted users added to group chat
         
 ## Team Members
 | Name | Student id | University Email      
