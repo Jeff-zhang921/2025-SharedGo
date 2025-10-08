@@ -5,6 +5,7 @@
 * [Stakeholders](#stakeholders)
 * [User Stories](#user-stories)
 * [Tech Stack](#teckstack)
+* [Flow Steps](#flow-steps)
 * [Team members](#team-members)
 * 
 
@@ -50,7 +51,32 @@
 |----------|-------------|----------------|-------------------|-------------|----|
 |PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
 
+## Flow Steps
+* #### Indivisual user
+     1. Register and log in
+     2. Grant location access to see nearby events
+     3. Browse events by filter (interest and time)
+     4. Tap an event pin to see details
+     5. Click "join"
+     6. Recieve confirmation
+     7. Added to the schedule and access group chat
+        
+* #### Host
+     1. Log in with verified host account
+     2. Click "create event"
+     3. Fill in event details (title, time, location, capacity)
+     4. Click "publish"
+     5. Event appers on the map, chat is created
 
+* #### Friend group & Societies
+     1. CLick "create private event"
+     2. Fills in event details (title, time, location, capacity)
+     3. Chooses friends from contacts/app list to invite
+     4. Click "create & send invites"
+     5. Event is created but only visible to invited users
+     6. Invited users receive notification
+     7. Accepted users added to group chat
+        
 ## Team Members
 | Name | Student id | University Email      
 |  -------------- |-----------------------|-----------------------|
