@@ -43,6 +43,7 @@
 
 * As the client, I want all (direct & indirect) users to have a way of setting-up informal meet-ups. The goal is "to build the most loved real-time activity map". I would like the app to positively impact direct use-cases, for groups, societies, event organisers, and the list goes on!
 
+* As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
 
 ## TechStack
 |Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
