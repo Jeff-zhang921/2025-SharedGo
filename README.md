@@ -47,9 +47,11 @@
 * As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
 
 ## TechStack
-|Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
-|----------|-------------|----------------|-------------------|-------------|----|
-|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend <br>•Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
+| Tech Stack                                                                                                                                           | Description |File to Project| Experience in Team| Maintenance|Risks
+|------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|----------------|-------------------|-------------|----|
+| PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend <br>•Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql|PWA is a web application that behaves like a native mobile app — installable, offline-capable, fast, and responsive. <br><br> Frontend React + TypeScript: Core UI, components, caching logic, manifest.json, service worker<br><br>Map: Geocoding Converts addresses ↔ coordinates, displays map markers<br><br>Backend: Node.js + Express: providing a RESTful API that handles requests from the PWA frontend. It manages operations such as retrieving user data, creating new events, and handling geolocation queries.  Express middleware is used for request validation, error handling, and JSON parsing to ensure reliable communication between the client and the server.<br><br>Database: PostgreSQL as the main relational database for storing structured data such as user accounts, activity posts, and location information. PostgreSQL is chosen for its reliability, ACID compliance, and strong support for geospatial queries (via the PostGIS extension), which is essential for map-based features.
+
+
 
 ## Flow Steps
 * #### Indivisual user
