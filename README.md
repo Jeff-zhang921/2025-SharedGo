@@ -49,7 +49,7 @@
 ## TechStack
 |Tech Stack| Description |File to Project| Experience in Team| Maintenance|Risks
 |----------|-------------|----------------|-------------------|-------------|----|
-|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend •Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
+|PWA<br><br>Frontend<br><br> •React<br>•Typescript<br>•Geocoding <br><br>Backend <br>•Node.js+Express<br>•SuperTest<br><br>Database<br><br>•Postgresql
 
 ## Flow Steps
 * #### Indivisual user
