@@ -1,5 +1,6 @@
 # 2025-SharedGo
 <a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/PostgreSQL-316195?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
+
 ## Contents
 * [Project Description](#project-Description)
 * [Stakeholders](#stakeholders)
@@ -46,11 +47,7 @@
 * As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
 
 ## TechStack
-| Tech Stack                | Description                                                                                                                                                                 |                                                                                                                                                            
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Progressive Web App (PWA) | A web application that behaves like a native mobile app. It’s installable, fast, and works offline using service workers and caching.                                       |
-|React + TypeScript| React provides a dynamic, component-based user interface, while TypeScript adds static typing to improve reliability and maintainable code structure.                       |
-|Node.js + Express| Handles server logic and provides RESTful APIs for user, event, and location data. Express middleware manages validation, error handling, and efficient request processing. |
+
 
 
 ## Flow Steps
