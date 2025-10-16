@@ -7,7 +7,6 @@
 * [Tech Stack](#teckstack)
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
-* 
 
 ## Project Description
 

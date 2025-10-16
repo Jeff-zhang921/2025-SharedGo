@@ -14,9 +14,7 @@ cd Backend
 
 3.Install dependencies
 ```
-npm install -y
-npm i express
-
+npm ci
 ```
 4. Run Backend
 ```
