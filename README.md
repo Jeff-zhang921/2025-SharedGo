@@ -9,6 +9,7 @@
 * [Team members](#team-members)
 
 ## Project Description
+   Shared-Go aims to provide the most loved real-time activity map, through a Progressive Web App. Shared-Go will enable users to create and join events through a map-based user interface. The project will directly impact use-cases for Event Organisers, Societies, and Groups.
 
 ## Stakeholders
 * #### Event organizers
