@@ -67,7 +67,7 @@
      5. Event appers on the map, chat is created
 
 * #### Friend group & Societies
-     1. CLick "create private event"
+     1. Click "create private event"
      2. Fills in event details (title, time, location, capacity)
      3. Chooses friends from contacts/app list to invite
      4. Click "create & send invites"
