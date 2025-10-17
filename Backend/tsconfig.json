@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    /* File Layout */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Environment */
+    "target": "ES2020",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node","express"],
+    "skipLibCheck": true,
+
+    /* Build Output */
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Type-safety */
+    "strict": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strictNullChecks": true,
+
+    /* Module behaviour */
+    "verbatimModuleSyntax": false,
+    "moduleDetection": "force",
+    "isolatedModules": false,
+
+    /* JSX (ignored, just disables React mode) */
+    "jsx": "preserve"
+  },
+  "include": ["src"]
+}
