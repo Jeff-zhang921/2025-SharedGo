@@ -47,7 +47,9 @@
 * As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
 
 ## TechStack
+### MVP Architecture
 
+![framework (1)](https://github.com/spe-uob/2025-SharedGo/blob/branchJeff/Docs/Architecture/framework.jpg)
 
 ## Flow Steps
 * #### Indivisual user
