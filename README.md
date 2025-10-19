@@ -49,7 +49,7 @@
 ## TechStack
 ### MVP Architecture
 
-![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/branchJeff/Docs/Architecture/framework.jpg)
+![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/branchJeff/Docs/Architecture/MVParchitecture.jpg)
 
 ## Flow Steps
 * #### Indivisual user
