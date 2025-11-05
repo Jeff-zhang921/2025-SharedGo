@@ -1,5 +1,7 @@
 import express,{Request,Response} from "express";
 import session from "express-session"
+import eventsRouter from "./routes/events";
+
 const app=express()
 app.use(express.json())
 
@@ -24,9 +26,10 @@ declare module 'express-session' {
 }
 
 
+app.use("/events", eventsRouter)
+
 app.get("/",(request:Request,response:Response)=>{
-     console.log("base url")
-     return 
+     response.json({message:"ShareGo backend running"})
 })
 app.listen(PORT,()=>{
     console.log(`running on port ${PORT} `)
