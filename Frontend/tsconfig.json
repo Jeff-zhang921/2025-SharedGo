@@ -7,24 +7,23 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
+    
+    "module": "esnext", 
+    
+    "moduleResolution": "bundler", 
 
-    // Other Outputs
+    "target": "esnext",
+    "types": ["vite/client"], // Add Vite client types for environment variables/imports
+    "lib": ["esnext", "dom", "dom.iterable"], // Add DOM libraries for browser use
+
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style Options
+    // Style Options (Fine to keep commented out or enable as needed)
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
     // "noUnusedLocals": true,
@@ -39,6 +38,8 @@
     "isolatedModules": true,
     //"noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    "skipLibCheck": true
+  },
+  
+  "include": ["src/**/*"] 
 }
