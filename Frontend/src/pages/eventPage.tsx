@@ -1,8 +1,6 @@
 import React from 'react';
 
-// 1. Define the component
 const EventPage = () => {
-  // Return some basic JSX so the component renders successfully
   return (
     <div>
       <h1>Welcome to the Event Page!</h1>
@@ -10,5 +8,4 @@ const EventPage = () => {
   );
 };
 
-// 2. Use 'export default' so it can be imported without curly braces
 export default EventPage;
