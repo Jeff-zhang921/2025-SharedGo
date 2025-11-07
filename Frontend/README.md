@@ -19,6 +19,7 @@ Make sure you install these:
 ### Install dependencies
 
 - npm ci
+- npm install react-router-dom
 
 ### Run frontend development server
 
