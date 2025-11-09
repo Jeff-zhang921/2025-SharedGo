@@ -10,7 +10,8 @@ const prisma = new PrismaClient();
 router.post("/create", async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
-  
+//if anything is undefine in josn input, it will throw 
+
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
@@ -19,6 +20,8 @@ router.post("/create", async (req, res) => {
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
   const capacityRaw = req.body?.capacity; // could be number or string; validate below
+
+//? means if titleRaw is a string, trim it; otherwise use an empty string "" 
 
   const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
   const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
@@ -49,6 +52,7 @@ router.post("/create", async (req, res) => {
     res.status(400).json({ message: "Start date/time is required." });
     return;
   }
+
  // Convert the startsAt string to a Date and ensure it’s valid.
   const startsAt = new Date(startsAtInput);
   if (Number.isNaN(startsAt.getTime())) {
@@ -65,16 +69,21 @@ router.post("/create", async (req, res) => {
     res.status(400).json({ message: "Host email is required to publish an event." });
     return;
   }
+
  // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
   if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
     const parsedCapacity = Number(capacityRaw);
+  //number.isfinite returns true only when value is a real,
     if (!Number.isFinite(parsedCapacity) || parsedCapacity < 0) {
       res.status(400).json({ message: "Capacity must be a positive number." });
       return;
     }
+//math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
+
+
  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
@@ -82,6 +91,8 @@ router.post("/create", async (req, res) => {
     update: {},
     create: { email: hostEmail },
   });
+
+
 // Create the event row in the database and also include related data in the result.
   const event = await prisma.event.create({
     data: {
@@ -95,6 +106,7 @@ router.post("/create", async (req, res) => {
       // foreign key to the user we just upserted
       hostId: host.id,
     },
+
     include: {
       // include the host user object
       host: true,
@@ -104,7 +116,7 @@ router.post("/create", async (req, res) => {
       },
     },
   });
- // Send a 201 Created with a clean response shape (don’t leak everything from Prisma).
+ // Send Created with a clean response
   res.status(201).json({
     message: "Event created successfully.",
     event: {
@@ -125,8 +137,6 @@ router.post("/create", async (req, res) => {
     },
   });
 });
-
-
 
 
 
