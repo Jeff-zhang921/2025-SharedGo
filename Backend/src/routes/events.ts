@@ -8,16 +8,38 @@ const prisma = new PrismaClient();
 //publish event logic
 //you can post on /events/create
 router.post("/create", async (req, res) => {
+  // Read and sanitize inputs from the request body.
+  //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
+  
+  const titleRaw = req.body?.title;
+  const startsAtRaw = req.body?.startsAt;
+  const locationRaw = req.body?.location;
+  const hostEmailRaw = req.body?.hostEmail;
+  const descriptionRaw = req.body?.description;
+  const imageUrlRaw = req.body?.imageUrl;
+  const externalUrlRaw = req.body?.externalUrl;
+  const capacityRaw = req.body?.capacity; // could be number or string; validate below
 
-  const title = typeof req.body?.title === "string" ? req.body.title.trim() : "";
-  const startsAtInput = typeof req.body?.startsAt === "string" ? req.body.startsAt : "";
-  const location = typeof req.body?.location === "string" ? req.body.location.trim() : "";
-  const hostEmail = typeof req.body?.hostEmail === "string" ? req.body.hostEmail.trim() : "";
-  const description = typeof req.body?.description === "string" ? req.body.description.trim() : undefined;
-  const imageUrl = typeof req.body?.imageUrl === "string" ? req.body.imageUrl.trim() : undefined;
-  const externalUrl = typeof req.body?.externalUrl === "string" ? req.body.externalUrl.trim() : undefined;
-  const capacityRaw = req.body?.capacity;
+  const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
+  const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
+  const location = typeof locationRaw === "string" ? locationRaw.trim() : "";
+  const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
+  const description = typeof descriptionRaw === "string" && descriptionRaw.trim() !== ""
+    ? descriptionRaw.trim()
+    : null;
+  const imageUrl = typeof imageUrlRaw === "string" && imageUrlRaw.trim() !== ""
+    ? imageUrlRaw.trim()
+    : null;
+  const externalUrl = typeof externalUrlRaw === "string" && externalUrlRaw.trim() !== ""
+    ? externalUrlRaw.trim()
+    : null;
 
+
+
+
+
+  
+ // Basic required-field validation. If invalid, return 400 and stop.
   if (!title) {
     res.status(400).json({ message: "Title is required." });
     return;
@@ -27,7 +49,7 @@ router.post("/create", async (req, res) => {
     res.status(400).json({ message: "Start date/time is required." });
     return;
   }
-
+ // Convert the startsAt string to a Date and ensure it’s valid.
   const startsAt = new Date(startsAtInput);
   if (Number.isNaN(startsAt.getTime())) {
     res.status(400).json({ message: "Start date/time is invalid." });
@@ -43,7 +65,7 @@ router.post("/create", async (req, res) => {
     res.status(400).json({ message: "Host email is required to publish an event." });
     return;
   }
-
+ // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
   if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
     const parsedCapacity = Number(capacityRaw);
@@ -53,13 +75,14 @@ router.post("/create", async (req, res) => {
     }
     capacity = Math.floor(parsedCapacity);
   }
-
+ // Ensure the host user exists by email.
+  // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
     where: { email: hostEmail },
     update: {},
     create: { email: hostEmail },
   });
-
+// Create the event row in the database and also include related data in the result.
   const event = await prisma.event.create({
     data: {
       title,
@@ -69,16 +92,19 @@ router.post("/create", async (req, res) => {
       location,
       imageUrl,
       externalUrl,
+      // foreign key to the user we just upserted
       hostId: host.id,
     },
     include: {
+      // include the host user object
       host: true,
+       // include participants and each participant's user
       participants: {
         include: { user: true },
       },
     },
   });
-
+ // Send a 201 Created with a clean response shape (don’t leak everything from Prisma).
   res.status(201).json({
     message: "Event created successfully.",
     event: {
