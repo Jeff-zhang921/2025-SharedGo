@@ -6,7 +6,8 @@ const router = Router();
 const prisma = new PrismaClient(); 
 
 //publish event logic
-router.post("/", async (req, res) => {
+//you can post on /events/create
+router.post("/create", async (req, res) => {
 
   const title = typeof req.body?.title === "string" ? req.body.title.trim() : "";
   const startsAtInput = typeof req.body?.startsAt === "string" ? req.body.startsAt : "";
@@ -105,6 +106,7 @@ router.post("/", async (req, res) => {
 
 
 //return json object with event id....
+//you can get at /events/:id
 router.get("/:id", async (req, res) => { 
   const idText = req.params.id; 
   const eventId = Number(idText);
@@ -175,6 +177,7 @@ router.get("/:id", async (req, res) => {
 
 // Handle the case where someone presses "Join" on the event screen.
 //it takes in eventid
+//you can post on /events/:id/join
 router.post("/:id/join", async (req, res) => { 
   // Read the event id from the URL.
   const idText = req.params.id;
