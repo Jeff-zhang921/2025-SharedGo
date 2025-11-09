@@ -1,17 +1,19 @@
 import express,{Request,Response} from "express";
-import session from "express-session"
+import session from "express-session";
 import eventsRouter from "./routes/events";
 
-const app=express()
-app.use(express.json())
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // allow basic form submissions for create-event flow
 
 app.use(session({
      secret:'sharego',
      //if someone just see around there is no need store them
      saveUninitialized:false,
      resave:false
-}))
-const PORT=3000;
+}));
+
+const PORT = Number(process.env.PORT) || 3000;
 declare module 'express-session' {
   interface SessionData {
     visited?: boolean;
@@ -26,11 +28,12 @@ declare module 'express-session' {
 }
 
 
-app.use("/events", eventsRouter)
+app.use("/events", eventsRouter);
 
 app.get("/",(request:Request,response:Response)=>{
-     response.json({message:"ShareGo backend running"})
-})
+     response.json({message:"ShareGo backend running"});
+});
+
 app.listen(PORT,()=>{
-    console.log(`running on port ${PORT} `)
-})
+    console.log(`running on port ${PORT} `);
+});
