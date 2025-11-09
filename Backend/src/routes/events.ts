@@ -5,6 +5,105 @@ import { PrismaClient } from "../generated/prisma";
 const router = Router(); 
 const prisma = new PrismaClient(); 
 
+//publish event logic
+router.post("/", async (req, res) => {
+
+  const title = typeof req.body?.title === "string" ? req.body.title.trim() : "";
+  const startsAtInput = typeof req.body?.startsAt === "string" ? req.body.startsAt : "";
+  const location = typeof req.body?.location === "string" ? req.body.location.trim() : "";
+  const hostEmail = typeof req.body?.hostEmail === "string" ? req.body.hostEmail.trim() : "";
+  const description = typeof req.body?.description === "string" ? req.body.description.trim() : undefined;
+  const imageUrl = typeof req.body?.imageUrl === "string" ? req.body.imageUrl.trim() : undefined;
+  const externalUrl = typeof req.body?.externalUrl === "string" ? req.body.externalUrl.trim() : undefined;
+  const capacityRaw = req.body?.capacity;
+
+  if (!title) {
+    res.status(400).json({ message: "Title is required." });
+    return;
+  }
+
+  if (!startsAtInput) {
+    res.status(400).json({ message: "Start date/time is required." });
+    return;
+  }
+
+  const startsAt = new Date(startsAtInput);
+  if (Number.isNaN(startsAt.getTime())) {
+    res.status(400).json({ message: "Start date/time is invalid." });
+    return;
+  }
+
+  if (!location) {
+    res.status(400).json({ message: "Location is required." });
+    return;
+  }
+
+  if (!hostEmail) {
+    res.status(400).json({ message: "Host email is required to publish an event." });
+    return;
+  }
+
+  let capacity: number | null = null;
+  if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
+    const parsedCapacity = Number(capacityRaw);
+    if (!Number.isFinite(parsedCapacity) || parsedCapacity < 0) {
+      res.status(400).json({ message: "Capacity must be a positive number." });
+      return;
+    }
+    capacity = Math.floor(parsedCapacity);
+  }
+
+  const host = await prisma.user.upsert({
+    where: { email: hostEmail },
+    update: {},
+    create: { email: hostEmail },
+  });
+
+  const event = await prisma.event.create({
+    data: {
+      title,
+      description,
+      startsAt,
+      capacity,
+      location,
+      imageUrl,
+      externalUrl,
+      hostId: host.id,
+    },
+    include: {
+      host: true,
+      participants: {
+        include: { user: true },
+      },
+    },
+  });
+
+  res.status(201).json({
+    message: "Event created successfully.",
+    event: {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startsAt: event.startsAt,
+      capacity: event.capacity,
+      location: event.location,
+      imageUrl: event.imageUrl,
+      externalUrl: event.externalUrl,
+      host: {
+        id: event.host.id,
+        email: event.host.email,
+        name: event.host.name,
+      },
+      attendeeCount: event.participants.length,
+    },
+  });
+});
+
+
+
+
+
+
 //return json object with event id....
 router.get("/:id", async (req, res) => { 
   const idText = req.params.id; 
