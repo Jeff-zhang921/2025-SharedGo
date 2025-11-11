@@ -1,6 +1,6 @@
 //this is the structure of database
 
-
+//migrate file is the communication let prisma and database stay sync, if prisma want create list after migrate. it will create a on database
 
 generator client { // Configure the Prisma Client generator block.
   provider = "prisma-client-js" // Use the JavaScript Prisma Client implementation.

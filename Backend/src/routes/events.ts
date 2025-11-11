@@ -5,7 +5,144 @@ import { PrismaClient } from "../generated/prisma";
 const router = Router(); 
 const prisma = new PrismaClient(); 
 
+//publish event logic
+//you can post on /events/create
+router.post("/create", async (req, res) => {
+  // Read and sanitize inputs from the request body.
+  //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
+//if anything is undefine in josn input, it will throw 
+
+  const titleRaw = req.body?.title;
+  const startsAtRaw = req.body?.startsAt;
+  const locationRaw = req.body?.location;
+  const hostEmailRaw = req.body?.hostEmail;
+  const descriptionRaw = req.body?.description;
+  const imageUrlRaw = req.body?.imageUrl;
+  const externalUrlRaw = req.body?.externalUrl;
+  const capacityRaw = req.body?.capacity; // could be number or string; validate below
+
+//? means if titleRaw is a string, trim it; otherwise use an empty string "" 
+
+  const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
+  const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
+  const location = typeof locationRaw === "string" ? locationRaw.trim() : "";
+  const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
+  const description = typeof descriptionRaw === "string" && descriptionRaw.trim() !== ""
+    ? descriptionRaw.trim()
+    : null;
+  const imageUrl = typeof imageUrlRaw === "string" && imageUrlRaw.trim() !== ""
+    ? imageUrlRaw.trim()
+    : null;
+  const externalUrl = typeof externalUrlRaw === "string" && externalUrlRaw.trim() !== ""
+    ? externalUrlRaw.trim()
+    : null;
+
+
+
+
+
+  
+ // Basic required-field validation. If invalid, return 400 and stop.
+  if (!title) {
+    res.status(400).json({ message: "Title is required." });
+    return;
+  }
+
+  if (!startsAtInput) {
+    res.status(400).json({ message: "Start date/time is required." });
+    return;
+  }
+
+ // Convert the startsAt string to a Date and ensure it’s valid.
+  const startsAt = new Date(startsAtInput);
+  if (Number.isNaN(startsAt.getTime())) {
+    res.status(400).json({ message: "Start date/time is invalid." });
+    return;
+  }
+
+  if (!location) {
+    res.status(400).json({ message: "Location is required." });
+    return;
+  }
+
+  if (!hostEmail) {
+    res.status(400).json({ message: "Host email is required to publish an event." });
+    return;
+  }
+
+ // Capacity is optional. If provided, parse to a finite non-negative integer.
+  let capacity: number | null = null;
+  if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
+    const parsedCapacity = Number(capacityRaw);
+  //number.isfinite returns true only when value is a real,
+    if (!Number.isFinite(parsedCapacity) || parsedCapacity < 0) {
+      res.status(400).json({ message: "Capacity must be a positive number." });
+      return;
+    }
+//math.floor round down number
+    capacity = Math.floor(parsedCapacity);
+  }
+
+
+ // Ensure the host user exists by email.
+  // upsert: if a user with that email exists -> return it; else create it.
+  const host = await prisma.user.upsert({
+    where: { email: hostEmail },
+    update: {},
+    create: { email: hostEmail },
+  });
+
+
+// Create the event row in the database and also include related data in the result.
+  const event = await prisma.event.create({
+    data: {
+      title,
+      description,
+      startsAt,
+      capacity,
+      location,
+      imageUrl,
+      externalUrl,
+      // foreign key to the user we just upserted
+      hostId: host.id,
+    },
+
+    include: {
+      // include the host user object
+      host: true,
+       // include participants and each participant's user
+      participants: {
+        include: { user: true },
+      },
+    },
+  });
+ // Send Created with a clean response
+  res.status(201).json({
+    message: "Event created successfully.",
+    event: {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startsAt: event.startsAt,
+      capacity: event.capacity,
+      location: event.location,
+      imageUrl: event.imageUrl,
+      externalUrl: event.externalUrl,
+      host: {
+        id: event.host.id,
+        email: event.host.email,
+        name: event.host.name,
+      },
+      attendeeCount: event.participants.length,
+    },
+  });
+});
+
+
+
+
 //return json object with event id....
+//you can get at /events/:id
 router.get("/:id", async (req, res) => { 
   const idText = req.params.id; 
   const eventId = Number(idText);
@@ -76,6 +213,7 @@ router.get("/:id", async (req, res) => {
 
 // Handle the case where someone presses "Join" on the event screen.
 //it takes in eventid
+//you can post on /events/:id/join
 router.post("/:id/join", async (req, res) => { 
   // Read the event id from the URL.
   const idText = req.params.id;
