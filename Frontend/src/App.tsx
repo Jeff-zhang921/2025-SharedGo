@@ -1,29 +1,18 @@
-import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/homePage';
 import MapPage from './pages/mapPage';
 import PersonalPage from './pages/personalPage';
 import EventPage from './pages/eventPage';
 
-
-{/* Setting up react router for navigation */}
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* set the path for the home page */}
-        <Route path="/" element={<HomePage />} />
-        
-        {/* set the path for the map page */}
-        <Route path="/map" element={<MapPage />} />
-        
-        {/* set the path for the personal page */}
-        <Route path="/profile" element={<PersonalPage />} />
-
-        {/* set the path for the event page */}
-        <Route path="/profile" element={<EventPage />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/map" element={<MapPage />} />
+      <Route path="/personal" element={<PersonalPage />} />
+      <Route path="/event" element={<EventPage />} />
+    </Routes>
   );
 }
 

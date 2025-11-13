@@ -1,11 +1,24 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const HomePage = () => {
+// const HomePage = () => {
+//   return (
+//     <div>
+//       <h1>Welcome to the Home Page!</h1>
+//     </div>
+//   );
+// };
+
+
+function HomePage() {
   return (
     <div>
-      <h1>Welcome to the Home Page!</h1>
+      <h1>Home Page</h1>
+      <Link to="/map">MapPage</Link>
+      <Link to="/event">EventPage</Link>
+      <Link to="/personal">PersonalPage</Link>
     </div>
   );
-};
+}
 
 export default HomePage;
