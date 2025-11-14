@@ -9,7 +9,7 @@
     "module": "CommonJS",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node","express"],
+    "types": ["node","express", "jest"],
     "skipLibCheck": true,
 
     /* Build Output */
@@ -33,5 +33,5 @@
     /* JSX (ignored, just disables React mode) */
     "jsx": "preserve"
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }
