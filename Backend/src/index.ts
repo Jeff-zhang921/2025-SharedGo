@@ -34,6 +34,8 @@ app.get("/",(request:Request,response:Response)=>{
      response.json({message:"ShareGo backend running"});
 });
 
+export default app; // to export app
+
 app.listen(PORT,()=>{
     console.log(`running on port ${PORT} `);
 });
