@@ -8,25 +8,21 @@ const EventDetailsPage = () => {
     <div>
       <div>
         {/*back button links to map page, using react-router-dom*/}
-        <Button link="/map" imgSrc="./../assets/back.svg" text="Go to Map Page" size={12}/>
-
+        <Button link="/map" imgSrc="./../assets/back.svg" text="back" size={12}/>
         {/*Page Title*/}
-        <div>
-          <h1>Event details<h1>
-        </div>     
-
+        <h1>Event details</h1>
         {/*home button links to home page, using react-router-dom*/}
-        <Button link="/" imgSrc="./../assets/home.svg" text="Go to Home Page" size={12}/>
+        <Button link="/" imgSrc="./../assets/home.svg" text="home" size={12}/>
       </div>
 
       <div>
         {/*all event detail listed as shown in the design*/}
-        <h2>TITLE: <h2><h3> title</h3>
-        <h2>DATE: <h2><h3> yyyy/mm/dd</h3>
-        <h2>CAPACITY: <h2><h3> 0000</h3>
-        <h2>LOCATION: <h2><h3> Location</h3>
-        <h2>DESCRIPTION: <h2><h3> Description goes here</h3>
-        <h2>HOSTED BY: <h2><h3> Name, contact details, profile picture</h3>
+        <h2>TITLE: title</h2>
+        <h2>DATE: yyyy/mm/dd</h2>
+        <h2>CAPACITY: 0000</h2>
+        <h2>LOCATION: Location</h2>
+        <h2>DESCRIPTION: Description goes here</h2>
+        <h2>HOSTED BY: Name, contact details, profile picture</h2>
       </div>
 
       <div>

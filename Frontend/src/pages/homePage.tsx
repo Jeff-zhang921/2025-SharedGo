@@ -14,9 +14,11 @@ function HomePage() {
   return (
     <div>
       <h1>Home Page</h1>
-      <Link to="/map">MapPage</Link>
-      <Link to="/event">EventPage</Link>
-      <Link to="/personal">PersonalPage</Link>
+      <Link to="/map">MapPage </Link>
+      <Link to="/eventDetails">EventDetailsPage </Link>
+      <Link to="/personal">PersonalPage </Link>
+      <Link to="/createEvent">CreateEventPage </Link>
+      <Link to="/chat">ChatPage </Link>
     </div>
   );
 }
