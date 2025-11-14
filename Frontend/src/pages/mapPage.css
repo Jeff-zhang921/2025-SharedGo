@@ -2,8 +2,14 @@
     width: 100vw;
     height: 100vh;
     background-image: url('/public/BristolMap.png');
-    background-size: cover;       /* fills screen */
-    background-position: center;  /* centers the map */
+    background-size: 100% 100%;       /* fills screen */
+    background-position: top left;  /* centers the map */
     background-repeat: no-repeat;
     position: relative;           /* allows icons to be absolutely placed */
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* prevents scrolling completely */
   }
