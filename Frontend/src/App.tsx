@@ -3,16 +3,28 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/homePage';
 import MapPage from './pages/mapPage';
 import PersonalPage from './pages/personalPage';
-import EventPage from './pages/eventPage';
+import EventDetailsPage from './pages/eventDetailsPage';
+import CreateEventPage from './pages/createEventPage';
+import ChatPage from './pages/chatPage';
+
 
 function App() {
   return (
     <Routes>
+      {/* set the path for the home page */}
       <Route path="/" element={<HomePage />} />
+      {/* set the path for the map page */}
       <Route path="/map" element={<MapPage />} />
+      {/* set the path for the personal page */}
       <Route path="/personal" element={<PersonalPage />} />
-      <Route path="/event" element={<EventPage />} />
+      {/* set the path for the event details page */}
+      <Route path="/eventDetails" element={<EventDetailsPage />} />
+      {/* set the path for the create event page */}
+      <Route path="/creatEvent" element={<CreateEventPage />} />
+      {/* set the path for the chat page */}
+      <Route path="/chat" element={<ChatPage />} />
     </Routes>
+
   );
 }
 
