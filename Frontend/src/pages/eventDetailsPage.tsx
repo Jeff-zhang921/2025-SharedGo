@@ -1,6 +1,4 @@
 import React from 'react'
-import Heading from  "../components/Heading"
-import { Section } from "../components/Section"
 import { Link } from "react-router-dom"
 import Button from "./../components/Button"
 
@@ -13,7 +11,9 @@ const EventDetailsPage = () => {
         <Button link="/map" imgSrc="./../assets/back.svg" text="Go to Map Page" size={12}/>
 
         {/*Page Title*/}
-        <Heading title={"Event details\n"}/>
+        <div>
+          <h1>Event details<h1>
+        </div>     
 
         {/*home button links to home page, using react-router-dom*/}
         <Button link="/" imgSrc="./../assets/home.svg" text="Go to Home Page" size={12}/>
@@ -21,15 +21,12 @@ const EventDetailsPage = () => {
 
       <div>
         {/*all event detail listed as shown in the design*/}
-        <Section>title={"TITLE"}title</Section>
-        <Section>title={"DATE"}yyyy/mm/dd</Section>
-        <Section>title={"CAPACITY"}0000</Section>
-        <Section>title={"LOCATION"}Location</Section>
-        <Section>title={"DESCRIPTION\n"}Description goes here</Section>
-      </div>
-
-      <div>
-        <Section>title={"HOSTED BY"}Name, contact details, profile picture</Section>
+        <h2>TITLE: <h2><h3> title</h3>
+        <h2>DATE: <h2><h3> yyyy/mm/dd</h3>
+        <h2>CAPACITY: <h2><h3> 0000</h3>
+        <h2>LOCATION: <h2><h3> Location</h3>
+        <h2>DESCRIPTION: <h2><h3> Description goes here</h3>
+        <h2>HOSTED BY: <h2><h3> Name, contact details, profile picture</h3>
       </div>
 
       <div>
