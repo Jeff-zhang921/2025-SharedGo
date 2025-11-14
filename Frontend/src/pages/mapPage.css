@@ -1,0 +1,9 @@
+.map-container {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/public/BristolMap.png');
+    background-size: cover;       /* fills screen */
+    background-position: center;  /* centers the map */
+    background-repeat: no-repeat;
+    position: relative;           /* allows icons to be absolutely placed */
+  }
