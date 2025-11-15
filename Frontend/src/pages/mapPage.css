@@ -1,11 +1,14 @@
 .map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100vw;
-    height: 100vh;
-    background-image: url('/public/BristolMap.png');
-    background-size: 100% 100%;       /* fills screen */
-    background-position: top left;  /* centers the map */
+    height: 100dvh;
+    background-image: url('/public/bristolMap.png');
+    background-size: cover;       /* fills screen */
+    background-position: centre;  /* centers the map */
     background-repeat: no-repeat;
-    position: relative;           /* allows icons to be absolutely placed */
+    
   }
 
   body, html {
