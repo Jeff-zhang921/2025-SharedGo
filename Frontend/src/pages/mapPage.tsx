@@ -1,13 +1,14 @@
 import React from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
+import { Link } from "react-router-dom";
 
 const MapPage = () => {
   const icons = [ //Clickable icons representing events in the area
-    { top: "40%", left: "60%", label: "📍" }, //Icon 0
-    { top: "20%", left: "10%", label: "📍" }, //Icon 1
-    { top: "80%", left: "30%", label: "📍" }, //Icon 2
-    { top: "50%", left: "80%", label: "📍" }  //Icon 3
+    { id: 0, top: "40%", left: "60%", label: "📍" }, //Icon 0 - Id's used to differentiate different events (implement functionality later)
+    { id: 1, top: "20%", left: "10%", label: "📍" }, //Icon 1
+    { id: 2, top: "80%", left: "30%", label: "📍" }, //Icon 2
+    { id: 3, top: "50%", left: "80%", label: "📍" }  //Icon 3
   ];
 
   return (
@@ -25,23 +26,25 @@ const MapPage = () => {
           link="/"                // Link to the home page
           imgSrc="/src/assets/home.svg"       // Path to home icon
           text="Home"
-          size={40}                       // Adjust size in pixels
+          size={60}                       // Adjust size in pixels
         />
       </div>
       {icons.map((icon, idx) => (
-        <div
+        <Link
           key={idx}
+          //to={`/eventDetails/${icon.id}`} //Different eventDetails page for different events/icons pressed (implement later)
+          to={`/eventDetails`}
           style={{
             position: "absolute",
             top: icon.top,
             left: icon.left,
             cursor: "pointer",
-            fontSize: "60px"
+            fontSize: "60px",
+            textDecoration: 'none', //remove blue underline
           }}
-          onClick={() => alert(`Clicked icon ${idx}`)}
         >
           {icon.label}
-        </div>
+        </Link>
       ))}
     </div>
   );
