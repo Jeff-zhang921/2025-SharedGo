@@ -23,7 +23,7 @@ const MapPage = () => {
       >
         <Button
           link="/"                // Link to the home page
-          imgSrc="/assets/home.svg"       // Path to home icon
+          imgSrc="/src/assets/home.svg"       // Path to home icon
           text="Home"
           size={40}                       // Adjust size in pixels
         />
