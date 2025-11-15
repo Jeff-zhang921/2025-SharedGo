@@ -1,5 +1,6 @@
 import React from 'react';
 import "./mapPage.css"
+import Button from '../components/Button';
 
 const MapPage = () => {
   const icons = [ //Clickable icons representing events in the area
@@ -11,6 +12,22 @@ const MapPage = () => {
 
   return (
     <div className="map-container">
+      {/*HOME BUTTON*/}
+      <div 
+        style={{
+          position: "absolute",
+          top: "20px",        // Positioning 
+          left: "20px",
+          zIndex: 10          // layer above the map and icons
+        }}
+      >
+        <Button
+          link="/"                // Link to the home page
+          imgSrc="/assets/home.svg"       // Path to home icon
+          text="Home"
+          size={40}                       // Adjust size in pixels
+        />
+      </div>
       {icons.map((icon, idx) => (
         <div
           key={idx}
