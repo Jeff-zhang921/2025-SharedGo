@@ -29,6 +29,9 @@ const EventDetailsPage = () => {
         {/*Join button links to chat page, as described in the design*/}
         <Link to="Chat">Join Event</Link>
       </div>
+      <div>
+        <Link to="/host">HOST</Link>
+      </div>
     </div>
   )
 };

@@ -6,6 +6,7 @@ import PersonalPage from './pages/personalPage';
 import EventDetailsPage from './pages/eventDetailsPage';
 import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
+import HostPage from './pages/hostPage'
 
 
 function App() {
@@ -23,6 +24,8 @@ function App() {
       <Route path="/creatEvent" element={<CreateEventPage />} />
       {/* set the path for the chat page */}
       <Route path="/chat" element={<ChatPage />} />
+      {/* set the path for the host page */}
+      <Route path="/host" element={<HostPage />} />
     </Routes>
 
   );
