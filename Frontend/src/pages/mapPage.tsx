@@ -8,7 +8,10 @@ const MapPage = () => {
     { id: 0, top: "40%", left: "60%", label: "📍" }, //Icon 0 - Id's used to differentiate different events (implement functionality later)
     { id: 1, top: "20%", left: "10%", label: "📍" }, //Icon 1
     { id: 2, top: "80%", left: "30%", label: "📍" }, //Icon 2
-    { id: 3, top: "50%", left: "80%", label: "📍" }  //Icon 3
+    { id: 3, top: "50%", left: "80%", label: "📍" },  //Icon 3
+    { id: 4, top: "10%", left: "35%", label: "📍" },  //Icon 4
+    { id: 5, top: "50%", left: "33%", label: "📍" },  //Icon 5
+    { id: 6, top: "60%", left: "40%", label: "📍" }  //Icon 6
   ];
 
   return (
