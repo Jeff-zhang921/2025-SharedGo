@@ -122,6 +122,7 @@ sudo systemctl enable --now postgresql
 ---
 
 ### 2.2 Create Database and User
+{Password refers to the password i send in teams}
 
 Create database and user
 
@@ -133,7 +134,7 @@ Inside `psql`:
 
 ```sql
 CREATE DATABASE sharedgo;
-CREATE USER sharedgo_user WITH PASSWORD '2025Sharego';
+CREATE USER sharedgo_user WITH PASSWORD '{Password}';
 GRANT ALL PRIVILEGES ON DATABASE sharedgo TO sharedgo_user;
 ```
 
@@ -177,7 +178,7 @@ Click Add rule, choose Type: PostgreSQL (it auto-fills TCP/5432), set Source to 
 execute to check if it works
 
 ```bash
-.\psql.exe "postgresql://sharedgo_user:2025Sharego@51.21.80.169:5432/sharedgo"
+.\psql.exe "postgresql://sharedgo_user:{password}@51.21.80.169:5432/sharedgo"
 ```
 
 ---
@@ -187,7 +188,7 @@ execute to check if it works
 in Backend Folder,in .env file, change the only line(suppose to be)to
 
 ```env
-DATABASE_URL="postgresql://sharedgo_user:2025Sharego@51.21.80.169:5432/sharedgo?schema=public""
+DATABASE_URL="postgresql://sharedgo_user:{password}@51.21.80.169:5432/sharedgo?schema=public""
 ```
 
 ---
