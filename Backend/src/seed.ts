@@ -44,7 +44,6 @@ async function main(): Promise<void> { // Wrap the seeding logic in an async fun
         include: { // Include the same related data we requested earlier so `event` has a consistent shape.
           host: true, // Include the host for logging.
           participants: { include: { user: true } }, // Include participants even though the event is new (there will be zero).
-
         }, 
       }); 
 
