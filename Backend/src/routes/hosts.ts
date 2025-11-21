@@ -68,4 +68,101 @@ const mapReview = (review: {
   },
 });
 
+// Overview for Host tab (upcoming/past previews + stats + recent reviews).
+router.get("/:hostId/overview", async (req, res) => {
+  const hostId = Number(req.params.hostId);
+  if (!Number.isInteger(hostId)) {
+    res.status(400).json({ message: "Host id must be a number." });
+    return;
+  }
+
+  const host = await prisma.user.findUnique({ where: { id: hostId } });
+  if (!host) {
+    res.status(404).json({ message: "Host not found." });
+    return;
+  }
+
+  const now = new Date();
+  const previewLimit = 5;
+
+  const [
+    upcomingEvents,
+    pastEvents,
+    totalUpcoming,
+    totalPast,
+    eventsForStats,
+    recentReviews,
+  ] = await Promise.all([
+    prisma.event.findMany({
+      where: { hostId, startsAt: { gte: now } },
+      orderBy: { startsAt: "asc" },
+      take: previewLimit,
+      include: { participants: true },
+    }),
+    prisma.event.findMany({
+      where: { hostId, startsAt: { lt: now } },
+      orderBy: { startsAt: "desc" },
+      take: previewLimit,
+      include: { participants: true },
+    }),
+    prisma.event.count({ where: { hostId, startsAt: { gte: now } } }),
+    prisma.event.count({ where: { hostId, startsAt: { lt: now } } }),
+    prisma.event.findMany({
+      where: { hostId },
+      include: { participants: true, reviews: true },
+    }),
+    prisma.review.findMany({
+      where: { hostId },
+      include: { author: true, event: true },
+      orderBy: { createdAt: "desc" },
+      take: previewLimit,
+    }),
+  ]);
+
+  const totalAttendees = eventsForStats.reduce(
+    (sum, event) => sum + event.participants.length,
+    0,
+  );
+  const capacityTotal = eventsForStats.reduce(
+    (sum, event) => sum + (event.capacity ?? 0),
+    0,
+  );
+  const averageFillRate =
+    capacityTotal > 0
+      ? Number((totalAttendees / capacityTotal).toFixed(2))
+      : null;
+
+  const allRatings = eventsForStats
+    .flatMap((event) => event.reviews)
+    .map((review) => review.rating)
+    .filter((value): value is number => typeof value === "number");
+  const averageRating =
+    allRatings.length > 0
+      ? Number(
+          (allRatings.reduce((sum, value) => sum + value, 0) / allRatings.length).toFixed(2),
+        )
+      : null;
+
+  res.json({
+    host: {
+      id: host.id,
+      name: host.name,
+      email: host.email,
+    },
+    stats: {
+      totalEvents: eventsForStats.length,
+      upcomingCount: totalUpcoming,
+      pastCount: totalPast,
+      totalAttendees,
+      averageFillRate,
+      averageRating,
+      reviewCount: allRatings.length,
+    },
+    upcomingEvents: upcomingEvents.map(mapEventSummary),
+    pastEvents: pastEvents.map(mapEventSummary),
+    reviews: recentReviews.map(mapReview),
+  });
+});
+
+
 export default router;
