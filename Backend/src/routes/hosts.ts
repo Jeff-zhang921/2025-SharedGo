@@ -44,5 +44,28 @@ const mapEventSummary = (event: {
   };
 };
 
+const mapReview = (review: {
+  id: number;
+  rating: number | null;
+  comment: string | null;
+  createdAt: Date;
+  author: { id: number; name: string | null; email: string };
+  event: { id: number; title: string; startsAt: Date };
+}) => ({
+  id: review.id,
+  rating: review.rating,
+  comment: review.comment,
+  createdAt: review.createdAt,
+  author: {
+    id: review.author.id,
+    name: review.author.name,
+    email: review.author.email,
+  },
+  event: {
+    id: review.event.id,
+    title: review.event.title,
+    startsAt: review.event.startsAt,
+  },
+});
 
 export default router;
