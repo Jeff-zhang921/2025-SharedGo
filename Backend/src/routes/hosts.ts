@@ -204,4 +204,34 @@ router.get("/:hostId/events", async (req, res) => {
   });
 });
 
+
+// Paginated host reviews feed.
+router.get("/:hostId/reviews", async (req, res) => {
+  const hostId = Number(req.params.hostId);
+  if (!Number.isInteger(hostId)) {
+    res.status(400).json({ message: "Host id must be a number." });
+    return;
+  }
+
+  const limit = parsePageSize(req.query.limit);
+  const page = parsePage(req.query.page);
+  const skip = (page - 1) * limit;
+
+  const [reviews, total] = await Promise.all([
+    prisma.review.findMany({
+      where: { hostId },
+      include: { author: true, event: true },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({ where: { hostId } }),
+  ]);
+
+  res.json({
+    pagination: { page, limit, total },
+    reviews: reviews.map(mapReview),
+  });
+});
+
 export default router;
