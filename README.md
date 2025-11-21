@@ -54,7 +54,7 @@
 
 
 ## User Stories
-* As an even host, I want to make it easy to set up, manage and advertise events so that others can join.
+* As an event host, I want to make it easy to set up, manage and advertise events so that others can join.
 
 * As the client, I want all (direct & indirect) users to have a way of setting-up informal meet-ups. The goal is "to build the most loved real-time activity map". I would like the app to positively impact direct use-cases, for groups, societies, event organisers, and the list goes on!
 
