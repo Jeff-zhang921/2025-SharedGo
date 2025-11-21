@@ -20,6 +20,8 @@ model User {
   updatedAt      DateTime            @updatedAt // Timestamp automatically updated whenever the record changes.
   eventsHosted   Event[]             // Relation listing the events this user has created.
   registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
+  authoredReviews Review[]           @relation("UserReviews")
+  hostReviews     Review[]           @relation("HostReviews")
 }
 
 
@@ -35,6 +37,7 @@ model Event {
   hostId       Int // Foreign key pointing to the User who hosts the event.
   host         User               @relation(fields: [hostId], references: [id]) // Relation tying the event to its host user.
   participants EventParticipant[] // Relation exposing everyone registered for the event.
+  reviews      Review[]
   createdAt    DateTime           @default(now()) 
   updatedAt    DateTime           @updatedAt 
 } 
@@ -51,3 +54,20 @@ model EventParticipant { // Join table linking users to events they attend.
 
   @@unique([eventId, userId]) // Prevent duplicate participation records for the same user and event.
 } 
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int?
+  comment   String?
+  eventId   Int
+  hostId    Int
+  authorId  Int
+  createdAt DateTime @default(now())
+
+  event  Event @relation(fields: [eventId], references: [id])
+  host   User  @relation("HostReviews", fields: [hostId], references: [id])
+  author User  @relation("UserReviews", fields: [authorId], references: [id])
+
+  @@unique([eventId, authorId])
+  @@index([hostId, createdAt])
+}
