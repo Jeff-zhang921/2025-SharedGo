@@ -194,6 +194,7 @@ router.get("/:id", async (req, res) => {
     };
   });
 
+  //map copy review array to reviews and only copy field of return in review to reviews
   const reviews = event.reviews.map((review) => ({
     id: review.id,
     rating: review.rating,
@@ -206,12 +207,15 @@ router.get("/:id", async (req, res) => {
     },
   }));
 
+  //return only rating number in array
+  //calculate average rating
+  //if is null or undefined, filter it out
   const ratingValues = event.reviews
     .map((review) => review.rating)
     .filter((value): value is number => typeof value === "number");
   const averageRating =
     ratingValues.length > 0
-      ? Number(
+      ? Number(//only keep two decimal points
           (ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length).toFixed(2),
         )
       : null;
