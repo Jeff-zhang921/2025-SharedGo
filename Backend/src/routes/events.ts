@@ -323,11 +323,17 @@ router.post("/:id/join", async (req, res) => {
   });
 });
 
+
+
+
+
 // Allow attendees to leave or update a review for an event (and host).
 router.post("/:id/reviews", async (req, res) => {
   const idText = req.params.id;
   const eventId = Number(idText);
 
+
+  //validate event id
   if (!Number.isInteger(eventId)) {
     res.status(400).json({ message: "Event id must be a number." });
     return;
@@ -342,6 +348,8 @@ router.post("/:id/reviews", async (req, res) => {
     return;
   }
 
+
+  //validate rating
   let rating: number | null = null;
   if (ratingRaw !== undefined && ratingRaw !== null && ratingRaw !== "") {
     const parsedRating = Number(ratingRaw);
@@ -359,6 +367,7 @@ router.post("/:id/reviews", async (req, res) => {
     return;
   }
 
+  //validate event id
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: {
@@ -388,6 +397,10 @@ router.post("/:id/reviews", async (req, res) => {
   }
 
   const review = await prisma.review.upsert({
+//Find the review where
+// eventId = this event and authorId = this user.
+// If such a review exists → go to the update block.
+// If it does not exist → go to the create block.
     where: {
       eventId_authorId: { eventId: event.id, authorId: participant.userId },
     },
@@ -402,6 +415,7 @@ router.post("/:id/reviews", async (req, res) => {
       hostId: event.hostId,
       authorId: participant.userId,
     },
+    //This controls what Prisma returns after the upsert.
     include: {
       author: true,
       event: true,
