@@ -165,4 +165,43 @@ router.get("/:hostId/overview", async (req, res) => {
 });
 
 
+// Paginated host events list: upcoming/past/all.
+router.get("/:hostId/events", async (req, res) => {
+  const hostId = Number(req.params.hostId);
+  if (!Number.isInteger(hostId)) {
+    res.status(400).json({ message: "Host id must be a number." });
+    return;
+  }
+
+  const statusRaw = typeof req.query.status === "string" ? req.query.status : "upcoming";
+  const status = statusRaw.toLowerCase();
+  const limit = parsePageSize(req.query.limit);
+  const page = parsePage(req.query.page);
+  const skip = (page - 1) * limit;
+  const now = new Date();
+
+  const where =
+    status === "upcoming"
+      ? { hostId, startsAt: { gte: now } }
+      : status === "past"
+        ? { hostId, startsAt: { lt: now } }
+        : { hostId };
+
+  const [events, total] = await Promise.all([
+    prisma.event.findMany({
+      where,
+      orderBy: { startsAt: status === "past" ? "desc" : "asc" },
+      skip,
+      take: limit,
+      include: { participants: true },
+    }),
+    prisma.event.count({ where }),
+  ]);
+
+  res.json({
+    pagination: { page, limit, total },
+    events: events.map(mapEventSummary),
+  });
+});
+
 export default router;
