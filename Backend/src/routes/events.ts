@@ -160,6 +160,10 @@ router.get("/:id", async (req, res) => {
       participants: { 
         include: { user: true }, 
       },
+      reviews: {
+        include: { author: true },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 
@@ -190,6 +194,28 @@ router.get("/:id", async (req, res) => {
     };
   });
 
+  const reviews = event.reviews.map((review) => ({
+    id: review.id,
+    rating: review.rating,
+    comment: review.comment,
+    createdAt: review.createdAt,
+    author: {
+      id: review.author.id,
+      name: review.author.name,
+      email: review.author.email,
+    },
+  }));
+
+  const ratingValues = event.reviews
+    .map((review) => review.rating)
+    .filter((value): value is number => typeof value === "number");
+  const averageRating =
+    ratingValues.length > 0
+      ? Number(
+          (ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length).toFixed(2),
+        )
+      : null;
+
   res.json({ // Send back the event details as JSON so the front end can show the screen.
     id: event.id, 
     title: event.title, 
@@ -207,6 +233,8 @@ router.get("/:id", async (req, res) => {
     },
     attendees, 
     attendeeCount, 
+    averageRating,
+    reviews,
   });
 });
 
@@ -287,6 +315,112 @@ router.post("/:id/join", async (req, res) => {
       name: participant.user.name, // Participant name.
       email: participant.user.email, // Participant email.
       joinedAt: participant.joinedAt, // When they joined.
+    },
+  });
+});
+
+// Allow attendees to leave or update a review for an event (and host).
+router.post("/:id/reviews", async (req, res) => {
+  const idText = req.params.id;
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+  const commentInput = typeof req.body?.comment === "string" ? req.body.comment.trim() : "";
+  const ratingRaw = req.body?.rating;
+
+  if (email.length === 0) {
+    res.status(400).json({ message: "Email is required to leave a review." });
+    return;
+  }
+
+  let rating: number | null = null;
+  if (ratingRaw !== undefined && ratingRaw !== null && ratingRaw !== "") {
+    const parsedRating = Number(ratingRaw);
+    if (!Number.isFinite(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      res.status(400).json({ message: "Rating must be between 1 and 5." });
+      return;
+    }
+    rating = Math.round(parsedRating);
+  }
+
+  const comment = commentInput.length > 0 ? commentInput : null;
+
+  if (rating === null && !comment) {
+    res.status(400).json({ message: "Provide at least a rating or a comment." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      host: true,
+      participants: { include: { user: true } },
+    },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.startsAt > new Date()) {
+    res.status(400).json({ message: "Reviews can be left only after the event starts." });
+    return;
+  }
+
+  const participant = event.participants.find(
+    (participantRecord) =>
+      participantRecord.user.email.toLowerCase() === email.toLowerCase(),
+  );
+
+  if (!participant) {
+    res.status(403).json({ message: "Only attendees of this event can leave a review." });
+    return;
+  }
+
+  const review = await prisma.review.upsert({
+    where: {
+      eventId_authorId: { eventId: event.id, authorId: participant.userId },
+    },
+    update: {
+      rating,
+      comment,
+    },
+    create: {
+      rating,
+      comment,
+      eventId: event.id,
+      hostId: event.hostId,
+      authorId: participant.userId,
+    },
+    include: {
+      author: true,
+      event: true,
+    },
+  });
+
+  res.status(201).json({
+    message: "Review saved.",
+    review: {
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt,
+      author: {
+        id: review.author.id,
+        name: review.author.name,
+        email: review.author.email,
+      },
+      event: {
+        id: review.event.id,
+        title: review.event.title,
+        startsAt: review.event.startsAt,
+      },
     },
   });
 });
