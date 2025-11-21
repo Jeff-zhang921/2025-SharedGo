@@ -77,6 +77,22 @@ async function main(): Promise<void> { // Wrap the seeding logic in an async fun
       }, 
     }); 
   } 
+
+  const existingReview = await prisma.review.findFirst({
+    where: { eventId: event.id, authorId: attendeeUser.id },
+  });
+
+  if (!existingReview) {
+    await prisma.review.create({
+      data: {
+        rating: 5,
+        comment: "Great atmosphere and friendly crowd.",
+        eventId: event.id,
+        hostId: host.id,
+        authorId: attendeeUser.id,
+      },
+    });
+  }
  
   console.log(
     [
