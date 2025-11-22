@@ -10,7 +10,7 @@ This guide explains how to:
 - Open security group rules
 - Connect from local machine & set backend `.env`
 
-Instruction below is how i setup the database on cloud, using AWS. If you want to access, please read through. since the node has been created and postgres database has added in AWS, only thing you need to do is figure out how to connect with the database.
+The instructions below describe how I set up the database in the cloud using AWS. If you want to access it, please read through. Since the node has already been created and the PostgreSQL database has been added in AWS, the only thing you need to do is figure out how to connect to the database.
 
 ---
 
