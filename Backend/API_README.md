@@ -4,8 +4,22 @@
 
 This section documents the endpoints used by **Frontend**
 
-- Event details, join, review
+- Event tab: **Get info**, **join**, **review**
 - Host tabs: **Upcoming**, **Past events**, **Overview**, **Reviews**
+
+---
+
+## Table of Contents
+
+- [1. Event Endpoints](#1-event-endpoints)
+  - [1.1 Create Event](#11-create-event)
+  - [1.2 Get Event Details](#12-get-event-details)
+  - [1.3 Join Event](#13-join-event)
+  - [1.4 Create Review for Event](#14-create-review-for-event)
+- [2. Host Endpoints (Tabs)](#2-host-endpoints-tabs)
+  - [2.1 Host Overview](#21-host-overview)
+  - [2.2 Host Events (Upcoming / Past / All)](#22-host-events-upcoming--past--all)
+  - [2.3 Host Reviews (Paginated)](#23-host-reviews-paginated)
 
 ---
 
