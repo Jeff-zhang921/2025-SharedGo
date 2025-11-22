@@ -1,6 +1,7 @@
 //seed file is use to init database
-import { PrismaClient } from "./generated/prisma"; 
-
+import { PrismaClient } from "@prisma/client"; 
+//to run this file use command
+//npx ts-node src/seed.ts
 
 const prisma = new PrismaClient(); 
 async function main(): Promise<void> { // Wrap the seeding logic in an async function so we can await queries.
