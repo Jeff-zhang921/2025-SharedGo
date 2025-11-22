@@ -220,6 +220,7 @@ These power the **Host** page tabs:
   ]
 }
 ```
+---
 ### 2.2 Host Events (Upcoming / Past / All)
 
 **GET** `/hosts/:hostId/events?status=&limit=&page=`
