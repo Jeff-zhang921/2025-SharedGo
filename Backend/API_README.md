@@ -1,38 +1,207 @@
-# SharedGo Backend API (Host page focused)
+# SharedGo Backend API – Host Page
 
-Base URL: `http://localhost:3000`
+**Base URL:** `http://localhost:3000`
 
-## Events
-- `POST /events/create`  
-  Body: `title` (string, required), `startsAt` (ISO string, required), `location` (string, required), `hostEmail` (string, required), optional `description`, `imageUrl`, `externalUrl`, `capacity` (number).  
-  Returns: created event with host info and attendee count.
+This section documents the endpoints used by the **Host** screens:
 
+- Event details, join, review
+- Host tabs: **Upcoming**, **Past events**, **Overview**, **Reviews**
 
-- `GET /events/:id`  
-  Params: `id` (number).  
-  Returns: event fields, host, attendees (id, name, email, joinedAt), `attendeeCount`, `seatsRemaining`, `averageRating`, and `reviews` (id, rating, comment, createdAt, author info).
+---
 
+## 1. Event Endpoints
 
-- `POST /events/:id/join`  
-  Params: `id`. Body: `email` (required), optional `name`.  
-  Returns: joined attendee (id, name, email, joinedAt). Handles already-joined and capacity-full cases.
+### 1.1 Create Event
 
+**POST** `/events/create`
 
-- `POST /events/:id/reviews`  
-  Params: `id`. Body: `email` (required), optional `rating` (1–5), optional `comment`. Requires the user to have joined and the event to have started.  
-  Returns: saved review with author and event summary.
+Create a new event for a host.
 
+**Request body (JSON)**
 
+| Field         | Type   | Required | Notes                                |
+|--------------|--------|----------|--------------------------------------|
+| `title`      | string | yes      | Event title                          |
+| `startsAt`   | string | yes      | ISO datetime string                  |
+| `location`   | string | yes      | Text description of the location     |
+| `hostEmail`  | string | yes      | Email of the host user               |
+| `description`| string | no       | Longer description of the event      |
+| `imageUrl`   | string | no       | URL of event image                   |
+| `externalUrl`| string | no       | URL for external registration/info   |
+| `capacity`   | number | no       | Max attendees; `null` = no limit     |
 
-## Host (tabs: Upcoming, Past events, Overview, Reviews)
-- `GET /hosts/:hostId/overview`  
-  Params: `hostId` (number).  
-  Returns: host info; stats (`totalEvents`, `upcomingCount`, `pastCount`, `totalAttendees`, `averageFillRate`, `averageRating`, `reviewCount`); preview lists for upcoming/past events (id, title, startsAt, capacity, attendeeCount, seatsRemaining); recent reviews (author + event summary).
+**Response**
 
-- `GET /hosts/:hostId/events?status=upcoming|past|all&limit=&page=`  
-  Params: `hostId`. Query: `status` (default `upcoming`), `limit` (default 10, max 50), `page` (default 1).  
-  Returns: pagination + events (id, title, startsAt, capacity, location, attendeeCount, seatsRemaining).
+Returns the created event, including:
 
-- `GET /hosts/:hostId/reviews?limit=&page=`  
-  Params: `hostId`. Query: `limit` (default 10, max 50), `page` (default 1).  
-  Returns: pagination + reviews (id, rating, comment, createdAt, author info, event summary).
+- Event fields
+- Host info
+- `attendeeCount` (number of participants)
+
+---
+
+### 1.2 Get Event Details
+
+**GET** `/events/:id`
+
+**URL params**
+
+| Param | Type   | Required | Notes    |
+|-------|--------|----------|----------|
+| `id`  | number | yes      | Event ID |
+
+**Response**
+
+Includes:
+
+- Event fields
+- Host info
+- `attendees`: list of `{ id, name, email, joinedAt }`
+- `attendeeCount`
+- `seatsRemaining` (if capacity set)
+- `averageRating`
+- `reviews`: list of  
+  `{ id, rating, comment, createdAt, author: { id, name, email } }`
+
+---
+
+### 1.3 Join Event
+
+**POST** `/events/:id/join`
+
+**URL params**
+
+| Param | Type   | Required |
+|-------|--------|----------|
+| `id`  | number | yes      |
+
+**Request body (JSON)**
+
+| Field   | Type   | Required | Notes                    |
+|---------|--------|----------|--------------------------|
+| `email` | string | yes      | Attendee email           |
+| `name`  | string | no       | Attendee display name    |
+
+**Behavior**
+
+- If user is already joined: returns existing/consistent join.
+- If event is full (capacity reached): returns capacity-full error.
+
+**Response**
+
+- Joined attendee: `{ id, name, email, joinedAt }`
+
+---
+
+### 1.4 Create Review for Event
+
+**POST** `/events/:id/reviews`
+
+**URL params**
+
+| Param | Type   | Required |
+|-------|--------|----------|
+| `id`  | number | yes      |
+
+**Request body (JSON)**
+
+| Field     | Type   | Required | Notes                               |
+|-----------|--------|----------|-------------------------------------|
+| `email`   | string | yes      | Author’s email (must have joined)   |
+| `rating`  | number | no       | 1–5; optional rating                |
+| `comment` | string | no       | Optional text comment               |
+
+**Rules**
+
+- The user must **have joined** the event.
+- The event must have **already started**.
+
+**Response**
+
+- Saved review with:
+  - `id`, `rating`, `comment`, `createdAt`
+  - `author` summary
+  - `event` summary
+
+---
+
+## 2. Host Endpoints (Tabs)
+
+These power the **Host** page tabs:
+
+- Upcoming
+- Past events
+- Overview
+- Reviews
+
+---
+
+### 2.1 Host Overview
+
+**GET** `/hosts/:hostId/overview`
+
+**URL params**
+
+| Param    | Type   | Required |
+|----------|--------|----------|
+| `hostId` | number | yes      |
+
+**Response**
+
+```jsonc
+{
+  "host": {
+    "id": 1,
+    "name": "Host Name",
+    "email": "host@example.com"
+  },
+  "stats": {
+    "totalEvents": 12,
+    "upcomingCount": 3,
+    "pastCount": 9,
+    "totalAttendees": 120,
+    "averageFillRate": 0.75, // or null if no capacity
+    "averageRating": 4.5,    // or null if no reviews
+    "reviewCount": 18
+  },
+  "upcomingEvents": [
+    {
+      "id": 10,
+      "title": "Event title",
+      "startsAt": "2025-11-21T18:00:00.000Z",
+      "capacity": 20,
+      "location": "Bristol",
+      "attendeeCount": 12,
+      "seatsRemaining": 8
+    }
+  ],
+  "pastEvents": [
+    {
+      "id": 3,
+      "title": "Past event",
+      "startsAt": "2025-10-01T18:00:00.000Z",
+      "capacity": 30,
+      "location": "Bristol",
+      "attendeeCount": 25,
+      "seatsRemaining": 5
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "rating": 5,
+      "comment": "Great event!",
+      "createdAt": "2025-11-20T12:00:00.000Z",
+      "author": {
+        "id": 5,
+        "name": "Alice",
+        "email": "alice@example.com"
+      },
+      "event": {
+        "id": 3,
+        "title": "Past event",
+        "startsAt": "2025-10-01T18:00:00.000Z"
+      }
+    }
+  ]
+}
