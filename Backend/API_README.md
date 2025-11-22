@@ -320,4 +320,8 @@ This endpoint powers the **Reviews** tab for a host.
     }
   ]
 }
+```
 
+- `total` is the total number of reviews for this host.
+
+- Each review includes both the `author` and a short `event summary` so the UI can show which event the review belongs to.
