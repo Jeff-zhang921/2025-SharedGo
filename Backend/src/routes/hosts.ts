@@ -258,6 +258,12 @@ router.get("/:hostId/reviews", async (req, res) => {
     return;
   }
 
+  // Check if host exists
+  const host = await prisma.host.findUnique({ where: { id: hostId } });
+  if (!host) {
+    res.status(404).json({ message: "Host not found." });
+    return;
+  }
   const limit = parsePageSize(req.query.limit); 
   const page = parsePage(req.query.page); 
   const skip = (page - 1) * limit; 
