@@ -182,7 +182,7 @@ These power the **Host** page tabs:
     {
       "id": 10,
       "title": "Event title",
-      "startsAt": "2025-11-21T18:00:00.000Z",
+      "startsAt": "2025-12-21T18:00:00.000Z",
       "capacity": 20,
       "location": "Bristol",
       "attendeeCount": 12,
