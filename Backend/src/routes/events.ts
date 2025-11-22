@@ -354,11 +354,16 @@ router.post("/:id/reviews", async (req, res) => {
   let rating: number | null = null;
   if (ratingRaw !== undefined && ratingRaw !== null && ratingRaw !== "") {
     const parsedRating = Number(ratingRaw);
-    if (!Number.isFinite(parsedRating) || parsedRating < 1 || parsedRating > 5) {
-      res.status(400).json({ message: "Rating must be between 1 and 5." });
+    if (
+      !Number.isFinite(parsedRating) ||
+      !Number.isInteger(parsedRating) ||
+      parsedRating < 1 ||
+      parsedRating > 5
+    ) {
+      res.status(400).json({ message: "Rating must be an integer between 1 and 5." });
       return;
     }
-    rating = Math.round(parsedRating);
+    rating = parsedRating;
   }
 
   const comment = commentInput.length > 0 ? commentInput : null;
