@@ -6,9 +6,10 @@ const prisma = new PrismaClient();
 
 const DEFAULT_PAGE_SIZE = 10; // Default pagination size.
 const MAX_PAGE_SIZE = 50; // Upper bound to avoid huge queries.
+//page is all about how many items you FETCH at once
 
-const parsePageSize = (raw: unknown, fallback = DEFAULT_PAGE_SIZE): number => { // Normalize limit query param.
-  const parsed = Number(raw); // Turn the input into a number.
+const parsePageSize = (raw: unknown, fallback = DEFAULT_PAGE_SIZE): number => { 
+  const parsed = Number(raw); 
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback; // Fallback when invalid or non-positive.
   return parsed > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : Math.floor(parsed); // Clamp to max and floor.
 };
@@ -208,6 +209,11 @@ router.get("/:hostId/events", async (req, res) => {
     return; // Stop.
   }
 
+
+//page = 1, limit = 10 → skip = 0
+// page = 2, limit = 10 → skip = 10
+// page = 3, limit = 10 → skip = 20
+  
   const statusRaw = typeof req.query.status === "string" ? req.query.status : "upcoming"; 
   const status = statusRaw.toLowerCase(); 
   const limit = parsePageSize(req.query.limit); 
@@ -225,6 +231,8 @@ router.get("/:hostId/events", async (req, res) => {
   const [events, total] = await Promise.all([ 
     prisma.event.findMany({
       where, 
+      //past events → newest first (desc)
+      //upcoming/all → earliest first (asc)
       orderBy: { startsAt: status === "past" ? "desc" : "asc" }, 
       skip, 
       take: limit, 
