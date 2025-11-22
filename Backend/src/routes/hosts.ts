@@ -209,6 +209,12 @@ router.get("/:hostId/events", async (req, res) => {
     return; // Stop.
   }
 
+  // Check if host exists
+  const host = await prisma.host.findUnique({ where: { id: hostId } });
+  if (!host) {
+    res.status(404).json({ message: "Host not found." });
+    return;
+  }
 
 //page = 1, limit = 10 → skip = 0
 // page = 2, limit = 10 → skip = 10
