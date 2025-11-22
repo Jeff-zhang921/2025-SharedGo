@@ -327,6 +327,7 @@ router.post("/:id/join", async (req, res) => {
 
 
 
+
 // Allow attendees to leave or update a review for an event (and host).
 router.post("/:id/reviews", async (req, res) => {
   const idText = req.params.id;
