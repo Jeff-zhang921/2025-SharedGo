@@ -91,7 +91,7 @@ export default function host() {
                         <div
                             key={index}
                             style={{
-                                width: '33.333333%',
+                                width: '33%',
                                 height: '2.5rem',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -126,20 +126,15 @@ export default function host() {
                                 width: '12.5rem',
                                 height: '5rem',
                                 backgroundColor: 'white',
+                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                border: '1px solid #e5e7eb',
                                 borderRadius: '0.5rem',
                                 marginRight: '0.75rem'
                             }}>
-                                <div style={{
-                                    height: '5rem',
-                                    width: '12.5rem',
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '0.75rem',
-                                    paddingLeft: '1rem',
-                                    paddingTop: '0.5rem'
-                                }}>
-                                    <div style={{ fontWeight: 'bold' }}>Date</div>
-                                    <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
-                                </div>
+
+                                <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
+                                <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
+                                
                             </div>
                         ))}
                     </div>
