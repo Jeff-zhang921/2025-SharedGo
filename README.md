@@ -14,6 +14,14 @@
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
 
+## Documentation
+
+- [Kanban Board](https://github.com/orgs/spe-uob/projects/392)
+- [Milestones](https://github.com/spe-uob/2025-SharedGo/milestones)
+- [Issues](https://github.com/spe-uob/2025-SharedGo/issues)
+- [Pull Requests](https://github.com/spe-uob/2025-SharedGo/pulls)
+- [Docs Folder](https://github.com/spe-uob/2025-SharedGo/tree/main/Docs)
+
 ## Project Description
    Shared-Go aims to provide the most loved real-time activity map, through a Progressive Web App. Shared-Go will enable users to create and join events through a map-based user interface. The project will directly impact use-cases for Event Organisers, Societies, and Groups.
 
@@ -55,7 +63,7 @@
 ## TechStack
 ### MVP Architecture
 
-![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/MVParchitecture.jpg)
+![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
 
 ## Flow Steps
 * #### Indivisual user
@@ -84,6 +92,46 @@
      6. Invited users receive notification
      7. Accepted users added to group chat
         
+## Developer instructions
+
+- first clone the repository
+  - ```git clone https://github.com/spe-uob/2025-SharedGo.git``` ( HTTPS )
+  - ```git clone git@github.com:spe-uob/2025-SharedGo.git``` ( SSH )
+- navigate into the folder
+  
+  ```cd 2025-SharedGo```
+- Install the dependencies for both the frontend and the backend
+  - for frontend:
+    
+    ```cd frontend```
+    
+    ```npm i```
+  - for backend:
+    
+    ```cd backend```
+    
+    ```npm ci```
+    
+    ```cd src```
+    
+    ```npx prisma generate```
+
+    ```npx prisma migrate main```
+
+- first start the backend
+
+  ```cd Backend```
+
+  ```npm run build```
+
+  ```npm run main```
+
+- then start the frontend
+
+  ```cd Frontend```
+
+  ```npm run main```
+
 ## Team Members
 | Name | Student id | University Email|  
 |  -------------- |-----------------------|-----------|
