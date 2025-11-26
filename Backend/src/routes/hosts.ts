@@ -141,14 +141,14 @@ router.get("/:hostId/overview", async (req, res) => {
 
 //reduce is a method that iterates through an array and accumulates a single value based on a provided function.
   const totalAttendees = eventsForStats.reduce( 
-    (sums, event) => sums + event.participants.length, 
+    (sums: number, event: { participants: unknown[] }) => sums + event.participants.length, 
     0, 
   );
 
   //for later average fill 
   const capacityTotal=eventsForStats.reduce(
     // ?? If event.capacity is not null or undefined, use it.Otherwise, use 0.
-    (sum,event)=>sum+(event.capacity ??0),0
+    (sum: number, event: { capacity: number | null })=>sum+(event.capacity ??0),0
   )
 
 
@@ -159,16 +159,16 @@ router.get("/:hostId/overview", async (req, res) => {
 
 
   const allRatings = eventsForStats 
-    .flatMap((event) => event.reviews)//glue all event together 
-    .map((event) => event.rating) // Take rating values.
-    .filter((value): value is number => typeof value === "number"); 
+    .flatMap((event: { reviews: { rating: number | null }[] }) => event.reviews)//glue all event together 
+    .map((event: { rating: number | null }) => event.rating) // Take rating values.
+    .filter((value: number | null): value is number => typeof value === "number"); 
 
 
     
   const averageRating =
     allRatings.length > 0
       ? Number(
-          (allRatings.reduce((sum, value) => sum + value, 0) / allRatings.length).toFixed(2), 
+          (allRatings.reduce((sum: number, value: number) => sum + value, 0) / allRatings.length).toFixed(2), 
         )
       : null; 
 

@@ -184,7 +184,7 @@ router.get("/:id", async (req, res) => {
    
   //map copy participant array to attendees and only copy field of return in participate to attendees
   //which is
-  const attendees = event.participants.map((participant) => { // Build an array that only contains the data the UI needs.
+  const attendees = event.participants.map((participant: { user: { id: number; name: string | null; email: string }; joinedAt: Date }) => { // Build an array that only contains the data the UI needs.
     const participantUser = participant.user; // Pull the related user off the participant record to keep the code readable.
     return { 
       id: participantUser.id, 
@@ -195,7 +195,13 @@ router.get("/:id", async (req, res) => {
   });
 
   //map copy review array to reviews and only copy field of return in review to reviews
-  const reviews = event.reviews.map((review) => ({
+  const reviews = event.reviews.map((review: {
+    id: number;
+    rating: number | null;
+    comment: string | null;
+    createdAt: Date;
+    author: { id: number; name: string | null; email: string };
+  }) => ({
     id: review.id,
     rating: review.rating,
     comment: review.comment,
@@ -211,12 +217,12 @@ router.get("/:id", async (req, res) => {
   //calculate average rating
   //if is null or undefined, filter it out
   const ratingValues = event.reviews
-    .map((review) => review.rating)
-    .filter((value): value is number => typeof value === "number");
+    .map((review: { rating: number | null }) => review.rating)
+    .filter((value: number | null): value is number => typeof value === "number");
   const averageRating =
     ratingValues.length > 0
       ? Number(//only keep two decimal points
-          (ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length).toFixed(2),
+          (ratingValues.reduce((sum: number, value: number) => sum + value, 0) / ratingValues.length).toFixed(2),
         )
       : null;
 
@@ -287,7 +293,7 @@ router.post("/:id/join", async (req, res) => {
     return; // Stop here because we cannot add more people.
   }
 
-  const userAlreadyJoined = event.participants.some((participant) => { // Check if this email already appears in the attendee list.
+  const userAlreadyJoined = event.participants.some((participant: { user: { email: string } }) => { // Check if this email already appears in the attendee list.
     return participant.user.email.toLowerCase() === email.toLowerCase(); // Compare emails case-insensitively.
   });
 
@@ -393,7 +399,7 @@ router.post("/:id/reviews", async (req, res) => {
   }
 
   const participant = event.participants.find(
-    (participantRecord) =>
+    (participantRecord: { user: { email: string }; userId: number }) =>
       participantRecord.user.email.toLowerCase() === email.toLowerCase(),
   );
 
