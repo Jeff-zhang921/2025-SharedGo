@@ -22,10 +22,11 @@ cd Backend
 
 ## 4.Install Dependencies
 > ⚠️ Before running these commands, make sure you have:
-> 1. Added your own `.env` file in the Backend root with a valid connection string:
+> 1. Added your own `.env` file in the Backend root with a valid connection string(If want remote database, please review Doc folder readme):
 >    ```env
 >    DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/Sharedgo
 >    ```
+
 
 * Download all the dependency for express
 ```

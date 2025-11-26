@@ -1,6 +1,8 @@
 import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
+import 'dotenv/config'; // fetch .env variables
+
 
 const app = express();
 app.use(express.json());
