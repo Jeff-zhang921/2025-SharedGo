@@ -210,7 +210,7 @@ router.get("/:hostId/events", async (req, res) => {
   }
 
   // Check if host exists
-  const host = await prisma.host.findUnique({ where: { id: hostId } });
+  const host = await prisma.user.findUnique({ where: { id: hostId } });
   if (!host) {
     res.status(404).json({ message: "Host not found." });
     return;
@@ -265,7 +265,7 @@ router.get("/:hostId/reviews", async (req, res) => {
   }
 
   // Check if host exists
-  const host = await prisma.host.findUnique({ where: { id: hostId } });
+  const host = await prisma.user.findUnique({ where: { id: hostId } });
   if (!host) {
     res.status(404).json({ message: "Host not found." });
     return;
