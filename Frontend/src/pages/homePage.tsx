@@ -5,13 +5,18 @@ import "./homePage.css"
 function HomePage() {
   return (
     <div className='background-container'>
-      <h1>Shared-Go</h1>
-      <h2>A real-time activity map</h2>
+      <div className='top-section'>
+        <h1>Shared-Go</h1>
+        <h2>A real-time activity map</h2>
+      </div>
+
+      <div className='nav-links'>
       <Link to="/map">MapPage </Link>
       <Link to="/eventDetails">EventDetailsPage </Link>
       <Link to="/personal">PersonalPage </Link>
       <Link to="/createEvent">CreateEventPage </Link>
       <Link to="/chat">ChatPage </Link>
+      </div>
     </div>
   );
 }
