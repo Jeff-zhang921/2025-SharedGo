@@ -36,6 +36,11 @@ app.get("/",(request:Request,response:Response)=>{
      response.json({message:"ShareGo backend running"});
 });
 
-app.listen(PORT,()=>{
-    console.log(`running on port ${PORT} `);
-});
+// Only start the server if this file is run directly (not when imported)
+if (require.main === module) {
+    app.listen(PORT,()=>{
+        console.log(`running on port ${PORT} `);
+    });
+}
+
+export default app; // to export app
