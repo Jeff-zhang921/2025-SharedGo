@@ -1,19 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-// const HomePage = () => {
-//   return (
-//     <div>
-//       <h1>Welcome to the Home Page!</h1>
-//     </div>
-//   );
-// };
-
+import "./homePage.css"
 
 function HomePage() {
   return (
-    <div>
-      <h1>Home Page</h1>
+    <div className='background-container'>
+      <h1>Shared-Go</h1>
+      <h2>A real-time activity map</h2>
       <Link to="/map">MapPage </Link>
       <Link to="/eventDetails">EventDetailsPage </Link>
       <Link to="/personal">PersonalPage </Link>
