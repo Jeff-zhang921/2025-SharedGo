@@ -1,0 +1,18 @@
+.map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-image: url('/public/bristolMap.png');
+    background-size: cover;       /* fills screen */
+    background-position: centre;  /* centers the map */
+    background-repeat: no-repeat;
+    
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* prevents scrolling completely */
+  }
