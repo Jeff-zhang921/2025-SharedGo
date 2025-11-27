@@ -2,9 +2,14 @@
 
 //migrate file is the communication let prisma and database stay sync, if prisma want create list after migrate. it will create a on database
 
+//npx prisma migrate dev --name init
+//applies the Prisma schema to your dev database: creates/updates tables, records a new migration named init, and checks against a shadow database if configured.
+
+// npx prisma generate 
+// regenerates the Prisma Client code from the current schema so your app can use the latest models/queries
+
 generator client { // Configure the Prisma Client generator block.
   provider = "prisma-client-js" // Use the JavaScript Prisma Client implementation.
-  output   = "../src/generated/prisma" // Emit generated client files into the backend source tree.
 } 
 
 datasource db { // Configure the primary database connection for Prisma.
@@ -20,6 +25,8 @@ model User {
   updatedAt      DateTime            @updatedAt // Timestamp automatically updated whenever the record changes.
   eventsHosted   Event[]             // Relation listing the events this user has created.
   registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
+  authoredReviews Review[]           @relation("UserReviews")
+  hostReviews     Review[]           @relation("HostReviews")
 }
 
 
@@ -35,6 +42,7 @@ model Event {
   hostId       Int // Foreign key pointing to the User who hosts the event.
   host         User               @relation(fields: [hostId], references: [id]) // Relation tying the event to its host user.
   participants EventParticipant[] // Relation exposing everyone registered for the event.
+  reviews      Review[]
   createdAt    DateTime           @default(now()) 
   updatedAt    DateTime           @updatedAt 
 } 
@@ -51,3 +59,21 @@ model EventParticipant { // Join table linking users to events they attend.
 
   @@unique([eventId, userId]) // Prevent duplicate participation records for the same user and event.
 } 
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int?
+  comment   String?
+  eventId   Int
+  hostId    Int
+  authorId  Int
+  createdAt DateTime @default(now())
+
+  event  Event @relation(fields: [eventId], references: [id])
+  host   User  @relation("HostReviews", fields: [hostId], references: [id])
+  author User  @relation("UserReviews", fields: [authorId], references: [id])
+
+// The combination of (eventId, authorId) must be unique.
+  @@unique([eventId, authorId])
+  @@index([hostId, createdAt])
+}

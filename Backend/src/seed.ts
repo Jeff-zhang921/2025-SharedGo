@@ -1,6 +1,7 @@
 //seed file is use to init database
-import { PrismaClient } from "./generated/prisma"; 
-
+import { PrismaClient } from "@prisma/client"; 
+//to run this file use command
+//npx ts-node src/seed.ts
 
 const prisma = new PrismaClient(); 
 async function main(): Promise<void> { // Wrap the seeding logic in an async function so we can await queries.
@@ -77,6 +78,22 @@ async function main(): Promise<void> { // Wrap the seeding logic in an async fun
       }, 
     }); 
   } 
+
+  const existingReview = await prisma.review.findFirst({
+    where: { eventId: event.id, authorId: attendeeUser.id },
+  });
+
+  if (!existingReview) {
+    await prisma.review.create({
+      data: {
+        rating: 5,
+        comment: "Great atmosphere and friendly crowd.",
+        eventId: event.id,
+        hostId: host.id,
+        authorId: attendeeUser.id,
+      },
+    });
+  }
  
   console.log(
     [
