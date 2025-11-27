@@ -1,8 +1,7 @@
 import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
-import 'dotenv/config'; // fetch .env variables
-
+import hostsRouter from "./routes/hosts";
 
 const app = express();
 app.use(express.json());
@@ -31,11 +30,17 @@ declare module 'express-session' {
 
 
 app.use("/events", eventsRouter);
+app.use("/hosts", hostsRouter);
 
 app.get("/",(request:Request,response:Response)=>{
      response.json({message:"ShareGo backend running"});
 });
 
-app.listen(PORT,()=>{
-    console.log(`running on port ${PORT} `);
-});
+// Only start the server if this file is run directly (not when imported)
+if (require.main === module) {
+    app.listen(PORT,()=>{
+        console.log(`running on port ${PORT} `);
+    });
+}
+
+export default app; // to export app

@@ -91,7 +91,7 @@ export default function host() {
                         <div
                             key={index}
                             style={{
-                                width: '33.333333%',
+                                width: '33%',
                                 height: '2.5rem',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -126,20 +126,15 @@ export default function host() {
                                 width: '12.5rem',
                                 height: '5rem',
                                 backgroundColor: 'white',
+                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                border: '1px solid #e5e7eb',
                                 borderRadius: '0.5rem',
                                 marginRight: '0.75rem'
                             }}>
-                                <div style={{
-                                    height: '5rem',
-                                    width: '12.5rem',
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '0.75rem',
-                                    paddingLeft: '1rem',
-                                    paddingTop: '0.5rem'
-                                }}>
-                                    <div style={{ fontWeight: 'bold' }}>Date</div>
-                                    <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
-                                </div>
+
+                                <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
+                                <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
+                                
                             </div>
                         ))}
                     </div>
@@ -204,48 +199,6 @@ export default function host() {
                                 <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>{review.msg}</div>
                             </div>
                         </div>
-                    ))}
-                </div>
-
-                <div style={{ height: '5rem' }}></div>
-                {/* 底部icon */}
-                <div style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    backgroundColor: 'white',
-                    borderTop: '1px solid #e5e7eb',
-                    display: 'flex',
-                    justifyContent: 'space-around',
-                    paddingTop: '0.75rem',
-                    paddingBottom: '0.75rem'
-                }}>
-                    {/* 底部按钮保持不变，只是转换为行内样式 */}
-                    {[0, 1, 2, 3, 4].map((tabIndex) => (
-                        <button
-                            key={tabIndex}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                padding: '0.5rem'
-                            }}
-                            onClick={() => setSelectedTab(tabIndex)}
-                        >
-                            <div style={{ padding: '0.25rem', borderRadius: '50%' }}>
-                                {/* SVG图标保持不变 */}
-                                {selectedTab === tabIndex ? (
-                                    <svg style={{ height: '1.5rem', width: '1.5rem' }} viewBox="0 0 24 24" fill="black">
-                                        {/* 路径保持不变 */}
-                                    </svg>
-                                ) : (
-                                    <svg style={{ height: '1.5rem', width: '1.5rem' }} viewBox="0 0 24 24">
-                                        {/* 路径保持不变 */}
-                                    </svg>
-                                )}
-                            </div>
-                        </button>
                     ))}
                 </div>
             </div>

@@ -1,0 +1,41 @@
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-image: url('/public/frontPageBackground.jpg');
+    background-size: cover;       /* fills screen */
+    background-position: center;  /* centers the map */
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: row; /* Links horizontally next to each other */
+    gap: 1.5rem;
+    margin-bottom: 6rem;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* prevents scrolling completely */
+  }
+
+  h1, h2 {
+    color: black;
+  }
+  
+  .top-section h1 {
+    margin-bottom: 0.3rem; /* Bring h1 closer to h2 */
+  }
+
+  .top-section h2 {
+    margin-top: -0.2rem;
+  }
