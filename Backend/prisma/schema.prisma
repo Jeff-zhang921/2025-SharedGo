@@ -1,0 +1,53 @@
+//this is the structure of database
+
+//migrate file is the communication let prisma and database stay sync, if prisma want create list after migrate. it will create a on database
+
+generator client { // Configure the Prisma Client generator block.
+  provider = "prisma-client-js" // Use the JavaScript Prisma Client implementation.
+  output   = "../src/generated/prisma" // Emit generated client files into the backend source tree.
+} 
+
+datasource db { // Configure the primary database connection for Prisma.
+  provider = "postgresql" 
+  url      = env("DATABASE_URL") // Read the connection string from the environment file.
+} 
+
+model User { 
+  id             Int                 @id @default(autoincrement())  
+  email          String              @unique 
+  name           String? 
+  createdAt      DateTime            @default(now()) // Timestamp capturing when the user record was created.
+  updatedAt      DateTime            @updatedAt // Timestamp automatically updated whenever the record changes.
+  eventsHosted   Event[]             // Relation listing the events this user has created.
+  registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
+}
+
+
+model Event { 
+  id           Int                @id @default(autoincrement()) 
+  title        String 
+  description  String? 
+  startsAt     DateTime // Scheduled start date and time.
+  capacity     Int? // Optional maximum number of attendees allowed.
+  location     String // Text field noting where the event takes place.
+  imageUrl     String? // Optional image URL rendered in the UI.
+  externalUrl  String? // Optional link to an external page with more details.
+  hostId       Int // Foreign key pointing to the User who hosts the event.
+  host         User               @relation(fields: [hostId], references: [id]) // Relation tying the event to its host user.
+  participants EventParticipant[] // Relation exposing everyone registered for the event.
+  createdAt    DateTime           @default(now()) 
+  updatedAt    DateTime           @updatedAt 
+} 
+
+model EventParticipant { // Join table linking users to events they attend.
+  id        Int      @id @default(autoincrement()) 
+  eventId   Int // Foreign key referencing the event joined.
+  userId    Int // Foreign key referencing the user who joined.
+  joinedAt  DateTime @default(now())
+
+
+  event Event @relation(fields: [eventId], references: [id]) // Relation to fetch the associated event.
+  user  User  @relation(fields: [userId], references: [id]) // Relation to fetch the associated user.
+
+  @@unique([eventId, userId]) // Prevent duplicate participation records for the same user and event.
+} 
