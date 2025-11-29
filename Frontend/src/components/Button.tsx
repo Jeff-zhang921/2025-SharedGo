@@ -10,25 +10,20 @@ interface ButtonProps {
   text?: string;
   // pixel size, optional
   size?: number;
+  // class name, optional
+  className?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
-  // initialised, and defaults set for text & size
   link,
   imgSrc,
   text = 'Link Button',
   size = 12,
+  className = '',
 }) => {
   return (
-    <Link to={link} style={{ display: 'inline-block' }}>
-      <img
-        src={imgSrc}
-        alt={text}
-        style={{
-          width: size,
-          height: size
-        }}
-      />
+    <Link to={link} className={className} style={{ display: 'inline-block' }}>
+      <img src={imgSrc} alt={text} style={{width: size,height: size}}/>
     </Link>
   );
 };
