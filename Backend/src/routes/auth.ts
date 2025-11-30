@@ -24,7 +24,7 @@ router.post("/login", async (req, res) => {
   req.session.user = {
     id: user.id,
     email: user.email,
-    name: user.name ?? undefined,
+    name: user.name ?? null,
   };
 
   res.json({

@@ -2,6 +2,7 @@ import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
+import authRouter from "./routes/auth";
 
 const app = express();
 app.use(express.json());
@@ -20,15 +21,14 @@ declare module 'express-session' {
     visited?: boolean;
     user?: {
       id: number;
-      name: string;
-      age: number;
-      password: string;
+      email: string;
+      name?: string | null;
     };
     // add more custom fields as needed
   }
 }
 
-
+app.use("/auth", authRouter);
 app.use("/events", eventsRouter);
 app.use("/hosts", hostsRouter);
 
