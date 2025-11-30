@@ -4,12 +4,16 @@ import { PrismaClient } from "@prisma/client";
 const router = Router();
 const prisma = new PrismaClient();
 
+//email regex source: https://emailregex.com/
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Define allowed providers
 const ALLOWED_PROVIDERS = ["google", "apple"] as const;
+// Define OAuthProvider type
 type OAuthProvider = (typeof ALLOWED_PROVIDERS)[number];
 
-const isAllowedProvider = (value: string): value is OAuthProvider =>
-  ALLOWED_PROVIDERS.includes(value as OAuthProvider);
+function isAllowedProvider(value: string): value is OAuthProvider {
+  return value === "google" || value === "apple";
+}
 
 router.post("/login", async (req, res) => {
   const providerRaw =
