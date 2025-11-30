@@ -46,6 +46,30 @@ router.get("/me", (req, res) => {
   res.json({ user: req.session.user });
 });
 
+router.post("/check", async (req, res) => {
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+
+  if (!EMAIL_REGEX.test(email)) {
+    res.status(400).json({ message: "Valid email is required." });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (user) {
+    res.json({
+      exists: true,
+      message: "Account already exists for this email.",
+    });
+    return;
+  }
+
+  res.status(404).json({
+    exists: false,
+    message: "No account found for this email.",
+  });
+});
+
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
