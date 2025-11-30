@@ -22,7 +22,7 @@ declare module 'express-session' {
     user?: {
       id: number;
       email: string;
-      name?: string | null;
+      name: string | null;
     };
     // add more custom fields as needed
   }
