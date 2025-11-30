@@ -181,7 +181,7 @@ router.get("/:id", async (req, res) => {
     const remaining = event.capacity - attendeeCount; // Subtract the number of attendees from the total capacity.
     seatsRemaining = remaining > 0 ? remaining : 0; // Never show a negative value even if we somehow go over.
   }
-   
+  
   //map copy participant array to attendees and only copy field of return in participate to attendees
   //which is
   const attendees = event.participants.map((participant: { user: { id: number; name: string | null; email: string }; joinedAt: Date }) => { // Build an array that only contains the data the UI needs.
