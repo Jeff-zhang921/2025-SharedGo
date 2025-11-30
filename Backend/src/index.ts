@@ -23,6 +23,8 @@ declare module 'express-session' {
       id: number;
       email: string;
       name: string | null;
+      provider: "google" | "apple";
+      providerUserId: string;
     };
     // add more custom fields as needed
   }
