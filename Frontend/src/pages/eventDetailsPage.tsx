@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from "react-router-dom"
+import { Link, unstable_SerializesTo } from "react-router-dom"
 import Button from "./../components/Button"
 import './eventDetailsPage.css';
 import { useParams } from 'react-router-dom';
 
+interface User {
+  id: number;
+  name: string | null;
+  email: string
+}
 
 //Fields for the expected event data from the backend
 interface EventData {
@@ -15,7 +20,16 @@ interface EventData {
   location: string;
   imageUrl: string | null;
   externalUrl: string | null;
-  //Maybe include host here or maybe in seperate interface
+  host: User; //Whomever hosted the event
+  attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
+    id: number;
+    name: string | null;
+    email: string;
+    joinedAt: string;
+  }>;
+
+  attendeeCount: number;
+  averageRating: number | null;
 }
 
 const EventDetailsPage = () => {
@@ -88,26 +102,26 @@ const EventDetailsPage = () => {
         {/*all event detail listed as shown in the design*/}
         <div className="event-info">
           <div className="event-info-row">
-            <h3>TITLE:</h3><p>Example title</p>
+            <h3>TITLE:</h3><p>{event.title}</p>
           </div>
 
           <div className="event-info-row">
             <h3>DATE:</h3>
-            <p>example date</p>
+            <p>{new Date(event.startsAt).toLocaleString()}</p>
           </div>
 
           <div className="event-info-row">
             <h3>CAPACITY:</h3>
-            <p>example capacity</p>
+            <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
           </div>
           <div className="event-info-row">
             <h3>LOCATION:</h3>
-            <p>example location</p>
+            <p>{event.location}</p>
           </div>
           <div className="event-info-row">
             <h3>DESCRIPTION:</h3>
             <div className="event-description">
-              <p> Example event description goes here.</p>
+              <p>{event.description || "No description provided"}</p>
             </div>
           </div>
         </div>
@@ -116,8 +130,8 @@ const EventDetailsPage = () => {
           <h3>HOSTED BY:</h3>
           <div className="host-details">
             <div className="host-text">
-              <p><strong>Mike Rosoft</strong></p>
-              <p>mike@example.com</p>
+              <p><strong>{event.host.name}</strong></p>
+              <p>{event.host.email}</p>
             </div>
           </div>
         </div>
