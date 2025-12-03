@@ -2,8 +2,10 @@ import React from 'react'
 import { Link } from "react-router-dom"
 import Button from "./../components/Button"
 import './eventDetailsPage.css';
+import { useParams } from 'react-router-dom';
 
 const EventDetailsPage = () => {
+  const { eventId } = useParams() //Extract parameter defined in the route (eventId), allows seperate logic for seperate events
   return (
     <div className="event-details-container">
       <div className="navigation-buttons">
