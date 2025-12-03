@@ -1,9 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from "react-router-dom"
 import Button from "./../components/Button"
 import './eventDetailsPage.css';
+import { useParams } from 'react-router-dom';
+
+
+//Fields for the expected event data from the backend
+interface EventData {
+  id: number;
+  title: string;
+  description: string | null; //Null as doesn't have to be filled in
+  startsAt: string;
+  capacity: number | null;
+  location: string;
+  imageUrl: string | null;
+  externalUrl: string | null;
+  //Maybe include host here or maybe in seperate interface
+}
 
 const EventDetailsPage = () => {
+  const { eventId } = useParams<{ eventId: string }>(); //Use the eventId parameter from the URL
+
+  const [event, setEvent]  = useState<EventData | null>(null) //Store actual event data from backend, setting initial value to null
+  const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
+  const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
+
   return (
     <div className="event-details-container">
       <div className="navigation-buttons">
