@@ -25,6 +25,53 @@ const EventDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
 
+  //Code for actually fetching the data from the backend
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    setEvent(null);
+
+    //Hardcoded URL at the moment, might change later
+    const backendBaseURL = 'http://localhost:5432'; //Change to the correct URL which the backend is running on
+    const backendUrl = `${backendBaseURL}/events/${eventId}`;
+  
+    const fetchEvent = async () => {
+      try {
+        const response = await fetch(backendUrl);
+        //Error checking
+        if (response.status === 404) { //Check for 404 error
+             throw new Error("Event not found");
+        }
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const data: EventData = await response.json(); //pause here and wait for server to reply
+        setEvent(data); //Puts the fetched data into the event state variable
+        
+      } catch (err) { //If error gets thrown
+        console.error("Error:", err);
+        setError("Could not load event details");
+      } finally {
+        setIsLoading(false); //No longer loading so set to false
+      }
+    };
+
+    fetchEvent();
+    }, [eventId]); //Rerun the fetching when the eventId changes (different page requires different data)
+  
+    if (isLoading) { //Message displayed while loading the event details
+      return <div style={{ padding: '20px' }}><p>Loading event details: **{eventId}**...</p></div>; //Padding so msg not squashed in top left
+    }
+
+    if (error) {
+      return <div style={{ padding: '20px', color: 'red' }}><h1>Error</h1><p>{error}</p></div>;
+    }
+
+    if (!event) {
+      return <div style={{ padding: '20px' }}><h1>Event Not Found</h1><p>The requested event does not exist</p></div>;
+    }
+
   return (
     <div className="event-details-container">
       <div className="navigation-buttons">
