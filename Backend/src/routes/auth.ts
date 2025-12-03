@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+import { firebaseAdmin } from "../firebaseAdmin";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -71,6 +72,57 @@ router.get("/me", (req, res) => {
   }
 
   res.json({ user: req.session.user });
+});
+
+router.post("/firebase-login", async (req, res) => {
+  const authHeader = typeof req.headers.authorization === "string" ? req.headers.authorization : "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+
+  if (!idToken) {
+    res.status(401).json({ message: "Missing Firebase ID token (Authorization: Bearer <token>)." });
+    return;
+  }
+
+  try {
+    const decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
+    const email = decoded.email?.trim() || "";
+    const name = decoded.name?.trim() || null;
+    const providerId = decoded.firebase?.sign_in_provider || "firebase";
+    const uid = decoded.uid;
+
+    if (!email) {
+      res.status(400).json({ message: "Verified token did not include an email." });
+      return;
+    }
+
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: name ? { name } : {},
+      create: { email, name: name ?? undefined },
+    });
+
+    req.session.user = {
+      id: user.id,
+      email: user.email,
+      name: user.name ?? null,
+      provider: "firebase",
+      providerUserId: uid,
+      providerId,
+    };
+
+    res.json({
+      message: "Logged in with Firebase.",
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        provider: "firebase",
+        providerId,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({ message: "Invalid Firebase ID token." });
+  }
 });
 
 router.post("/logout", (req, res) => {
