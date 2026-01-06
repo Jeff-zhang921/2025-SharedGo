@@ -1,9 +1,15 @@
 //this is the backend logic
 import { Router } from "express"; 
 import { PrismaClient } from "@prisma/client";
+import { getEnabledCategories } from "trace_events";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
+
+export const Categories = [
+  "Physical Activities", "Festivals", "Educational", "Networking", "Arts & Culture", 
+  "Food & Drink", "Music & Concerts", "Tech & Gaming", "Wellness & Meditation", "Volunteer & Charity", "Other"
+];
 
 //publish event logic
 //you can post on /events/create
@@ -20,6 +26,9 @@ router.post("/create", async (req, res) => {
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
   const capacityRaw = req.body?.capacity; // could be number or string; validate below
+  const categoryRaw = req.body?.category;
+  const latitudeRaw = req.body?.latitude;
+  const longitudeRaw = req.body?.longitude;
 
 //? means if titleRaw is a string, trim it; otherwise use an empty string "" 
 
@@ -37,9 +46,9 @@ router.post("/create", async (req, res) => {
     ? externalUrlRaw.trim()
     : null;
 
-
-
-
+  const category = Categories.includes(categoryRaw) ? categoryRaw : "Other";
+  const latitude = latitudeRaw !== undefined ? Number(latitudeRaw) : null;
+  const longitude = longitudeRaw !== undefined ? Number(longitudeRaw) : null;
 
   
  // Basic required-field validation. If invalid, return 400 and stop.
@@ -100,7 +109,10 @@ router.post("/create", async (req, res) => {
       description,
       startsAt,
       capacity,
+      category
       location,
+      latitude,
+      longitude,
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
@@ -125,7 +137,10 @@ router.post("/create", async (req, res) => {
       description: event.description,
       startsAt: event.startsAt,
       capacity: event.capacity,
+      category: event.category,
       location: event.location,
+      latitude: event.latitude,
+      longitude: event.longitude,
       imageUrl: event.imageUrl,
       externalUrl: event.externalUrl,
       host: {
@@ -233,7 +248,10 @@ router.get("/:id", async (req, res) => {
     startsAt: event.startsAt, 
     capacity: event.capacity, 
     seatsRemaining, 
+    category: event.category,
     location: event.location, 
+    latitude: event.latitude,
+    longitude: event.longitude,
     imageUrl: event.imageUrl, 
     externalUrl: event.externalUrl, 
     host: { 

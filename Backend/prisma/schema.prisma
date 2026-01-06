@@ -36,7 +36,10 @@ model Event {
   description  String? 
   startsAt     DateTime // Scheduled start date and time.
   capacity     Int? // Optional maximum number of attendees allowed.
+  category     String   @default("Other")
   location     String // Text field noting where the event takes place.
+  latitude     Float
+  longitude    Float
   imageUrl     String? // Optional image URL rendered in the UI.
   externalUrl  String? // Optional link to an external page with more details.
   hostId       Int // Foreign key pointing to the User who hosts the event.
