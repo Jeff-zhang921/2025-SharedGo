@@ -12,6 +12,9 @@ This section documents the endpoints used by **Frontend**
 ## Table of Contents
 
 - [0. Authentication](#0-authentication)
+  - [0.1 Start Email Login](#01-start-email-login)
+  - [0.2 Verify Email Code](#02-verify-email-code)
+  - [0.3 Current User](#03-current-user)
 - [1. Event Endpoints](#1-event-endpoints)
   - [1.1 Create Event](#11-create-event)
   - [1.2 Get Event Details](#12-get-event-details)
@@ -61,6 +64,20 @@ This section documents the endpoints used by **Frontend**
 **Notes**
 
 - These endpoints establish a session cookie used for protected POST routes.
+
+---
+
+### 0.3 Current User
+
+**GET** `/auth/me`
+
+**Response**
+
+- `{ user: { id, email, name, provider } }`
+
+**Notes**
+
+- Requires the session cookie set by `/auth/email/verify`.
 
 ---
 ## 1. Event Endpoints
