@@ -218,3 +218,25 @@ router.post("/email/verify", async (req, res) => {
 });
 
 
+// Endpoint to get current user info
+router.get("/me", (req, res) => {
+  if (!req.session.user) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  res.json({ user: req.session.user });
+});
+
+// Endpoint to log out
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ message: "Failed to log out." });
+      return;
+    }
+    res.status(204).end();
+  });
+});
+
+export default router;
