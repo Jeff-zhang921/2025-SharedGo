@@ -1,13 +1,14 @@
 //this is the backend logic
 import { Router } from "express"; 
 import { PrismaClient } from "@prisma/client";
+import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
 
 //publish event logic
 //you can post on /events/create
-router.post("/create", async (req, res) => {
+router.post("/create", requireSession, async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
 //if anything is undefine in josn input, it will throw 
@@ -36,11 +37,6 @@ router.post("/create", async (req, res) => {
   const externalUrl = typeof externalUrlRaw === "string" && externalUrlRaw.trim() !== ""
     ? externalUrlRaw.trim()
     : null;
-
-
-
-
-
   
  // Basic required-field validation. If invalid, return 400 and stop.
   if (!title) {
@@ -252,7 +248,7 @@ router.get("/:id", async (req, res) => {
 // Handle the case where someone presses "Join" on the event screen.
 //it takes in eventid
 //you can post on /events/:id/join
-router.post("/:id/join", async (req, res) => { 
+router.post("/:id/join", requireSession, async (req, res) => { 
   // Read the event id from the URL.
   const idText = req.params.id;
   const eventId = Number(idText); // Turn the id string into a number.
@@ -335,7 +331,7 @@ router.post("/:id/join", async (req, res) => {
 
 
 // Allow attendees to leave or update a review for an event (and host).
-router.post("/:id/reviews", async (req, res) => {
+router.post("/:id/reviews", requireSession, async (req, res) => {
   const idText = req.params.id;
   const eventId = Number(idText);
 

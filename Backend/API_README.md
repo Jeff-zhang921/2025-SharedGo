@@ -11,6 +11,7 @@ This section documents the endpoints used by **Frontend**
 
 ## Table of Contents
 
+- [0. Authentication](#0-authentication)
 - [1. Event Endpoints](#1-event-endpoints)
   - [1.1 Create Event](#11-create-event)
   - [1.2 Get Event Details](#12-get-event-details)
@@ -23,7 +24,48 @@ This section documents the endpoints used by **Frontend**
 
 ---
 
+## 0. Authentication
+
+### 0.1 Start Email Login
+
+**POST** `/auth/email/start`
+
+**Request body (JSON)**
+
+| Field   | Type   | Required | Notes                  |
+|---------|--------|----------|------------------------|
+| `email` | string | yes      | Recipient email        |
+
+**Response**
+
+- `{ message: "Verification code sent." }`
+
+---
+
+### 0.2 Verify Email Code
+
+**POST** `/auth/email/verify`
+
+**Request body (JSON)**
+
+| Field   | Type   | Required | Notes                       |
+|---------|--------|----------|-----------------------------|
+| `email` | string | yes      | Same email used above       |
+| `code`  | string | yes      | 6-digit code from email     |
+| `name`  | string | no       | Optional display name       |
+
+**Response**
+
+- `{ message: "Logged in.", user: { id, email, name } }`
+
+**Notes**
+
+- These endpoints establish a session cookie used for protected POST routes.
+
+---
 ## 1. Event Endpoints
+
+All POST endpoints require an authenticated session cookie from /auth/email/verify.
 
 ### 1.1 Create Event
 
@@ -38,7 +80,7 @@ Create a new event for a host.
 | `title`      | string | yes      | Event title                          |
 | `startsAt`   | string | yes      | ISO datetime string                  |
 | `location`   | string | yes      | Text description of the location     |
-| `hostEmail`  | string | yes      | Email of the host user               |
+| `hostEmail`  | string | no       | Derived from the login session |
 | `description`| string | no       | Longer description of the event      |
 | `imageUrl`   | string | no       | URL of event image                   |
 | `externalUrl`| string | no       | URL for external registration/info   |
@@ -93,7 +135,7 @@ Includes:
 
 | Field   | Type   | Required | Notes                    |
 |---------|--------|----------|--------------------------|
-| `email` | string | yes      | Attendee email           |
+| `email` | string | no       | Derived from the login session |
 | `name`  | string | no       | Attendee display name    |
 
 **Behavior**
@@ -121,7 +163,7 @@ Includes:
 
 | Field     | Type   | Required | Notes                               |
 |-----------|--------|----------|-------------------------------------|
-| `email`   | string | yes      | Author’s email (must have joined)   |
+| `email`   | string | no       | Derived from the login session |
 | `rating`  | number | no       | 1–5; optional rating                |
 | `comment` | string | no       | Optional text comment               |
 

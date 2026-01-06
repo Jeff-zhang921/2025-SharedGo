@@ -27,7 +27,7 @@ model User {
   registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
   authoredReviews Review[]           @relation("UserReviews")
   hostReviews     Review[]           @relation("HostReviews")
-}
+  }
 
 
 model Event { 
@@ -76,4 +76,16 @@ model Review {
 // The combination of (eventId, authorId) must be unique.
   @@unique([eventId, authorId])
   @@index([hostId, createdAt])
+}
+
+model LoginCode {
+  id        Int      @id @default(autoincrement())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, expiresAt])
 }

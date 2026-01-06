@@ -1,3 +1,4 @@
+import "./types/express-session";
 import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
@@ -6,29 +7,16 @@ import authRouter from "./routes/auth";
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // allow basic form submissions for create-event flow
 
 app.use(session({
      secret:'sharego',
-     //if someone just see around there is no need store them
+     //reduce load
      saveUninitialized:false,
      resave:false
 }));
 
 const PORT = Number(process.env.PORT) || 3000;
-declare module 'express-session' {
-  interface SessionData {
-    visited?: boolean;
-    user?: {
-      id: number;
-      email: string;
-      name: string | null;
-      provider: "google" | "apple";
-      providerUserId: string;
-    };
-    // add more custom fields as needed
-  }
-}
+
 
 app.use("/auth", authRouter);
 app.use("/events", eventsRouter);
