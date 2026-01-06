@@ -131,3 +131,90 @@ router.post("/email/start", async (req, res) => {
 
 
 
+router.post("/email/verify", async (req, res) => {
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+  const code = typeof req.body?.code === "string" ? req.body.code.trim() : "";
+  const name = typeof req.body?.name === "string" ? req.body.name.trim() : null;
+
+  if (!EMAIL_REGEX.test(email)) {
+    res.status(400).json({ message: "Valid email is required." });
+    return;
+  }
+
+  if (!/^\d{6}$/.test(code)) {
+    res.status(400).json({ message: "Verification code must be 6 digits." });
+    return;
+  }
+
+  if (!LOGIN_CODE_SECRET) {
+    res.status(500).json({ message: "Email login is not configured." });
+    return;
+  }
+
+  const loginCode = await prisma.loginCode.findFirst({
+    where: {
+      email,
+      usedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!loginCode) {
+    res.status(401).json({ message: "Invalid or expired code." });
+    return;
+  }
+
+  if (loginCode.attempts >= MAX_ATTEMPTS) {
+    res.status(429).json({ message: "Too many attempts. Request a new code." });
+    return;
+  }
+
+  const providedHash = hashCode(code);
+  const storedHash = loginCode.codeHash;
+  //compare hashcode with user input code convert to hashcode
+  const hashesMatch =
+    providedHash.length === storedHash.length &&
+    crypto.timingSafeEqual(Buffer.from(providedHash), Buffer.from(storedHash));
+
+  if (!hashesMatch) {
+    await prisma.loginCode.update({
+      where: { id: loginCode.id },
+      data: { attempts: { increment: 1 } },
+    });
+    res.status(401).json({ message: "Invalid or expired code." });
+    return;
+  }
+
+  //mark code as used
+  await prisma.loginCode.update({
+    where: { id: loginCode.id },
+    data: { usedAt: new Date() },
+  });
+
+//find or create user
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: name ? { name } : {},
+    create: { email, name: name ?? undefined },
+  });
+  
+//store user in session
+  req.session.user = {
+    id: user.id,
+    email: user.email,
+    name: user.name ?? null,
+    provider: "email",
+  };
+
+  res.json({
+    message: "Logged in.",
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
+});
+
+
