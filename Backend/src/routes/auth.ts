@@ -65,3 +65,69 @@ async function sendLoginCode(email: string, code: string) {
     text: `Your ShareGo verification code is ${code}. It expires in 10 minutes.`,
   });
 }
+
+
+// Endpoint to start email login (sends code)
+router.post("/email/start", async (req, res) => {
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+
+  if (!EMAIL_REGEX.test(email)) {
+    res.status(400).json({ message: "Valid email is required." });
+    return;
+  }
+
+  if (!LOGIN_CODE_SECRET || !mailer) {
+    res.status(500).json({ message: "Email login is not configured." });
+    return;
+  }
+
+  const now = new Date();
+  const recentCode = await prisma.loginCode.findFirst({
+    where: {
+      email,
+      createdAt: { gt: new Date(now.getTime() - RESEND_WINDOW_MS) },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  //if a code was sent recently, block resending
+  if (recentCode) {
+    res.status(429).json({ message: "Please wait before requesting another code." });
+    return;
+  }
+
+  const code = generateCode();
+  //store the hascode to database
+  const codeHash = hashCode(code);
+  const expiresAt = new Date(now.getTime() + CODE_TTL_MS);
+
+  //mark all previous codes as used
+  await prisma.loginCode.updateMany({
+    where: { email, usedAt: null },
+    data: { usedAt: now },
+  });
+
+  //store the new code
+  await prisma.loginCode.create({
+    data: {
+      email,
+      codeHash,
+      expiresAt,
+    },
+  });
+
+//send the code via email
+  try {
+    if (process.env.NODE_ENV !== "test") {
+      await sendLoginCode(email, code);
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Failed to send verification code." });
+    return;
+  }
+
+  res.json({ message: "Verification code sent." });
+});
+
+
+
