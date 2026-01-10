@@ -37,8 +37,7 @@ const MapPage = () => {
       {icons.map((icon, idx) => (
         <Link
           key={idx}
-          //to={`/eventDetails/${icon.id}`} //Different eventDetails page for different events/icons pressed (implement later)
-          to={`/eventDetails`}
+          to={`/eventDetails/${icon.id}`} //Different eventDetails page for different events pressed using id system
           style={{
             position: "absolute",
             top: icon.top,
