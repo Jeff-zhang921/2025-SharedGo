@@ -19,7 +19,7 @@ function App() {
       {/* set the path for the personal page */}
       <Route path="/personal" element={<PersonalPage />} />
       {/* set the path for the event details page */}
-      <Route path="/eventDetails" element={<EventDetailsPage />} />
+      <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} />
       {/* set the path for the create event page */}
       <Route path="/creatEvent" element={<CreateEventPage />} />
       {/* set the path for the chat page */}
