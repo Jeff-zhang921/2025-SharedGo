@@ -23,7 +23,7 @@ app.use("/events", eventsRouter);
 app.use("/hosts", hostsRouter);
 
 app.get("/",(request:Request,response:Response)=>{
-     response.json({message:"ShareGo backend running"});
+     response.json({message:"SharedGo backend running"});
 });
 
 // Only start the server if this file is run directly (not when imported)

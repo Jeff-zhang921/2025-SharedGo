@@ -35,10 +35,10 @@ This section documents the endpoints used by **Frontend**
 
 **Request body (JSON)**
 
-| Field   | Type   | Required | Notes                  |
-|---------|--------|----------|------------------------|
-| `email` | string | yes      | Recipient email        |
-
+| Field   | Type   | Required | 
+|---------|--------|----------|
+| `email` | string | yes      |
+| `name`  | string | yes       |
 **Response**
 
 - `{ message: "Verification code sent." }`

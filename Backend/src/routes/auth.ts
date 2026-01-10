@@ -19,12 +19,14 @@ const RESEND_WINDOW_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
 //SMTP configuration from env
-const SMTP_USER = process.env.SMTP_USER || "";
+//node js read enviornment from process.env
+const SMTP_USER =process.env.SMTP_USER || "";
 const SMTP_PASS = process.env.SMTP_PASS || "";
-const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "ShareGo <no-reply@sharedgo.local>";
+const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "SharedGo <no-reply@sharedgo.local>";
 
 // Secret for hashing login codes
 const LOGIN_CODE_SECRET = process.env.LOGIN_CODE_SECRET || "";
+
 //create mailer if SMTP_USER and SMTP_PASS are provided
 const mailer =
   SMTP_USER && SMTP_PASS
@@ -36,9 +38,11 @@ const mailer =
         },
       })
     : null;
-
+//return a string
 function generateCode(): string {
+  //** means exponent operator
   const max = 10 ** CODE_LENGTH;
+  //padstart for "7" → "000007"
   return crypto.randomInt(0, max).toString().padStart(CODE_LENGTH, "0");
 }
 
@@ -53,24 +57,61 @@ function hashCode(code: string): string {
 }
 
 
-async function sendLoginCode(email: string, code: string) {
-  if (!mailer) {
-    throw new Error("Email login is not configured.");
-  }
+async function sendLoginCode(name: string, email: string, code: string) {
+if (!mailer) {
+  throw new Error("Email login is not configured.");
+}
 
-  await mailer.sendMail({
-    from: SMTP_FROM,
-    to: email,
-    subject: "Your ShareGo verification code",
-    text: `Your ShareGo verification code is ${code}. It expires in 10 minutes.`,
-  });
+const subject = "Your SharedGo verification code";
+
+const text = `Hello ${name},
+
+Your SharedGo verification code is: ${code}
+
+It expires in 10 minutes.
+
+If you didn’t request this code, you can ignore this email.`;
+
+const html = `
+  <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+    <p>Hello ${name},</p>
+
+    <p>Your SharedGo verification code is:</p>
+
+    <div style="
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      margin: 12px 0 8px 0;
+    ">
+      ${code}
+    </div>
+
+    <div style="font-size: 12px; color: #666; margin-top: 6px;">
+      Expires in 10 minutes. You’re receiving this email because you requested access to your SharedGo account.
+    </div>
+
+    <p style="font-size: 12px; color: #666; margin-top: 16px;">
+      If you didn’t request this code, you can ignore this email.
+    </p>
+  </div>
+`;
+
+await mailer.sendMail({
+  from: SMTP_FROM,
+  to: email,
+  subject,
+  text, 
+  html, // big code + smaller text underneath
+});
+
 }
 
 
 // Endpoint to start email login (sends code)
 router.post("/email/start", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
-
+  const name = typeof req.body?.name === "string" ? req.body.name.trim():"";
   if (!EMAIL_REGEX.test(email)) {
     res.status(400).json({ message: "Valid email is required." });
     return;
@@ -101,25 +142,23 @@ router.post("/email/start", async (req, res) => {
   const codeHash = hashCode(code);
   const expiresAt = new Date(now.getTime() + CODE_TTL_MS);
 
-  //mark all previous codes as used
-  await prisma.loginCode.updateMany({
-    where: { email, usedAt: null },
-    data: { usedAt: now },
-  });
-
-  //store the new code
-  await prisma.loginCode.create({
-    data: {
-      email,
-      codeHash,
-      expiresAt,
-    },
-  });
+  // delete any previous codes for this email so only the newest one remains
+  //$transaction is the feature that success or fail together
+  await prisma.$transaction([
+    prisma.loginCode.deleteMany({ where: { email } }),
+    prisma.loginCode.create({
+      data: {
+        email,
+        codeHash,
+        expiresAt,
+      },
+    }),
+  ]);
 
 //send the code via email
   try {
     if (process.env.NODE_ENV !== "test") {
-      await sendLoginCode(email, code);
+      await sendLoginCode(name, email, code);
     }
   } catch (err) {
     res.status(500).json({ message: "Failed to send verification code." });
@@ -174,8 +213,7 @@ router.post("/email/verify", async (req, res) => {
   const storedHash = loginCode.codeHash;
   //compare hashcode with user input code convert to hashcode
   const hashesMatch =
-    providedHash.length === storedHash.length &&
-    crypto.timingSafeEqual(Buffer.from(providedHash), Buffer.from(storedHash));
+  providedHash.length === storedHash.length && providedHash === storedHash;
 
   if (!hashesMatch) {
     await prisma.loginCode.update({
@@ -186,11 +224,8 @@ router.post("/email/verify", async (req, res) => {
     return;
   }
 
-  //mark code as used
-  await prisma.loginCode.update({
-    where: { id: loginCode.id },
-    data: { usedAt: new Date() },
-  });
+  // delete codes so they can't be reused
+  await prisma.loginCode.deleteMany({ where: { email } });
 
 //find or create user
   const user = await prisma.user.upsert({
@@ -200,6 +235,13 @@ router.post("/email/verify", async (req, res) => {
   });
   
 //store user in session
+//The browser remembers a cookie (e.g. connect.sid=abc123...)
+//On each request:
+//Session middleware reads the cookie (connect.sid=...)
+//It loads the session data for that session ID from the session store:
+//It attaches it to req.session
+//So you can do req.session.user and get the object back.
+
   req.session.user = {
     id: user.id,
     email: user.email,
@@ -224,7 +266,6 @@ router.get("/me", (req, res) => {
     res.status(401).json({ message: "Not authenticated." });
     return;
   }
-
   res.json({ user: req.session.user });
 });
 
