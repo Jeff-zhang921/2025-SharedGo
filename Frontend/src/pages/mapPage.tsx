@@ -3,6 +3,35 @@ import "./mapPage.css"
 import Button from '../components/Button';
 import { Link } from "react-router-dom";
 
+interface User {
+  id: number;
+  name: string | null;
+  email: string
+}
+
+//Fields for the expected event data from the backend
+interface EventData {
+  id: number;
+  title: string;
+  description: string | null; //Null as doesn't have to be filled in
+  startsAt: string;
+  capacity: number | null;
+  location: string;
+  imageUrl: string | null;
+  externalUrl: string | null;
+  host: User; //Whomever hosted the event
+  attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
+    id: number;
+    name: string | null;
+    email: string;
+    joinedAt: string;
+  }>;
+
+  attendeeCount: number;
+  averageRating: number | null;
+}
+
+
 const MapPage = () => {
   const [dbEvents, setDbEvents] = useState([]);
 
