@@ -46,7 +46,8 @@ const EventDetailsPage = () => {
     setEvent(null);
 
     //Hardcoded URL at the moment, might change later
-    const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on
+    //Backend seems to be on port 3000 atm
+    const backendBaseURL = 'http://localhost:5556'; //Change to the correct URL which the backend is running on
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
   
     const fetchEvent = async () => {

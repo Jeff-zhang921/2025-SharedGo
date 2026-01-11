@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
 import { Link } from "react-router-dom";
 
 const MapPage = () => {
-  const icons = [ //Clickable icons representing events in the area
-    { id: 0, top: "40%", left: "60%", title: "5-a-side"}, //Icon 0 - Id's used to differentiate different events (implement functionality later)
-    { id: 1, top: "20%", left: "10%", title: "Concert"}, //Icon 1
-    { id: 2, top: "80%", left: "75%", title: "CSS social"}, //Icon 2
-    { id: 3, top: "50%", left: "80%", title: "Cake baking"},  //Icon 3
-    { id: 4, top: "50%", left: "33%", title: "DJ set"},  //Icon 4
-    { id: 5, top: "60%", left: "40%", title: "Coffee social"}  //Icon 5
-  ];
+  const [dbEvents, setDbEvents] = useState([]);
+
+  //Hardcoded event positions for now, will change later
+  const positionLookup = {
+    1: {top: "40%", left: "60%"}, //Icon 1
+    2: {top: "20%", left: "10%"}, //Icon 2
+    3: {top: "80%", left: "75%"}, //Icon 3
+    4: {top: "50%", left: "80%"},  //Icon 4
+    5: {top: "50%", left: "33%"},  //Icon 5
+    6: {top: "60%", left: "40%"}  //Icon 6
+  }
+
+  useEffect(() => {
+    // Fetch events from backend
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/events');
+        const data = await response.json();
+        setDbEvents(data); // Put the events database into 'icons' state
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const ICON_DIAMETER = 100; // Diameter of the circle in pixels
   const FONT_SIZE = '16px';
