@@ -138,7 +138,7 @@ router.post("/create", async (req, res) => {
   });
 });
 
-//Logic to return json object of list of ALL events
+//Logic to return list of ALL events
 //can get at just /events so it lists all the events rather than just 1 for each id
 router.get("/", async (req, res) => {
   try {
