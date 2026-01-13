@@ -33,17 +33,17 @@ interface EventData {
 
 
 const MapPage = () => {
-  const [dbEvents, setDbEvents] = useState([]);
+  const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
 
   //Hardcoded event positions for now, will change later
-  const positionLookup = {
-    1: {top: "40%", left: "60%"}, //Icon 1
-    2: {top: "20%", left: "10%"}, //Icon 2
-    3: {top: "80%", left: "75%"}, //Icon 3
-    4: {top: "50%", left: "80%"},  //Icon 4
-    5: {top: "50%", left: "33%"},  //Icon 5
-    6: {top: "60%", left: "40%"}  //Icon 6
-  }
+  const positionLookup: { [key: number]: { top: string; left: string } } = {
+    1: { top: "40%", left: "60%" },
+    2: { top: "20%", left: "10%" },
+    3: { top: "80%", left: "75%" },
+    4: { top: "50%", left: "80%" },
+    5: { top: "50%", left: "33%" },
+    6: { top: "60%", left: "40%" }
+  };
 
   useEffect(() => {
     // Fetch events from backend
@@ -81,43 +81,39 @@ const MapPage = () => {
           size={60}                       // Adjust size in pixels
         />
       </div>
-      {icons.map((icon, idx) => (
-        <Link
-          key={idx}
-          to={`/eventDetails/${icon.id}`} //Different eventDetails page for different events/icons pressed (implement later)
-          style={{
-            position: "absolute",
-            top: icon.top,
-            left: icon.left,
-            cursor: "pointer",
-            textDecoration: 'none', //remove blue underline
-            transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location
-            width: ICON_DIAMETER,
-            height: ICON_DIAMETER,
-            borderRadius: '50%',
-            backgroundColor: 'white', //colour of circle event icons
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
 
-            //Flexbox to centre text inside circle
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {/* Black text content */}
-          <span 
+      {dbEvents.map((event) => {
+        // Find the coordinates for this specific DB ID
+        // If the ID isn't in our lookup, give it a default middle position
+        const pos = positionLookup[event.id] || { top: "50%", left: "50%" };
+
+        return (
+          <Link
+            key={event.id}
+            to={`/eventDetails/${event.id}`} //Uses event id from the database
             style={{
-              color: 'black',
-              fontSize: FONT_SIZE,
-              fontWeight: 'normal',
-              textAlign: 'center',
-              pointerEvents: 'none',
+              position: "absolute",
+              top: pos.top,
+              left: pos.left,
+              cursor: "pointer",
+              textDecoration: 'none', //remove blue underline
+              transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location 
+              width: ICON_DIAMETER,
+              height: ICON_DIAMETER,
+              borderRadius: '50%',
+              backgroundColor: 'white', //colour of circle event icons 
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
+              display: 'flex', //Flexbox to centre text inside circle 
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {icon.title}
-          </span>
-        </Link>
-      ))}
+            <span style={{ color: 'black', fontSize: FONT_SIZE, textAlign: 'center' }}>
+              {event.title} {/*Displays title from prisma*/}
+            </span>
+          </Link>
+        );
+      })}
     </div>
   );
 };
