@@ -36,7 +36,7 @@ model Event {
   description  String? 
   startsAt     DateTime // Scheduled start date and time.
   capacity     Int? // Optional maximum number of attendees allowed.
-  category     String   @default("Other")
+  category     Category   @default(Other)
   location     String // Text field noting where the event takes place.
   latitude     Float
   longitude    Float
@@ -49,6 +49,20 @@ model Event {
   createdAt    DateTime           @default(now()) 
   updatedAt    DateTime           @updatedAt 
 } 
+
+enum Category {
+  Physical_Activities
+  Festivals
+  Educational
+  Networking
+  Arts_Culture
+  Food_Drink
+  Music_Concerts
+  Tech_Gaming
+  Wellness_Meditation
+  Volunteer_Charity
+  Other
+}
 
 model EventParticipant { // Join table linking users to events they attend.
   id        Int      @id @default(autoincrement()) 
