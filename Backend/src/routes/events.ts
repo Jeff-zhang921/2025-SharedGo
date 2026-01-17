@@ -47,8 +47,8 @@ router.post("/create", async (req, res) => {
     : null;
 
   const category = Categories.includes(categoryRaw) ? categoryRaw : "Other";
-  const latitude = latitudeRaw !== undefined ? Number(latitudeRaw) : null;
-  const longitude = longitudeRaw !== undefined ? Number(longitudeRaw) : null;
+  const latitude = latitudeRaw !== undefined ? Number(latitudeRaw) : 0;
+  const longitude = longitudeRaw !== undefined ? Number(longitudeRaw) : 0;
 
   
  // Basic required-field validation. If invalid, return 400 and stop.
@@ -109,7 +109,7 @@ router.post("/create", async (req, res) => {
       description,
       startsAt,
       capacity,
-      category
+      category,
       location,
       latitude,
       longitude,

@@ -2,6 +2,7 @@ import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
+import homeRouter from "./routes/home";
 
 const app = express();
 app.use(express.json());
@@ -31,6 +32,7 @@ declare module 'express-session' {
 
 app.use("/events", eventsRouter);
 app.use("/hosts", hostsRouter);
+app.use("/home", homeRouter);
 
 app.get("/",(request:Request,response:Response)=>{
      response.json({message:"ShareGo backend running"});
