@@ -64,6 +64,7 @@ if (!mailer) {
 
 const subject = "Your SharedGo verification code";
 
+
 const text = `Hello ${name},
 
 Your SharedGo verification code is: ${code}
@@ -111,7 +112,7 @@ await mailer.sendMail({
 // Endpoint to start email login (sends code)
 router.post("/email/start", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
-  const name = typeof req.body?.name === "string" ? req.body.name.trim():"";
+  //const name = typeof req.body?.name === "string" ? req.body.name.trim():"";
   if (!EMAIL_REGEX.test(email)) {
     res.status(400).json({ message: "Valid email is required." });
     return;
@@ -123,9 +124,23 @@ router.post("/email/start", async (req, res) => {
   }
 
   const now = new Date();
+  const user = await prisma.user.findFirst({
+    where:{
+    email: email
+    },
+    select:{name:true}
+  })
+
+ let name: string;
+  if (!user){
+    name="New User"
+  }else{
+    name = user.name ?? "New User";
+  }
+
   const recentCode = await prisma.loginCode.findFirst({
     where: {
-      email,
+      email: email,
       createdAt: { gt: new Date(now.getTime() - RESEND_WINDOW_MS) },
     },
     orderBy: { createdAt: "desc" },
@@ -173,7 +188,7 @@ router.post("/email/start", async (req, res) => {
 router.post("/email/verify", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
   const code = typeof req.body?.code === "string" ? req.body.code.trim() : "";
-  const name = typeof req.body?.name === "string" ? req.body.name.trim() : null;
+  //const name = typeof req.body?.name === "string" ? req.body.name.trim() : null;
 
   if (!EMAIL_REGEX.test(email)) {
     res.status(400).json({ message: "Valid email is required." });
@@ -229,9 +244,9 @@ router.post("/email/verify", async (req, res) => {
 
 //find or create user
   const user = await prisma.user.upsert({
-    where: { email },
-    update: name ? { name } : {},
-    create: { email, name: name ?? undefined },
+    where: { email:email },
+    update: {},
+    create: { email },
   });
   
 //store user in session

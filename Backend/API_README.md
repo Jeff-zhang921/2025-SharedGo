@@ -38,7 +38,6 @@ This section documents the endpoints used by **Frontend**
 | Field   | Type   | Required | 
 |---------|--------|----------|
 | `email` | string | yes      |
-| `name`  | string | yes       |
 **Response**
 
 - `{ message: "Verification code sent." }`
@@ -55,7 +54,6 @@ This section documents the endpoints used by **Frontend**
 |---------|--------|----------|-----------------------------|
 | `email` | string | yes      | Same email used above       |
 | `code`  | string | yes      | 6-digit code from email     |
-| `name`  | string | no       | Optional display name       |
 
 **Response**
 
