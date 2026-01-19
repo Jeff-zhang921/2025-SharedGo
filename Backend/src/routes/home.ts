@@ -17,22 +17,22 @@ function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): n
     return R * c; // Distance in km
 }
 
-router.get("/feed", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
     try {
-        const now = new Date();  
-        
+        const now = new Date();  //get current date
+        // Extract query parameters
         const category = typeof req.query.category === "string" ? (req.query.category as Category) : null;
         const search = typeof req.query.search === "string" ? req.query.search : null;
         const userLatitude = req.query.latitude ? Number(req.query.latitude) : null;
         const userLongitude = req.query.longitude ? Number(req.query.longitude) : null;
-        // Build the where clause dynamically based on query parameters
+
         const whereClause: Prisma.EventWhereInput = {
             startsAt: { gte: now },
         };
         if (category) {
             whereClause.category = category;
         }
-        if (search) {
+        if (search) { // Case-insensitive search in title
             whereClause.title = { contains: search, mode: 'insensitive' };
         }
         const events = await prisma.event.findMany({
@@ -41,12 +41,13 @@ router.get("/feed", async (req: Request, res: Response) => {
                 host: true,
                 participants: true,
             },
-            orderBy : { startsAt: 'asc'}, 
+            orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
         
         // Map the results
         const feed = events.map((event) => {
             let distance: number | null = null;
+            //calculate distance only if both user and eventlocation is provided
             if (userLatitude !== null && userLongitude !== null && event.latitude && event.longitude) {
                 distance = distanceInKm(
                     userLatitude,
@@ -74,12 +75,20 @@ router.get("/feed", async (req: Request, res: Response) => {
                 distance: distance !== null ? Number(distance.toFixed(3)) : null,
             };
         });
-        if (userLatitude !== null && userLongitude !== null) {
-            feed.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-        }
+        
+        //sort the feed by nearest then most popular
+        feed.sort((a, b) => {
+            if (a.distance !== null && b.distance !== null) {
+                return (a.distance ?? Infinity) - (b.distance ?? Infinity); // Nearest first
+            }
+            //if distances are equal then sort by most popular
+            return b.attendeeCount - a.attendeeCount; 
+        });
+
         res.json({ 
-            recommendedEvents: feed.slice(0, 5), 
-            upcoming: feed, 
+            recommendedEvents: feed.slice(0, 5),  //top 5 recommended
+            categories: Object.values(Category), //turn Enum into array of strings
+            upcoming: feed,  //all sorted upcoming events
         });
     } catch (error) {
         console.error("Home feed error:", error);
