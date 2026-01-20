@@ -3,9 +3,11 @@ import express,{Request,Response} from "express";
 import session from "express-session";
 import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
+import cors from 'cors';
 import authRouter from "./routes/auth";
 
 const app = express();
+app.use(cors()) //prevent browser from blocking frontend requests
 app.use(express.json());
 
 app.use(session({

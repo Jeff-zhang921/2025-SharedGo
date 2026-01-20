@@ -134,7 +134,44 @@ router.post("/create", requireSession, async (req, res) => {
   });
 });
 
+//Logic to return list of ALL events
+//can get at just /events so it lists all the events rather than just 1 for each id
+router.get("/", async (req, res) => {
+  try {
+    const events = await prisma.event.findMany({
+      include: {
+        host: true,
+        participants: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
+    //map the data so it matches the EventData interface in frontend
+    const formattedEvents = events.map((event) => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startsAt: event.startsAt,
+      capacity: event.capacity,
+      location: event.location,
+      imageUrl: event.imageUrl,
+      externalUrl: event.externalUrl,
+      host: {
+        id: event.host.id,
+        name: event.host.name,
+        email: event.host.email,
+      },
+      attendeeCount: event.participants.length,
+    }));
+
+    res.json(formattedEvents); //Send back the event details as JSON so the front end can show it
+  } catch (error) {
+    console.error("Error fetching events", error);
+    res.status(500).json({ message: "Internal server error while fetching events." });
+  }
+});
 
 
 //return json object with event id....
