@@ -1,7 +1,7 @@
 //this is the backend logic
 import { Router } from "express"; 
 import { PrismaClient } from "@prisma/client";
-import { getEnabledCategories } from "trace_events";
+
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
