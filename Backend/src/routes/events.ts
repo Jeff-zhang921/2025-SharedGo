@@ -1,6 +1,7 @@
 //this is the backend logic
 import { Router } from "express"; 
 import { PrismaClient } from "@prisma/client";
+import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
@@ -12,7 +13,7 @@ export const Categories = [
 
 //publish event logic
 //you can post on /events/create
-router.post("/create", async (req, res) => {
+router.post("/create", requireSession, async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
 //if anything is undefine in josn input, it will throw 
@@ -152,7 +153,44 @@ router.post("/create", async (req, res) => {
   });
 });
 
+//Logic to return list of ALL events
+//can get at just /events so it lists all the events rather than just 1 for each id
+router.get("/", async (req, res) => {
+  try {
+    const events = await prisma.event.findMany({
+      include: {
+        host: true,
+        participants: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
+    //map the data so it matches the EventData interface in frontend
+    const formattedEvents = events.map((event) => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startsAt: event.startsAt,
+      capacity: event.capacity,
+      location: event.location,
+      imageUrl: event.imageUrl,
+      externalUrl: event.externalUrl,
+      host: {
+        id: event.host.id,
+        name: event.host.name,
+        email: event.host.email,
+      },
+      attendeeCount: event.participants.length,
+    }));
+
+    res.json(formattedEvents); //Send back the event details as JSON so the front end can show it
+  } catch (error) {
+    console.error("Error fetching events", error);
+    res.status(500).json({ message: "Internal server error while fetching events." });
+  }
+});
 
 
 //return json object with event id....
@@ -195,7 +233,7 @@ router.get("/:id", async (req, res) => {
     const remaining = event.capacity - attendeeCount; // Subtract the number of attendees from the total capacity.
     seatsRemaining = remaining > 0 ? remaining : 0; // Never show a negative value even if we somehow go over.
   }
-   
+  
   //map copy participant array to attendees and only copy field of return in participate to attendees
   //which is
   const attendees = event.participants.map((participant: { user: { id: number; name: string | null; email: string }; joinedAt: Date }) => { // Build an array that only contains the data the UI needs.
@@ -269,7 +307,7 @@ router.get("/:id", async (req, res) => {
 // Handle the case where someone presses "Join" on the event screen.
 //it takes in eventid
 //you can post on /events/:id/join
-router.post("/:id/join", async (req, res) => { 
+router.post("/:id/join", requireSession, async (req, res) => { 
   // Read the event id from the URL.
   const idText = req.params.id;
   const eventId = Number(idText); // Turn the id string into a number.
@@ -352,7 +390,7 @@ router.post("/:id/join", async (req, res) => {
 
 
 // Allow attendees to leave or update a review for an event (and host).
-router.post("/:id/reviews", async (req, res) => {
+router.post("/:id/reviews", requireSession, async (req, res) => {
   const idText = req.params.id;
   const eventId = Number(idText);
 

@@ -95,5 +95,6 @@ router.get("/", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to load feed" });
     }
 });
+
 export default router;
 
