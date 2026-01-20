@@ -1,17 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
 import { Link } from "react-router-dom";
 
+interface User {
+  id: number;
+  name: string | null;
+  email: string
+}
+
+//Fields for the expected event data from the backend
+interface EventData {
+  id: number;
+  title: string;
+  description: string | null; //Null as doesn't have to be filled in
+  startsAt: string;
+  capacity: number | null;
+  location: string;
+  imageUrl: string | null;
+  externalUrl: string | null;
+  host: User; //Whomever hosted the event
+  attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
+    id: number;
+    name: string | null;
+    email: string;
+    joinedAt: string;
+  }>;
+
+  attendeeCount: number;
+  averageRating: number | null;
+}
+
+
 const MapPage = () => {
-  const icons = [ //Clickable icons representing events in the area
-    { id: 0, top: "40%", left: "60%", title: "5-a-side"}, //Icon 0 - Id's used to differentiate different events (implement functionality later)
-    { id: 1, top: "20%", left: "10%", title: "Concert"}, //Icon 1
-    { id: 2, top: "80%", left: "75%", title: "CSS social"}, //Icon 2
-    { id: 3, top: "50%", left: "80%", title: "Cake baking"},  //Icon 3
-    { id: 4, top: "50%", left: "33%", title: "DJ set"},  //Icon 4
-    { id: 5, top: "60%", left: "40%", title: "Coffee social"}  //Icon 5
-  ];
+  const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
+
+  //Hardcoded event positions for now, will change later
+  const positionLookup: { [key: number]: { top: string; left: string } } = {
+    1: { top: "40%", left: "60%" },
+    2: { top: "20%", left: "10%" },
+    3: { top: "80%", left: "75%" },
+    4: { top: "50%", left: "80%" },
+    5: { top: "50%", left: "33%" },
+    6: { top: "60%", left: "40%" }
+  };
+
+  useEffect(() => {
+    // Fetch events from backend
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/events');
+        const data = await response.json();
+        setDbEvents(data); // Put the events database into 'icons' state
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const ICON_DIAMETER = 100; // Diameter of the circle in pixels
   const FONT_SIZE = '16px';
@@ -34,43 +81,39 @@ const MapPage = () => {
           size={60}                       // Adjust size in pixels
         />
       </div>
-      {icons.map((icon, idx) => (
-        <Link
-          key={idx}
-          to={`/eventDetails/${icon.id}`} //Different eventDetails page for different events pressed using id system
-          style={{
-            position: "absolute",
-            top: icon.top,
-            left: icon.left,
-            cursor: "pointer",
-            textDecoration: 'none', //remove blue underline
-            transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location
-            width: ICON_DIAMETER,
-            height: ICON_DIAMETER,
-            borderRadius: '50%',
-            backgroundColor: 'white', //colour of circle event icons
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
 
-            //Flexbox to centre text inside circle
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {/* Black text content */}
-          <span 
+      {dbEvents.map((event) => {
+        // Find the coordinates for this specific DB ID
+        // If the ID isn't in our lookup, give it a default middle position
+        const pos = positionLookup[event.id] || { top: "50%", left: "50%" };
+
+        return (
+          <Link
+            key={event.id}
+            to={`/eventDetails/${event.id}`} //Uses event id from the database
             style={{
-              color: 'black',
-              fontSize: FONT_SIZE,
-              fontWeight: 'normal',
-              textAlign: 'center',
-              pointerEvents: 'none',
+              position: "absolute",
+              top: pos.top,
+              left: pos.left,
+              cursor: "pointer",
+              textDecoration: 'none', //remove blue underline
+              transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location 
+              width: ICON_DIAMETER,
+              height: ICON_DIAMETER,
+              borderRadius: '50%',
+              backgroundColor: 'white', //colour of circle event icons 
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
+              display: 'flex', //Flexbox to centre text inside circle 
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {icon.title}
-          </span>
-        </Link>
-      ))}
+            <span style={{ color: 'black', fontSize: FONT_SIZE, textAlign: 'center' }}>
+              {event.title} {/*Displays title from prisma*/}
+            </span>
+          </Link>
+        );
+      })}
     </div>
   );
 };
