@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 //Interface to match backend
-interface hostData {
+interface HostData {
     id: number,
     name: string,
     email: string
@@ -21,41 +21,36 @@ interface ReviewItem {
     msg: string;
 }
 export default function host() {
+    const { hostId } = useParams<{ hostId: string }>(); //Fetches id of host from browser e.g. url/host/4 hostId becomes 4
+    const [host, setHost] = useState<HostData | null>(null);
     const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);  // select status of tags
-
-    const [card, setCard] = useState<CardItem[]>([{ title: "Title", date: "Date" }, { title: "Title", date: "Date" }, { title: "Title", date: "Date" }])
-
+    const [card, setCard] = useState<CardItem[]>([])
     // 在组件内部添加状态
-    const [reviews, setReviews] = useState<ReviewItem[]>([
-        {
-            id: 1,
-            userName: "User1",
-            msg: "reviews",
-        },
-        {
-            id: 2,
-            userName: "User2",
-            msg: "reviews",
-        },
-        {
-            id: 3,
-            userName: "User3",
-            msg: "reviews",
-        },
-        {
-            id: 4,
-            userName: "User4",
-            msg: "reviews",
-        },
-        {
-            id: 5,
-            userName: "User5",
-            msg: "reviews",
-        }
-    ]);
+    const [reviews, setReviews] = useState<ReviewItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    //const [selectedTab, setSelectedTab] = useState<number>(0);
 
-    const [selectedTab, setSelectedTab] = useState<number>(0);
+    useEffect(() => { //Logic to actually fetch host data from backend
+        const fetchHostData = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/hosts/${hostId}/overview`); //Backend route to get specific host
+                const data = await response.json();
+                setHost(data.host);
+                setCard(data.upcomingEvents); //backend returns their hosted events
+                setReviews(data.reviews); //backend returns their reviews
+            } catch (err) {
+                console.error("Failed to fetch host:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (hostId) fetchHostData();
+    }, [hostId]);
+
+    if (isLoading) return <p>Loading Host Profile...</p>;
+    if (!host) return <p>Host not found.</p>;
     return (
         <>
             <div style={{ height: '100vh' }}>
