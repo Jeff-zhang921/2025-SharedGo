@@ -1,22 +1,30 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
+//Interface to match backend
+interface hostData {
+    id: number,
+    name: string,
+    email: string
+}
+
+//Moved interfaces outside of the export
+interface CardItem {
+    title: string;
+    date: string;
+}
+
+interface ReviewItem {
+    id: number;
+    userName: string;
+    msg: string;
+}
 export default function host() {
-    interface CardItem {
-        title: string;
-        date: string;
-    }
-
     const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);  // select status of tags
 
     const [card, setCard] = useState<CardItem[]>([{ title: "Title", date: "Date" }, { title: "Title", date: "Date" }, { title: "Title", date: "Date" }])
-
-    interface ReviewItem {
-        id: number;
-        userName: string;
-        msg: string;
-    }
 
     // 在组件内部添加状态
     const [reviews, setReviews] = useState<ReviewItem[]>([
@@ -138,26 +146,6 @@ export default function host() {
                             </div>
                         ))}
                     </div>
-                </div>
-
-                {/* Description UI */}
-                <div style={{
-                    height: '20rem',
-                    marginTop: '2.5rem',
-                    marginLeft: '0.75rem',
-                    marginRight: '0.75rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.75rem',
-                    paddingLeft: '0.75rem',
-                    paddingRight: '0.75rem'
-                }}>
-                    <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Description</div>
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} style={{
-                            borderBottom: '1px solid #e5e7eb',
-                            height: '2.5rem'
-                        }}></div>
-                    ))}
                 </div>
 
                 {/* Reviews UI */}
