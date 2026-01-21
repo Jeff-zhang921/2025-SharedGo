@@ -10,7 +10,7 @@ interface HostData {
 }
 
 //Moved interfaces outside of the export
-interface CardItem {
+interface CardItem { //Cards = events
     title: string;
     date: string;
 }
@@ -36,6 +36,7 @@ export default function host() {
             try {
                 const response = await fetch(`http://localhost:3000/hosts/${hostId}/overview`); //Backend route to get specific host
                 const data = await response.json();
+                console.log("Debugging, host Overview Data:", data); //checking connection is working
                 setHost(data.host);
                 setCard(data.upcomingEvents); //backend returns their hosted events
                 setReviews(data.reviews); //backend returns their reviews
@@ -80,6 +81,27 @@ export default function host() {
                         justifyContent: 'center'
                     }}></div>
                 </div>
+
+                {/* Profile Section (Connects to backend) */}
+                {host && (
+                    <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem 1.25rem', backgroundColor: 'white' }}>
+                        <div style={{ marginRight: '1.5rem' }}>
+                            <img //Placeholder host icon image
+                                src="/src/assets/user-icon.png" 
+                                alt="Host Profile"
+                                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: '500', color: 'black' }}> {/*Name of host*/}
+                                {host.name || "Anonymous Host"} {/*Name of host from backend*/}
+                            </h1>
+                            <p style={{ margin: 0, fontSize: '1.25rem', color: '#6b7280' }}> {/*Email address*/}
+                                {host.email} {/*Email from backend*/}
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {/* tags UI */}
                 <div style={{

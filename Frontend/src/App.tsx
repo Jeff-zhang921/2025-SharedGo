@@ -25,7 +25,7 @@ function App() {
       {/* set the path for the chat page */}
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}
-      <Route path="/host" element={<HostPage />} />
+      <Route path="/host/:hostId" element={<HostPage />} />
     </Routes>
 
   );
