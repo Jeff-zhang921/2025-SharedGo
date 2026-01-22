@@ -5,6 +5,7 @@ import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
 import cors from 'cors';
 import authRouter from "./routes/auth";
+import profileRouter from "./routes/profile";
 
 const app = express();
 app.use(cors()) //prevent browser from blocking frontend requests
@@ -23,6 +24,7 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use("/auth", authRouter);
 app.use("/events", eventsRouter);
 app.use("/hosts", hostsRouter);
+app.use("/profile", profileRouter);
 
 app.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});
