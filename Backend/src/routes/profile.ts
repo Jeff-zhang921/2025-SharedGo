@@ -87,3 +87,51 @@ const mapEventSummary = (event: EventProfileRow, currentUserId: number) => {
   };
 };
 
+
+type ReviewProfileRow = {
+  id: number;
+  rating: number | null;
+  comment: string | null;
+  createdAt: Date;
+  author: { id: number; name: string | null; email: string };
+  host: { id: number; name: string | null; email: string };
+  event: { id: number; title: string; startsAt: Date };
+};
+
+const mapReview = (review: ReviewProfileRow) => ({
+  id: review.id,
+  rating: review.rating,
+  comment: review.comment,
+  createdAt: review.createdAt,
+  author: {
+    id: review.author.id,
+    name: review.author.name,
+    email: review.author.email,
+  },
+  host: {
+    id: review.host.id,
+    name: review.host.name,
+    email: review.host.email,
+  },
+  event: {
+    id: review.event.id,
+    title: review.event.title,
+    startsAt: review.event.startsAt,
+  },
+});
+
+//middleware request session
+function requireProfileSession(req: Request, res: Response, next: NextFunction) {
+    //from browser send cookie ID, interpret by express middleware
+    //It uses the session id to load the session data from your session store
+    //and attach to req
+  const user = req.session.user;
+  if (!user) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  //Avoid repeating req.session.user in every handle
+  res.locals.sessionUser = user;
+  next();
+}
