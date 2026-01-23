@@ -284,3 +284,71 @@ router.get("/me/overview", requireProfileSession, async (req, res) => {
     pastEvents: pastEvents.map((event) => mapEventSummary(event, userId)),
   });
 });
+
+
+
+// Paginated list of the user's events (joined and/or hosted).
+router.get("/me/events", requireProfileSession, async (req, res) => {
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+  
+
+  const userId = sessionUser.id;
+  const now = new Date();
+  //if it is not string request upcoming
+  const statusRaw = typeof req.query.status === "string" ? req.query.status : "upcoming";
+  const status = statusRaw.toLowerCase();
+  const limit = parsePageSize(req.query.limit);
+  const page = parsePage(req.query.page);
+  //how many rows ignore when start of the result
+  const skip = (page - 1) * limit;
+  if (!["upcoming", "past", "all"].includes(status)) {
+    res.status(400).json({ message: "status must be upcoming, past, or all." });
+    return;
+  }
+  const where: Prisma.EventWhereInput = {
+    //condition 1 if the user is the host
+   //some: does the list of participants contain atleast one with this userId?
+    OR: [{ hostId: userId }, { participants: { some: { userId } } }],
+  };
+
+  if (status === "upcoming") {
+    where.startsAt = { gte: now };
+  } else if (status === "past") {
+    where.startsAt = { lt: now };
+  }
+
+  const includeForUser: Prisma.EventInclude = {
+    host: { select: { id: true, name: true, email: true } },
+    participants: {
+      where: { userId },
+      select: { userId: true, joinedAt: true },
+    },
+    //the point of using _ count here is to get the whole list of paritcipant in this event.
+    //since you cannot use .length cause  where: { userId }, will only return that one row not the whole row
+    _count: { select: { participants: true } },
+  };
+
+  const orderDirection = status === "past" ? "desc" : "asc";
+
+  const [events, total] = await Promise.all([
+    prisma.event.findMany({
+    //event data whether joined by me or created by me
+      where,
+      orderBy: { startsAt: orderDirection },
+      skip,
+      take: limit,
+      include: includeForUser,
+    }),
+    
+    prisma.event.count({ where }),
+  ]);
+
+  res.json({
+    pagination: { page, limit, total },
+    events: events.map((event) => mapEventSummary(event, userId)),
+  });
+});
