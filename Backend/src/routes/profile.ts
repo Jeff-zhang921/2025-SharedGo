@@ -160,3 +160,50 @@ router.get("/me", requireProfileSession, async (req, res) => {
 });
 
 
+// Update profile fields (currently only `name`).
+router.patch("/me", requireProfileSession, async (req, res) => {
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+//“treat req.body as either:
+//an object that may have a name field (name?)
+//and if it has name, its type is unknown (we haven’t validated it yet)
+//OR undefined”
+
+  const nameRaw = (req.body as { name?: unknown } | undefined)?.name;
+   
+  if (nameRaw === undefined) {
+    res.status(400).json({ message: "No fields to update." });
+    return;
+  }
+
+  let name: string | null;
+  if (nameRaw === null) {
+    name = null;
+  } else if (typeof nameRaw === "string") {
+    const trimmed = nameRaw.trim();
+    name = trimmed.length > 0 ? trimmed : null;
+  } else {
+    res.status(400).json({ message: "Name must be a string or null." });
+    return;
+  }
+
+  const user = await prisma.user.update({
+    where: { id: sessionUser.id },
+    data: { name },
+    select: { id: true, email: true, name: true },
+  });
+
+  req.session.user = {
+    //copy anything inside the session
+    ...sessionUser,
+    name: user.name ?? null,
+  };
+
+  res.json({ message: "Profile updated.", user });
+});
+
+
