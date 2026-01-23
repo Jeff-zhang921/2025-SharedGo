@@ -135,3 +135,28 @@ function requireProfileSession(req: Request, res: Response, next: NextFunction) 
   res.locals.sessionUser = user;
   next();
 }
+
+
+
+// Basic profile info for the logged-in user.
+router.get("/me", requireProfileSession, async (req, res) => {
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: { id: true, email: true, name: true },
+  });
+
+  if (!user) {
+    delete req.session.user;
+    res.status(404).json({ message: "User not found." });
+    return;
+  }
+  res.json({ user });
+});
+
+
