@@ -207,3 +207,80 @@ router.patch("/me", requireProfileSession, async (req, res) => {
 });
 
 
+
+// Overview for the profile screen (previews + counts).
+router.get("/me/overview", requireProfileSession, async (req, res) => {
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  const userId = sessionUser.id;
+  const now = new Date();
+  const previewLimit = 5;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, name: true },
+  });
+
+  if (!user) {
+    delete req.session.user;
+    res.status(404).json({ message: "User not found." });
+    return;
+  }
+
+
+//TypeScript type that describes the allowed shape of that filter.
+  const baseWhere: Prisma.EventWhereInput = {
+    //OR is or operator between hostID and participants,
+    //some: is This event has at least one participant whose userId equals userId.”
+    OR: [{ hostId: userId }, { participants: { some: { userId } } }],
+  };
+
+  //Typescript Type that Used in include: to decide what relations to fetch along with each event.
+  const includeForUser: Prisma.EventInclude = {
+    //if you want to pick specific fields and fetch a relation. select and include cannot be same level
+    //want the info whole table but only this field
+    host: { select: { id: true, name: true, email: true }},
+    
+    participants: {
+        //only want this with specific userid
+      where: { userId },
+      select: { userId: true, joinedAt: true },
+    },
+    //whole relation. even if participants is filtered, _count shows the total number of participants
+    _count: { select: { participants: true } },
+  };
+
+//Output: It waits until the last one is finished not finish A then B then C
+//upcomingevent only have 5 event but upcoming count return every event that is upcoming
+//those four are array of object
+  const [upcomingEvents, pastEvents, upcomingCount, pastCount] = await Promise.all([
+    prisma.event.findMany({
+      where: { ...baseWhere, startsAt: { gte: now } },
+      orderBy: { startsAt: "asc" },
+      //only give me the first 5 event
+      take: previewLimit,
+      include: includeForUser,
+    }),
+    prisma.event.findMany({
+      where: { ...baseWhere, startsAt: { lt: now } },
+      orderBy: { startsAt: "desc" },
+      take: previewLimit,
+      include: includeForUser,
+    }),
+    //count return a number
+    //using count so 5 event return in detail and 100 event(in total can telling the total event)
+    prisma.event.count({ where: { ...baseWhere, startsAt: { gte: now } } }),
+    prisma.event.count({ where: { ...baseWhere, startsAt: { lt: now } } }),
+  ]);
+
+  res.json({
+    user,
+    stats: { upcomingCount, pastCount },
+   upcomingEvents: upcomingEvents.map((event) => mapEventSummary(event, userId)),
+    pastEvents: pastEvents.map((event) => mapEventSummary(event, userId)),
+  });
+});
