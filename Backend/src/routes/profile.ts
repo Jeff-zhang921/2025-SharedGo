@@ -352,3 +352,43 @@ router.get("/me/events", requireProfileSession, async (req, res) => {
     events: events.map((event) => mapEventSummary(event, userId)),
   });
 });
+
+
+
+// Paginated list of reviews authored by the user.
+router.get("/me/reviews", requireProfileSession, async (req, res) => {
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  const userId = sessionUser.id;
+
+  const limit = parsePageSize(req.query.limit);
+  const page = parsePage(req.query.page);
+  const skip = (page - 1) * limit;
+
+  const where = { authorId: userId };
+
+  const [reviews, total] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      include: { author: true, host: true, event: true },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({ where }),
+  ]);
+
+  res.json({
+    pagination: { page, limit, total },
+    // The cast keeps the mapper strict while Prisma's include result remains inferred
+    // convert the review to unkown since anything can be unknown and then casr unknown to reviewprofilerow since unknown can cast to anything
+    reviews: reviews.map((review) => mapReview(review as unknown as ReviewProfileRow)),
+  });
+});
+
+export default router;
+
