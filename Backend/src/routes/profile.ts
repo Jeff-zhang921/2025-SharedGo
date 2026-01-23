@@ -49,3 +49,41 @@ type EventProfileRow = {
   _count: { participants: number };
 };
 
+
+const mapEventSummary = (event: EventProfileRow, currentUserId: number) => {
+    
+  const attendeeCount = event._count.participants;
+
+  const seatsRemaining =
+    typeof event.capacity === "number" ? Math.max(event.capacity - attendeeCount, 0) : null;
+
+  const attendance = event.participants[0];
+
+  const joinedAt = attendance ? attendance.joinedAt : null;
+  const isAttendee = Boolean(attendance);
+  const isHost = event.hostId === currentUserId;
+
+  return {
+    id: event.id,
+    title: event.title,
+    startsAt: event.startsAt,
+    capacity: event.capacity,
+    seatsRemaining,
+    category: event.category,
+    location: event.location,
+    latitude: event.latitude,
+    longitude: event.longitude,
+    imageUrl: event.imageUrl,
+    externalUrl: event.externalUrl,
+    attendeeCount,
+    host: {
+      id: event.hostId,
+      name: event.host.name,
+      email: event.host.email,
+    },
+    isHost,
+    isAttendee,
+    joinedAt,
+  };
+};
+
