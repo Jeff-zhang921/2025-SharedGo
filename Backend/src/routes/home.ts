@@ -17,6 +17,7 @@ function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): n
     return R * c; // Distance in km
 }
 
+//home dashboard returns recommended (top 5), categories list, and upcoming events
 router.get("/", async (req: Request, res: Response) => {
     try {
         const now = new Date();  //get current date
@@ -95,6 +96,32 @@ router.get("/", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to load feed" });
     }
 });
+
+//get list of categories
+router.get("/categories", (req: Request, res: Response) => {
+    try {
+        res.json({ categories: Object.values(Category) });
+    } catch (error) {
+        console.error("Categories error:", error);
+        res.status(500).json({ error: "Failed to load categories" });
+    }
+});
+
+//get events by category
+router.get("/categories/:categoryName", async (req: Request, res: Response) => {
+    const categoryName = req.params.categoryName as Category;
+    try {
+        const events = await prisma.event.findMany({
+            where: { category: categoryName, startsAt: { gte: new Date() } },
+            include : {
+                host: true,
+                participants: true,
+            }});
+            res.json(events);
+        } catch (error) {
+            res.status(500).json({ error: "Failed to load events for category" });          
+        }
+    });
 
 export default router;
 
