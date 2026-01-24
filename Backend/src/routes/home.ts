@@ -123,5 +123,39 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
         }
     });
 
+//upcoming events 
+//support pagination (20 per page)
+router.get("/upcoming", async (req: Request, res: Response) => {
+    const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    try{
+        const [events, total] = await Promise.all([
+            prisma.event.findMany({
+                where: { startsAt: { gte: new Date() } },
+                include : {
+                    host: true,
+                    participants: true,
+                },
+                orderBy: { startsAt: 'asc' },
+                skip,
+                take: limit,
+            }),
+            prisma.event.count({ where: { startsAt: { gte: new Date() } } }),
+        ]);
+
+        res.json({
+            pagination: {
+                page,
+                limit,
+                total,
+            },
+            events,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to load upcoming events" });
+    }
+});
 export default router;
 
