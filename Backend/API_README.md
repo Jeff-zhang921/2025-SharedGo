@@ -24,6 +24,11 @@ This section documents the endpoints used by **Frontend**
   - [2.1 Host Overview](#21-host-overview)
   - [2.2 Host Events (Upcoming / Past / All)](#22-host-events-upcoming--past--all)
   - [2.3 Host Reviews (Paginated)](#23-host-reviews-paginated)
+- [3. Home Endpoints](#3-home-endpoints)
+  - [3.1 Home dashboard](#31-home-dashboard-feed)
+  - [3.2 List All Categories](#32-list-all-categories)
+  - [3.3 Events by Category](#33-events-by-category)
+  - [3.4 Upcoming Events](#34-upcoming-events) 
 
 ---
 
@@ -397,3 +402,128 @@ This endpoint powers the **Reviews** tab for a host.
 - `total` is the total number of reviews for this host.
 
 - Each review includes both the `author` and a short `event summary` so the UI can show which event the review belongs to.
+
+## 3. Home Endpoints
+This provides search functionality, recommended events, category based filtering and upcoming events.
+
+### 3.1 Home Dashboard
+**GET** `/home`
+
+**Query params**
+
+| Param    | Type   | Description  |    
+|----------|--------|--------------|
+| `search` | string | filter by title, description and location (case-insensitive) |
+| `latitude` | number | user's latitude for distance calculation|
+| `longitude` | number | user's longitude for distance calculation|
+
+**Example requests**
+-  search 
+  `GET /home/?search=coffee`
+
+- with coordinates of user  
+  `GET /home/?latitude=51.4574&longitude=-2.6078`
+
+**Response**
+```jsonc
+{"recommendedEvents":[{
+  "id":6,
+  "title":"Group Study Session ",
+  "description":null,
+  "startsAt":"2026-02-20T10:00:00.000Z",
+  "category":"Educational",
+  "location":"Wills Memorial Building",
+  "imageUrl":null,
+  "host":{
+    "id":1,
+    "name":"Bristol Host ",
+    "email":""},
+    "attendeeCount":0,
+    "seatsRemaining":"Unlimited",
+    "distance":0.411}
+  //next 4 recommended
+  ],
+
+  "categories": [
+    //categories
+  ],
+  "upcomingPreview": [
+    //Top 5 events starting soonest
+  ]
+}
+```
+### 3.2 List All Categories 
+**GET** `/home/categories`
+returns all event categories
+
+**Response** 
+```json
+{"categories":["Physical_Activities","Festivals","Educational","Networking","Arts_Culture","Food_Drink","Music_Concerts","Tech_Gaming","Wellness_Meditation","Volunteer_Charity","Other"]}
+```
+
+### 3.3 Events by Category
+**GET** `/home/categories/:categoryName`
+returns all future events within a specific category
+
+**URL params**
+
+| Param    | Type   | Required | Description    |
+|----------|--------|----------|----------------|
+| `categoryName` | string | yes      | Enum value (e.g Networking) |
+
+**Example Request**
+  `GET /home/categories/Networking`
+
+**Example Response**
+```jsonc
+{"events":[{
+  "id":1,
+  "title":"Tech Networking",
+  "description":null,
+  "startsAt":"2026-02-18T15:00:00.000Z",
+  "category":"Networking",
+  "location":"Engine Shed",
+  "imageUrl":null,
+  "host":{
+    "id":1,
+    "name":"Bristol Host ",
+    "email":""},
+    "attendeeCount":0,
+    "seatsRemaining":"Unlimited",
+    "distance":null}]}
+```
+### 3.4 Upcoming Events
+**GET** `/home/upcoming?page=`
+list of all future events with pagination (soones to latest)
+**Query params**
+| Param   | Type   | Default | Description                                   |
+|---------|--------|---------|-----------------------------------------------|
+| `page`  | number | `1`     | Page number for pagination    |
+
+**Example Request**
+`/home/upcoming?page=1`
+
+**Response**
+```json
+{"pagination":{
+  "page":1,
+  "limit":10,
+  "total":7
+  },
+  "events":[{
+    "id":4,
+    "title":"Stokes Croft Art Walk ",
+    "description":"Explore street art",
+    "startsAt":"2026-02-10T13:00:00.000Z",
+    "category":"Arts_Culture",
+    "location":"Stokes Croft",
+    "imageUrl":null,
+    "host":{
+      "id":1,
+      "name":"Bristol Host ",
+      "email":""},
+      "attendeeCount":0,
+      "seatsRemaining":"Unlimited",
+      "distance":null}],
+}
+```

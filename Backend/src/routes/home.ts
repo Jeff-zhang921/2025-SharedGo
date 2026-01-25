@@ -141,7 +141,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
 //support pagination (20 per page)
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
-    const limit = 20;
+    const limit = 10;
     const skip = (page - 1) * limit;
 
     try{
