@@ -138,7 +138,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
     });
 
 //upcoming events list to see all events
-//support pagination (20 per page)
+//support pagination (10 per page)
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
     const limit = 10;
