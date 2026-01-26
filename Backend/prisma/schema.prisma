@@ -38,8 +38,8 @@ model Event {
   capacity     Int? // Optional maximum number of attendees allowed.
   category     Category   @default(Other)
   location     String // Text field noting where the event takes place.
-  latitude     Float
-  longitude    Float
+  latitude  Float @default(0)
+  longitude Float @default(0)
   imageUrl     String? // Optional image URL rendered in the UI.
   externalUrl  String? // Optional link to an external page with more details.
   hostId       Int // Foreign key pointing to the User who hosts the event.

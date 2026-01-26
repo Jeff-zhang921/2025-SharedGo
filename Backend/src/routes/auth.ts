@@ -14,8 +14,6 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_LENGTH = 6;
 // Time to live for a login code (10 minutes)
 const CODE_TTL_MS = 10 * 60 * 1000;
-// Minimum time between resending codes (1 minute)
-const RESEND_WINDOW_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
 //SMTP configuration from env
@@ -138,17 +136,18 @@ router.post("/email/start", async (req, res) => {
     name = user.name ?? "New User";
   }
 
-  const recentCode = await prisma.loginCode.findFirst({
+  const activeCode = await prisma.loginCode.findFirst({
     where: {
-      email: email,
-      createdAt: { gt: new Date(now.getTime() - RESEND_WINDOW_MS) },
+      email,
+      usedAt: null,
+      expiresAt: { gt: now },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  //if a code was sent recently, block resending
-  if (recentCode) {
-    res.status(429).json({ message: "Please wait before requesting another code." });
+  //if a code is still valid, block resending
+  if (activeCode) {
+    res.status(429).json({ message: "A verification code is already active. Please wait for it to expire." });
     return;
   }
 
