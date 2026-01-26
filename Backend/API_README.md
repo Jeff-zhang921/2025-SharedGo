@@ -494,7 +494,7 @@ returns all future events within a specific category
 ```
 ### 3.4 Upcoming Events
 **GET** `/home/upcoming?page=`
-list of all future events with pagination (soones to latest)
+list of all future events with pagination (soonest to latest)
 **Query params**
 | Param   | Type   | Default | Description                                   |
 |---------|--------|---------|-----------------------------------------------|
