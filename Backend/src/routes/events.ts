@@ -1,5 +1,5 @@
 //this is the backend logic
-import { Router } from "express"; 
+import { Router, Request, Response  } from "express"; 
 import { PrismaClient } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
@@ -13,7 +13,8 @@ export const Categories = [
 
 //publish event logic
 //you can post on /events/create
-router.post("/create", requireSession, async (req, res) => {
+// --- COMMENT OUT requireSession TO TEST WITHOUT LOGIN ---
+router.post("/create", /*requireSession,*/ async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
 //if anything is undefine in josn input, it will throw 
@@ -203,6 +204,52 @@ router.get("/:id", async (req, res) => {
     res.status(400).json({ message: "Event id must be a number." }); 
     return; 
   }
+
+  // // --- POST for creating new events ---
+  // router.post("/", async (req: Request, res: Response): Promise<Response> => {
+  //   try {
+  //     const {
+  //       title,
+  //       description,
+  //       startsAt,
+  //       capacity,
+  //       category,
+  //       location,
+  //       latitude,
+  //       longitude,
+  //       imageUrl,
+  //       externalUrl,
+  //       hostId,
+  //     } = req.body;
+
+  //     // Validation
+  //     if (!title || !startsAt || !location || !hostId) {
+  //       return res.status(400).json({message: "Missing required fields"});
+  //     }
+
+  //     const newEvent = await prisma.event.create({
+  //       data: {
+  //         title,
+  //         description: description || null,
+  //         startsAt: new Date(startsAt),
+  //         capacity: capacity ?? null,
+  //         location,
+  //         category,
+  //         latitude,
+  //         longitude,
+  //         imageUrl: imageUrl || null,
+  //         externalUrl: externalUrl || null,
+  //         hostId,
+  //       } ,
+  //     });
+
+  //     return res.status(201).json(newEvent); // send the created event back
+  //   } catch (error) {
+  //     console.error("Error creating event:", error);
+  //     return res.status(500).json({ message: "Internal server error" });
+  //   }
+  // });
+
 
   //find database
   const event = await prisma.event.findUnique({ 
