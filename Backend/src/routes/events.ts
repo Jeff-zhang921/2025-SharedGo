@@ -187,10 +187,6 @@ router.get("/", async (req, res) => {
     const queryLongitude = parseCoordinate(
       typeof req.query.longitude === "string" ? req.query.longitude : undefined,
     );
-    const radiusKm = parseCoordinate(
-      typeof req.query.radiusKm === "string" ? req.query.radiusKm : undefined,
-    );
-
     //bool
     const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
 
@@ -261,12 +257,6 @@ router.get("/", async (req, res) => {
     });
 
     let result = formattedEvents;
-
-    if (radiusKm !== null) {
-      result = result.filter(
-        (event) => event.distance !== null && event.distance <= radiusKm,
-      );
-    }
 
     if (userLatitude !== null && userLongitude !== null) {
       result = [...result].sort((a, b) => {

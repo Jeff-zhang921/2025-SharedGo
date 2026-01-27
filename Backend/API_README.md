@@ -104,7 +104,6 @@ All POST endpoints require an authenticated session cookie from /auth/email/veri
 |-------------|--------|-------------|
 | `latitude`  | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
 | `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
-| `radiusKm`  | number | Optional. Filter to events within this distance (km). Requires user location (query or session). |
 
 **Notes**
 
