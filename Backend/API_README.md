@@ -16,6 +16,7 @@ This section documents the endpoints used by **Frontend**
   - [0.2 Verify Email Code](#02-verify-email-code)
   - [0.3 Current User](#03-current-user)
 - [1. Event Endpoints](#1-event-endpoints)
+  - [1.0 List Events (Nearby / All)](#10-list-events-nearby--all)
   - [1.1 Create Event](#11-create-event)
   - [1.2 Get Event Details](#12-get-event-details)
   - [1.3 Join Event](#13-join-event)
@@ -93,6 +94,34 @@ This section documents the endpoints used by **Frontend**
 
 All POST endpoints require an authenticated session cookie from /auth/email/verify.
 
+### 1.0 List Events (Nearby / All)
+
+**GET** `/events`
+
+**Query params**
+
+| Param       | Type   | Description |
+|-------------|--------|-------------|
+| `latitude`  | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
+| `radiusKm`  | number | Optional. Filter to events within this distance (km). Requires user location (query or session). |
+
+**Notes**
+
+- You only need to send location once per session. After that, `/events` will reuse the session location.
+- If no user location is available, `distance` will be `null` and results are returned in `createdAt` descending order.
+
+**Response**
+
+Returns a list of events. Each item includes:
+
+- Event fields (including `category`, `latitude`, `longitude`)
+- Host info
+- `attendeeCount`
+- `distance` (km) or `null`
+
+---
+
 ### 1.1 Create Event
 
 **POST** `/events/create`
@@ -111,6 +140,9 @@ Create a new event for a host.
 | `imageUrl`   | string | no       | URL of event image                   |
 | `externalUrl`| string | no       | URL for external registration/info   |
 | `capacity`   | number | no       | Max attendees; `null` = no limit     |
+| `category`   | string | no       | Must be a Category enum value. Defaults to `Other`. |
+| `latitude`   | number | no       | Optional latitude (can be null).     |
+| `longitude`  | number | no       | Optional longitude (can be null).    |
 
 **Response**
 
@@ -119,6 +151,7 @@ Returns the created event, including:
 - Event fields
 - Host info
 - `attendeeCount` (number of participants)
+- `category`, `latitude`, `longitude`
 
 ---
 
@@ -138,6 +171,7 @@ Includes:
 
 - Event fields
 - Host info
+- `category`, `latitude`, `longitude`
 - `attendees`: list of `{ id, name, email, joinedAt }`
 - `attendeeCount`
 - `seatsRemaining` (if capacity set)
@@ -420,8 +454,8 @@ This provides search functionality, recommended events, category based filtering
 | Param    | Type   | Description  |    
 |----------|--------|--------------|
 | `search` | string | filter by title, description and location (case-insensitive) |
-| `latitude` | number | user's latitude for distance calculation|
-| `longitude` | number | user's longitude for distance calculation|
+| `latitude` | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
 
 **Example requests**
 -  search 
@@ -429,6 +463,10 @@ This provides search functionality, recommended events, category based filtering
 
 - with coordinates of user  
   `GET /home/?latitude=51.4574&longitude=-2.6078`
+
+**Notes**
+
+- You only need to send location once per session. After that, `/home` will reuse the session location.
 
 **Response**
 ```jsonc

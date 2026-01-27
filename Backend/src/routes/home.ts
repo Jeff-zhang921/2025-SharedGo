@@ -62,8 +62,25 @@ router.get("/", async (req: Request, res: Response) => {
         const now = new Date();  //get current date
         // Extract query parameters
         const search = typeof req.query.search === "string" ? req.query.search : null;
-        const userLatitude = parseCoordinate(req.query.latitude);
-        const userLongitude = parseCoordinate(req.query.longitude);
+        const queryLatitude = parseCoordinate(req.query.latitude);
+        const queryLongitude = parseCoordinate(req.query.longitude);
+
+        const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+        if (hasQueryCoords) {
+            req.session.location = {
+                latitude: queryLatitude,
+                longitude: queryLongitude,
+                updatedAt: new Date().toISOString(),
+            };
+        }
+
+        const sessionLocation = req.session.location;
+        const userLatitude = hasQueryCoords
+            ? queryLatitude
+            : sessionLocation?.latitude ?? null;
+        const userLongitude = hasQueryCoords
+            ? queryLongitude
+            : sessionLocation?.longitude ?? null;
 
         const whereClause: Prisma.EventWhereInput = {
             startsAt: { gte: now },

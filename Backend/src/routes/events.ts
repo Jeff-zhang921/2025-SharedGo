@@ -13,6 +13,19 @@ const parseCoordinate = (raw: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+// Haversine formula to calculate distance between two lat/lon points
+function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
 export const Categories = Object.values(Category);
 //publish event logic
 //you can post on /events/create
@@ -167,6 +180,33 @@ const latitude = parseCoordinate(latitudeRaw);
 //can get at just /events so it lists all the events rather than just 1 for each id
 router.get("/", async (req, res) => {
   try {
+    const queryLatitude = parseCoordinate(
+      typeof req.query.latitude === "string" ? req.query.latitude : undefined,
+    );
+    const queryLongitude = parseCoordinate(
+      typeof req.query.longitude === "string" ? req.query.longitude : undefined,
+    );
+    const radiusKm = parseCoordinate(
+      typeof req.query.radiusKm === "string" ? req.query.radiusKm : undefined,
+    );
+
+    const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+    if (hasQueryCoords) {
+      req.session.location = {
+        latitude: queryLatitude,
+        longitude: queryLongitude,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    const sessionLocation = req.session.location;
+    const userLatitude = hasQueryCoords
+      ? queryLatitude
+      : sessionLocation?.latitude ?? null;
+    const userLongitude = hasQueryCoords
+      ? queryLongitude
+      : sessionLocation?.longitude ?? null;
+
     const events = await prisma.event.findMany({
       include: {
         host: true,
@@ -177,28 +217,61 @@ router.get("/", async (req, res) => {
       },
     });
 
-    //map the data so it matches the EventData interface in frontend
-    const formattedEvents = events.map((event) => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      startsAt: event.startsAt,
-      capacity: event.capacity,
-      category: event.category,
-      location: event.location,
-      latitude: event.latitude,
-      longitude: event.longitude,
-      imageUrl: event.imageUrl,
-      externalUrl: event.externalUrl,
-      host: {
-        id: event.host.id,
-        name: event.host.name,
-        email: event.host.email,
-      },
-      attendeeCount: event.participants.length,
-    }));
+    const formattedEvents = events.map((event) => {
+      let distance: number | null = null;
+      if (
+        userLatitude !== null &&
+        userLongitude !== null &&
+        event.latitude !== null &&
+        event.longitude !== null
+      ) {
+        distance = distanceInKm(
+          userLatitude,
+          userLongitude,
+          event.latitude,
+          event.longitude,
+        );
+      }
 
-    res.json(formattedEvents); //Send back the event details as JSON so the front end can show it
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        startsAt: event.startsAt,
+        capacity: event.capacity,
+        category: event.category,
+        location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        imageUrl: event.imageUrl,
+        externalUrl: event.externalUrl,
+        host: {
+          id: event.host.id,
+          name: event.host.name,
+          email: event.host.email,
+        },
+        attendeeCount: event.participants.length,
+        distance: distance !== null ? Number(distance.toFixed(3)) : null,
+      };
+    });
+
+    let result = formattedEvents;
+
+    if (radiusKm !== null) {
+      result = result.filter(
+        (event) => event.distance !== null && event.distance <= radiusKm,
+      );
+    }
+
+    if (userLatitude !== null && userLongitude !== null) {
+      result = [...result].sort((a, b) => {
+        const distanceA = a.distance !== null ? a.distance : Infinity;
+        const distanceB = b.distance !== null ? b.distance : Infinity;
+        return distanceA - distanceB;
+      });
+    }
+
+    res.json(result);
   } catch (error) {
     console.error("Error fetching events", error);
     res.status(500).json({ message: "Internal server error while fetching events." });
