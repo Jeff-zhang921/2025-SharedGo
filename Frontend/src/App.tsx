@@ -8,6 +8,7 @@ import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
 
+//Testing CI frontend
 
 function App() {
   return (
