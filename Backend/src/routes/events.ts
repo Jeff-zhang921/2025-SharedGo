@@ -178,6 +178,7 @@ const latitude = parseCoordinate(latitudeRaw);
 
 //Logic to return list of ALL events
 //can get at just /events so it lists all the events rather than just 1 for each id
+//what it return is base on the user location, if location is provided, order by the nearest location event to far
 router.get("/", async (req, res) => {
   try {
     const queryLatitude = parseCoordinate(
@@ -190,7 +191,9 @@ router.get("/", async (req, res) => {
       typeof req.query.radiusKm === "string" ? req.query.radiusKm : undefined,
     );
 
+    //bool
     const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+
     if (hasQueryCoords) {
       req.session.location = {
         latitude: queryLatitude,
@@ -200,11 +203,13 @@ router.get("/", async (req, res) => {
     }
 
     const sessionLocation = req.session.location;
+
     const userLatitude = hasQueryCoords
       ? queryLatitude
       : sessionLocation?.latitude ?? null;
     const userLongitude = hasQueryCoords
       ? queryLongitude
+      //"If the thing on the left is null or undefined, give me the thing on the right
       : sessionLocation?.longitude ?? null;
 
     const events = await prisma.event.findMany({
@@ -267,6 +272,7 @@ router.get("/", async (req, res) => {
       result = [...result].sort((a, b) => {
         const distanceA = a.distance !== null ? a.distance : Infinity;
         const distanceB = b.distance !== null ? b.distance : Infinity;
+        //in ascending order
         return distanceA - distanceB;
       });
     }

@@ -102,6 +102,7 @@ router.get("/", async (req: Request, res: Response) => {
             orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
 
+        
         const mapped = events.map(event => mapEvent(event, userLatitude, userLongitude));
         const recommendedEvents = [...mapped]
             .sort ((a, b) => {
@@ -112,11 +113,33 @@ router.get("/", async (req: Request, res: Response) => {
                 }
                 return b.attendeeCount - a.attendeeCount; // Most popular next
             })
+            //.slice copy the 0-5 object in array
             .slice(0, 5); // Top 5 recommended
-    
-        const upcomingPreview = [...mapped]
-            .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()) // Soonest first
-            .slice(0, 5); // Next 5 upcoming events
+        const upcomingPreviewLimit = 5;
+        const upcomingPreviewMaxDistanceKm = 10;
+        let upcomingPreview: typeof mapped = [];
+        if (userLatitude !== null && userLongitude !== null) {
+            for (const event of mapped) {
+                const distance = event.distance;
+                if (distance === null || distance > upcomingPreviewMaxDistanceKm) continue;
+                let insertAt = upcomingPreview.length;
+                for (let i = 0; i < upcomingPreview.length; i++) {
+                    const currentDistance = upcomingPreview[i].distance ?? Infinity;
+                    if (distance < currentDistance || (distance === currentDistance && event.startsAt < upcomingPreview[i].startsAt)) {
+                        insertAt = i;
+                        break;
+                    }
+                }
+                if (insertAt < upcomingPreviewLimit) {
+                    upcomingPreview.splice(insertAt, 0, event);
+                    if (upcomingPreview.length > upcomingPreviewLimit) {
+                        upcomingPreview.pop();
+                    }
+                }
+            }
+        } else {
+            upcomingPreview = mapped.slice(0, upcomingPreviewLimit);
+        }
 
         res.json({ 
             recommendedEvents,  
@@ -128,6 +151,8 @@ router.get("/", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to load feed" });
     }
 });
+
+
 
 //get list of all categories
 router.get("/categories", (req: Request, res: Response) => {
@@ -161,6 +186,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
 
 //upcoming events list to see all events
 //support pagination (10 per page)
+//TODO:make sure that the upcoming Preivew is the sorted in order that is within 100 km 
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
     const limit = 10;
