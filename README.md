@@ -10,6 +10,7 @@
 * [Project Description](#project-Description)
 * [Stakeholders](#stakeholders)
 * [User Stories](#user-stories)
+* [Project structure](#project-structure)
 * [Tech Stack](#teckstack)
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
@@ -59,6 +60,12 @@
 * As the client, I want all (direct & indirect) users to have a way of setting-up informal meet-ups. The goal is "to build the most loved real-time activity map". I would like the app to positively impact direct use-cases, for groups, societies, event organisers, and the list goes on!
 
 * As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
+
+## Project structure
+> [!NOTE]
+> For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+> For a more thorough explanation of Project structure Detial, see [DOC](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs)
+
 
 ## TechStack
 ### MVP Architecture
