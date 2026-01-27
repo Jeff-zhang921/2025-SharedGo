@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-//import { Link, unstable_SerializesTo } from "react-router-dom"
+import { Link, unstable_SerializesTo } from "react-router-dom"
 import Button from "./../components/Button"
 import './eventDetailsPage.css';
 import { useParams } from 'react-router-dom';
