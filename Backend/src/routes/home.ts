@@ -3,6 +3,11 @@ import { PrismaClient, Category, Prisma } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
+const parseCoordinate = (raw: unknown): number | null => {
+    if (typeof raw !== "string") return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+};
 
 // Haversine formula to calculate distance between two lat/lon points
 function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -24,7 +29,7 @@ function mapEvent(
 ) {
     const attendeeCount = event.participants.length;
     let distance: number | null = null;
-    if (userLatitude !== null && userLongitude !== null && event.latitude && event.longitude) {
+    if (userLatitude !== null && userLongitude !== null && event.latitude !== null && event.longitude !== null) {
         distance = distanceInKm(
             userLatitude,
             userLongitude,
@@ -57,8 +62,8 @@ router.get("/", async (req: Request, res: Response) => {
         const now = new Date();  //get current date
         // Extract query parameters
         const search = typeof req.query.search === "string" ? req.query.search : null;
-        const userLatitude = req.query.latitude ? Number(req.query.latitude) : null;
-        const userLongitude = req.query.longitude ? Number(req.query.longitude) : null;
+        const userLatitude = parseCoordinate(req.query.latitude);
+        const userLongitude = parseCoordinate(req.query.longitude);
 
         const whereClause: Prisma.EventWhereInput = {
             startsAt: { gte: now },
@@ -75,7 +80,7 @@ router.get("/", async (req: Request, res: Response) => {
             where: whereClause,
             include : {
                 host: true,
-                participants: { select: { id: true } }, //only need participant count
+                participants: { select: { userId: true } }, //only need participant count
             },
             orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
@@ -125,7 +130,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
             where: { category: categoryName, startsAt: { gte: new Date() } },
             include : {
                 host: true,
-                participants: {select: { id: true } }, 
+                participants: {select: { userId: true } }, 
             },
             orderBy: { startsAt: 'asc' },
         });

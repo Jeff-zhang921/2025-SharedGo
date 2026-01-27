@@ -29,6 +29,12 @@ This section documents the endpoints used by **Frontend**
   - [3.2 List All Categories](#32-list-all-categories)
   - [3.3 Events by Category](#33-events-by-category)
   - [3.4 Upcoming Events](#34-upcoming-events) 
+- [4. Profile Endpoints (Me)](#4-profile-endpoints-me)
+  - [4.1 Current Profile](#41-current-profile)
+  - [4.2 Update Profile](#42-update-profile)
+  - [4.3 Profile Overview](#43-profile-overview)
+  - [4.4 My Events (Paginated)](#44-my-events-paginated)
+  - [4.5 My Reviews (Paginated)](#45-my-reviews-paginated)
 
 ---
 
@@ -527,3 +533,156 @@ list of all future events with pagination (soonest to latest)
       "distance":null}],
 }
 ```
+
+## 4. Profile Endpoints (Me)
+These endpoints power the **Profile / Me** page.
+All require the session cookie from `/auth/email/verify`.
+
+### 4.1 Current Profile
+**GET** `/profile/me`
+
+**Response**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name"
+  }
+}
+```
+
+---
+
+### 4.2 Update Profile
+**PATCH** `/profile/me`
+
+**Request body (JSON)**
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `name` | string \| null | yes | Trimmed; empty string becomes null |
+
+**Response**
+```json
+{
+  "message": "Profile updated.",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "New Name"
+  }
+}
+```
+
+---
+
+### 4.3 Profile Overview
+**GET** `/profile/me/overview`
+
+**Response**
+```jsonc
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name"
+  },
+  "stats": {
+    "upcomingCount": 2,
+    "pastCount": 5
+  },
+  "upcomingEvents": [
+    {
+      "id": 10,
+      "title": "Event title",
+      "startsAt": "2026-02-21T18:00:00.000Z",
+      "capacity": 20,
+      "seatsRemaining": 8,
+      "category": "Networking",
+      "location": "Bristol",
+      "latitude": 51.4518,
+      "longitude": -2.5902,
+      "imageUrl": null,
+      "externalUrl": null,
+      "attendeeCount": 12,
+      "host": { "id": 1, "name": "Host", "email": "host@example.com" },
+      "isHost": true,
+      "isAttendee": false,
+      "joinedAt": null
+    }
+  ],
+  "pastEvents": []
+}
+```
+
+---
+
+### 4.4 My Events (Paginated)
+**GET** `/profile/me/events?status=&limit=&page=`
+
+**Query params**
+
+| Param    | Type   | Default     | Description |
+|----------|--------|-------------|-------------|
+| `status` | string | "upcoming" | `"upcoming"`, `"past"`, or `"all"` |
+| `limit`  | number | `10`        | Max `50` |
+| `page`   | number | `1`         | 1-based page number |
+
+**Response**
+```jsonc
+{
+  "pagination": { "page": 1, "limit": 10, "total": 7 },
+  "events": [
+    {
+      "id": 10,
+      "title": "Event title",
+      "startsAt": "2026-02-21T18:00:00.000Z",
+      "capacity": 20,
+      "seatsRemaining": 8,
+      "category": "Networking",
+      "location": "Bristol",
+      "latitude": 51.4518,
+      "longitude": -2.5902,
+      "imageUrl": null,
+      "externalUrl": null,
+      "attendeeCount": 12,
+      "host": { "id": 1, "name": "Host", "email": "host@example.com" },
+      "isHost": true,
+      "isAttendee": false,
+      "joinedAt": null
+    }
+  ]
+}
+```
+
+---
+
+### 4.5 My Reviews (Paginated)
+**GET** `/profile/me/reviews?limit=&page=`
+
+**Query params**
+
+| Param   | Type   | Default | Description |
+|---------|--------|---------|-------------|
+| `limit` | number | `10`    | Max `50` |
+| `page`  | number | `1`     | 1-based page number |
+
+**Response**
+```jsonc
+{
+  "pagination": { "page": 1, "limit": 10, "total": 3 },
+  "reviews": [
+    {
+      "id": 1,
+      "rating": 5,
+      "comment": "Great event!",
+      "createdAt": "2026-01-15T12:00:00.000Z",
+      "author": { "id": 1, "name": "User", "email": "user@example.com" },
+      "host": { "id": 2, "name": "Host", "email": "host@example.com" },
+      "event": { "id": 3, "title": "Past event", "startsAt": "2025-12-01T18:00:00.000Z" }
+    }
+  ]
+}
+```
+

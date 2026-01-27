@@ -5,6 +5,11 @@ import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
+const parseCoordinate = (raw: unknown): number | null => {
+  if (raw === undefined || raw === null || raw === "") return null;
+  const parsed = typeof raw === "number" ? raw : Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 
 export const Categories = [
   "Physical Activities", "Festivals", "Educational", "Networking", "Arts & Culture", 
@@ -47,8 +52,8 @@ router.post("/create", requireSession, async (req, res) => {
     : null;
 
   const category = Categories.includes(categoryRaw) ? categoryRaw : "Other";
-  const latitude = latitudeRaw !== undefined ? Number(latitudeRaw) : 0;
-  const longitude = longitudeRaw !== undefined ? Number(longitudeRaw) : 0;
+  const latitude = parseCoordinate(latitudeRaw);
+  const longitude = parseCoordinate(longitudeRaw);
 
   
  // Basic required-field validation. If invalid, return 400 and stop.

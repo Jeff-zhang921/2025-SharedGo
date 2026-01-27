@@ -10,6 +10,7 @@ const MAX_PAGE_SIZE = 50;
 
 //convert unknown to number but with maximum
 //how many item per page
+//fallback is the Default Parameter.
 const parsePageSize = (raw: unknown, fallback = DEFAULT_PAGE_SIZE): number => {
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
@@ -34,8 +35,8 @@ type EventProfileRow = {
   capacity: number | null;
   category: Category;
   location: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   imageUrl: string | null;
   externalUrl: string | null;
   hostId: number;
