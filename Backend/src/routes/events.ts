@@ -1,21 +1,19 @@
 //this is the backend logic
 import { Router } from "express"; 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Category } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
+
+//parse coodinate make sure that coodinate is number
 const parseCoordinate = (raw: unknown): number | null => {
   if (raw === undefined || raw === null || raw === "") return null;
   const parsed = typeof raw === "number" ? raw : Number(raw);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-export const Categories = [
-  "Physical Activities", "Festivals", "Educational", "Networking", "Arts & Culture", 
-  "Food & Drink", "Music & Concerts", "Tech & Gaming", "Wellness & Meditation", "Volunteer & Charity", "Other"
-];
-
+export const Categories = Object.values(Category);
 //publish event logic
 //you can post on /events/create
 router.post("/create", requireSession, async (req, res) => {
@@ -51,8 +49,12 @@ router.post("/create", requireSession, async (req, res) => {
     ? externalUrlRaw.trim()
     : null;
 
-  const category = Categories.includes(categoryRaw) ? categoryRaw : "Other";
-  const latitude = parseCoordinate(latitudeRaw);
+    //treat categoryRaw as if it were already a valid Category type so that the .includes() function accepts it
+    //and test whether or not it is inside the category list
+  const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
+    ? (categoryRaw as Category)
+    : Category.Other;
+const latitude = parseCoordinate(latitudeRaw);
   const longitude = parseCoordinate(longitudeRaw);
 
   
@@ -158,6 +160,9 @@ router.post("/create", requireSession, async (req, res) => {
   });
 });
 
+
+
+
 //Logic to return list of ALL events
 //can get at just /events so it lists all the events rather than just 1 for each id
 router.get("/", async (req, res) => {
@@ -179,7 +184,10 @@ router.get("/", async (req, res) => {
       description: event.description,
       startsAt: event.startsAt,
       capacity: event.capacity,
+      category: event.category,
       location: event.location,
+      latitude: event.latitude,
+      longitude: event.longitude,
       imageUrl: event.imageUrl,
       externalUrl: event.externalUrl,
       host: {
@@ -196,6 +204,10 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Internal server error while fetching events." });
   }
 });
+
+
+
+
 
 
 //return json object with event id....
