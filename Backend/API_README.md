@@ -467,6 +467,7 @@ This provides search functionality, recommended events, category based filtering
 **Notes**
 
 - You only need to send location once per session. After that, `/home` will reuse the session location.
+- `upcomingPreview` returns the 5 soonest events within 10 km when location is available; otherwise it returns the 5 soonest overall.
 
 **Response**
 ```jsonc
@@ -492,7 +493,7 @@ This provides search functionality, recommended events, category based filtering
     //categories
   ],
   "upcomingPreview": [
-    //Top 5 events starting soonest
+    //Top 5 events starting soonest (within 10 km if location is available)
   ]
 }
 ```
@@ -543,6 +544,13 @@ list of all future events with pagination (soonest to latest)
 | Param   | Type   | Default | Description                                   |
 |---------|--------|---------|-----------------------------------------------|
 | `page`  | number | `1`     | Page number for pagination    |
+| `latitude` | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
+
+**Notes**
+
+- If location is available (query or session), results are limited to events within 100 km.
+- If no location is available, all upcoming events are returned and `distance` is `null`.
 
 **Example Request**
 `/home/upcoming?page=1`

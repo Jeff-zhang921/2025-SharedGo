@@ -102,6 +102,7 @@ router.get("/", async (req: Request, res: Response) => {
             orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
 
+
         
         const mapped = events.map(event => mapEvent(event, userLatitude, userLongitude));
         const recommendedEvents = [...mapped]
@@ -115,28 +116,19 @@ router.get("/", async (req: Request, res: Response) => {
             })
             //.slice copy the 0-5 object in array
             .slice(0, 5); // Top 5 recommended
+
+            //soonest within 10 km
         const upcomingPreviewLimit = 5;
         const upcomingPreviewMaxDistanceKm = 10;
         let upcomingPreview: typeof mapped = [];
         if (userLatitude !== null && userLongitude !== null) {
-            for (const event of mapped) {
-                const distance = event.distance;
-                if (distance === null || distance > upcomingPreviewMaxDistanceKm) continue;
-                let insertAt = upcomingPreview.length;
-                for (let i = 0; i < upcomingPreview.length; i++) {
-                    const currentDistance = upcomingPreview[i].distance ?? Infinity;
-                    if (distance < currentDistance || (distance === currentDistance && event.startsAt < upcomingPreview[i].startsAt)) {
-                        insertAt = i;
-                        break;
-                    }
-                }
-                if (insertAt < upcomingPreviewLimit) {
-                    upcomingPreview.splice(insertAt, 0, event);
-                    if (upcomingPreview.length > upcomingPreviewLimit) {
-                        upcomingPreview.pop();
-                    }
-                }
-            }
+            upcomingPreview = mapped
+                .filter((event) => {
+                    const distance = event.distance;
+                    return distance !== null && distance <= upcomingPreviewMaxDistanceKm;
+                })
+                //.slice(startindex,endindex)
+                .slice(0, upcomingPreviewLimit);
         } else {
             upcomingPreview = mapped.slice(0, upcomingPreviewLimit);
         }
@@ -186,26 +178,49 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
 
 //upcoming events list to see all events
 //support pagination (10 per page)
-//TODO:make sure that the upcoming Preivew is the sorted in order that is within 100 km 
+//make sure that the upcoming event is the sorted in order that is within 100 km 
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
     const limit = 10;
+    const maxDistanceKm = 100;
     const skip = (page - 1) * limit;
 
-    try{
-        const [events, total] = await Promise.all([
-            prisma.event.findMany({
-                where: { startsAt: { gte: new Date() } },
-                include : {
-                    host: true,
-                    participants: true,
-                },
-                orderBy: { startsAt: 'asc' },
-                skip,
-                take: limit,
-            }),
-            prisma.event.count({ where: { startsAt: { gte: new Date() } } }),
-        ]);
+    const queryLatitude = parseCoordinate(req.query.latitude);
+    const queryLongitude = parseCoordinate(req.query.longitude);
+    const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+    if (hasQueryCoords) {
+        req.session.location = {
+            latitude: queryLatitude,
+            longitude: queryLongitude,
+            updatedAt: new Date().toISOString(),
+        };
+    }
+
+    const sessionLocation = req.session.location;
+    const userLatitude = hasQueryCoords
+        ? queryLatitude
+        : sessionLocation?.latitude ?? null;
+    const userLongitude = hasQueryCoords
+        ? queryLongitude
+        : sessionLocation?.longitude ?? null;
+
+    try {
+        const events = await prisma.event.findMany({
+            where: { startsAt: { gte: new Date() } },
+            include: {
+                host: true,
+                participants: true,
+            },
+            orderBy: { startsAt: 'asc' },
+        });
+
+        const mapped = events.map((event) => mapEvent(event, userLatitude, userLongitude));
+        const filtered = userLatitude !== null && userLongitude !== null
+            ? mapped.filter((event) => event.distance !== null && event.distance <= maxDistanceKm)
+            : mapped;
+
+        const total = filtered.length;
+        const paged = filtered.slice(skip, skip + limit);
 
         res.json({
             pagination: {
@@ -213,7 +228,7 @@ router.get("/upcoming", async (req: Request, res: Response) => {
                 limit,
                 total,
             },
-            events: events.map(event => mapEvent(event, null, null)),
+            events: paged,
         });
     } catch (error) {
         res.status(500).json({ error: "Failed to load upcoming events" });
