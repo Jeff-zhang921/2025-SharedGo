@@ -63,9 +63,11 @@
 
 ## Project structure
 > [!NOTE]
-> For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
-> For a more thorough explanation of Project structure Detial, see [DOC](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs)
+> For a more thorough explanation of project structure Detail, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
 
+> For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+
+>For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
 ## TechStack
 ### MVP Architecture
