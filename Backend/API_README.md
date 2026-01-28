@@ -466,6 +466,7 @@ This provides search functionality, recommended events, category based filtering
 **Notes**
 
 - You only need to send location once per session. After that, `/home` will reuse the session location.
+- `recommendedEvents` uses the logged-in user's most joined past category, then returns the top 5 by attendance within 10 km when location is available. If the user has no past joins (or is not logged in), it returns the top 5 by attendance within 10 km when location is available.
 - `upcomingPreview` returns the 5 soonest events within 10 km when location is available; otherwise it returns the 5 soonest overall.
 
 **Response**

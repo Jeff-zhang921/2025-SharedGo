@@ -56,11 +56,14 @@ function mapEvent(
     };
 }       
 
+
+
 //home dashboard returns recommended (top 5), categories list, and upcoming events
 router.get("/", async (req: Request, res: Response) => {
     try {
         const now = new Date();  //get current date
         // Extract query parameters
+        //search should move to filter???????
         const search = typeof req.query.search === "string" ? req.query.search : null;
         const queryLatitude = parseCoordinate(req.query.latitude);
         const queryLongitude = parseCoordinate(req.query.longitude);
@@ -102,20 +105,79 @@ router.get("/", async (req: Request, res: Response) => {
             orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
 
-
-        
         const mapped = events.map(event => mapEvent(event, userLatitude, userLongitude));
-        const recommendedEvents = [...mapped]
-            .sort ((a, b) => {
-                const distanceA = a.distance !== null ? a.distance : Infinity;
-                const distanceB = b.distance !== null ? b.distance : Infinity;
-                if (distanceA !== distanceB) {
-                    return distanceA - distanceB; // Nearest first
+      
+        const sessionUser = req.session.user;
+        const hasUserLocation = userLatitude !== null && userLongitude !== null;
+        const recommendedMaxDistanceKm = 10;
+
+
+        const baseRecommended = hasUserLocation
+            ? mapped.filter((event) => event.distance !== null && event.distance <= recommendedMaxDistanceKm)
+            : mapped;//<= inclusive smaller than
+
+        let recommendedEvents: typeof mapped = [];
+        if (sessionUser) {
+            //eventId | userId | joinedAt
+        // ------- | ------ | -------------------------
+        // 10      | 5      | 2026-01-05T12:34:56.000Z
+        // 11      | 5      | 2026-01-06T09:10:11.000Z
+        // 10      | 6      | 2026-01-05T13:00:00.000Z
+        // 11      | 6      | 2026-01-06T09:30:00.000Z
+
+            const joined = await prisma.eventParticipant.findMany({
+                where: {
+                    userId: sessionUser.id,
+                    event: { startsAt: { lt: now } },
+                },
+                select: { event: { select: { category: true } } },
+            });
+            //Record is a object that contains key: string value: number
+          
+            //record is the each category
+            const categoryCounts: Record<string, number> = {};
+            for (const record of joined) {
+                //loop rach joined, fetch the key, if key is equal to some other key already inside the categorycount, add one
+                const key = record.event.category;
+                categoryCounts[key] = (categoryCounts[key] ?? 0) + 1;
+            }
+
+
+           //get the top count
+            let topCategory: Category | undefined;
+            let topCount = -1;
+            
+            for (const key in categoryCounts) {
+            
+                if ((categoryCounts[key] ?? 0) > topCount) {
+                    topCount = categoryCounts[key]??0;
+                    topCategory = key as Category;
                 }
-                return b.attendeeCount - a.attendeeCount; // Most popular next
-            })
-            //.slice copy the 0-5 object in array
-            .slice(0, 5); // Top 5 recommended
+            }
+
+            if (topCategory) {
+                recommendedEvents = [...baseRecommended]
+                    .filter((event) => event.category === topCategory)
+                    .sort((a, b) => {
+                        const attendeeDelta = b.attendeeCount - a.attendeeCount;
+                        if (attendeeDelta !== 0) return attendeeDelta;
+                        return a.startsAt.getTime() - b.startsAt.getTime();
+                    })
+                    .slice(0, 5);
+            }
+        }
+
+        if (recommendedEvents.length === 0) {
+            recommendedEvents = baseRecommended
+            //to sroted returns a sorted copy array
+            
+                .toSorted((a, b) => {
+                    const attendeeDelta = b.attendeeCount - a.attendeeCount;
+                    if (attendeeDelta !== 0) return attendeeDelta;
+                    return a.startsAt.getTime() - b.startsAt.getTime();
+                })
+                .slice(0, 5);
+        }
 
             //soonest within 10 km
         const upcomingPreviewLimit = 5;
@@ -146,6 +208,8 @@ router.get("/", async (req: Request, res: Response) => {
 
 
 
+
+
 //get list of all categories
 router.get("/categories", (req: Request, res: Response) => {
     try {
@@ -155,7 +219,7 @@ router.get("/categories", (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to load categories" });
     }
 });
-
+//move to filter
 //filter events by category
 router.get("/categories/:categoryName", async (req: Request, res: Response) => {
     const categoryName = req.params.categoryName as Category;  
@@ -178,6 +242,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
 
 //upcoming events list to see all events
 //support pagination (10 per page)
+//move to filter
 //make sure that the upcoming event is the sorted in order that is within 100 km 
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
