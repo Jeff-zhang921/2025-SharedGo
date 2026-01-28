@@ -7,6 +7,7 @@ import EventDetailsPage from './pages/eventDetailsPage';
 import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
+import HostProfile from './pages/profilePage';
 
 //Testing CI frontend
 
@@ -27,6 +28,8 @@ function App() {
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}
       <Route path="/host/:hostId" element={<HostPage />} />
+       {/* set the path for the profile page */}
+      <Route path="/profile" element={<HostProfile />} />
     </Routes>
 
   );

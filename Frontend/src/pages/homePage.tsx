@@ -16,6 +16,7 @@ function HomePage() {
       <Link to="/personal">PersonalPage </Link>
       <Link to="/createEvent">CreateEventPage </Link>
       <Link to="/chat">ChatPage </Link>
+      <Link to="/profile">ProfilePage </Link>
       </div>
     </div>
   );
