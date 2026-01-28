@@ -5,10 +5,20 @@ import "./loginPage.css"
 
 const CreateLoginPage = () => {
     return (
-      <div>
-        <h1>SharedGo</h1>
-        <h2>Create an account</h2>
-        <h3>Enter your email to sign up for this app</h3>
+      <div className="loginPage">
+        <div className="loginCard">
+            <h1 className="AppTitle">SharedGo</h1>
+             <h2 className="createAccount">Create an account</h2>
+              <p className="helperText">Enter your email to sign up for this app</p>
+        </div>
+        <div className="inputGroup">
+          <input 
+            type="email" 
+            placeholder="email@domain.com" 
+            className="emailField"
+          />
+          <button className="black-button">Get verification code</button>
+        </div>
       </div>
     );
   };

@@ -1,4 +1,28 @@
-.h1 {
-    padding-top: 10;
-    
+.loginPage {
+    position: fixed; /*white background fills screen*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw; /*Ensures entire background white*/
+    height: 100dvh;
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+.loginCard {
+    display: flex;
+    flex-direction: column; /*Keeping design consistent in centre*/
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+    text-align: center;
+}
+
+.appTitle {
+    font-size: 32px;
+    font-weight: 800px;
+    margin-bottom: 80px;
 }
