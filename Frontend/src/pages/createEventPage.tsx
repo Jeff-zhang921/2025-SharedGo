@@ -36,25 +36,27 @@ const CreateEventPage = () => {
   const [loading, setLoading] = React.useState(false);
 
   // handle changes on input
-  const onChange = (newEvent: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
-    const {name, value} = newEvent.target;
+  const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    const {name, value} = event.target;
     setForm((previous) => ({...previous, [name]:value}));
   };
 
+  const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
+
   // handle submition of the form
-  const onSubmit = async (newEvent: React.FormEvent) => {
-    newEvent.preventDefault();
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/events/create", {
+      const res = await fetch(`${backendBaseURL}/events/create`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
           ...form,
-          hostId: 1, // place-holder of Host
-          hostEmail: "host@sharego.dev", // place-holder for Host
+          hostId: 1, // place-holder of Host Id
+          hostEmail: "host@sharego.dev", // place-holder for Host email
           capacity: form.capacity === "" ? null:Number(form.capacity),
           latitude: form.latitude === "" ? null:Number(form.latitude),
           longitude: form.longitude === "" ? null:Number(form.longitude),
@@ -74,7 +76,7 @@ const CreateEventPage = () => {
       console.log("Event created:", createdEvent);
 
       // Redirect to event details page
-      navigate(`/events/${createdEvent.id}`);
+      navigate(`/events/${createdEvent.event.id}`);
     } catch (err: any) {
       console.error(err);
       setError(err.message);
