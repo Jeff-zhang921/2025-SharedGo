@@ -86,36 +86,44 @@ const CreateEventPage = () => {
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <h1>Create Event</h1>
-      {error && <p>{error}</p>}
+    <form className="event-form" onSubmit={onSubmit}>
+      <header className="form-header">
+        <h1>Create Event</h1>
+      </header>
+      {error && <p className="error">{error}</p>}
 
-      <input name="title" placeholder="Title" onChange={onChange} required />
-      <input
-        name="startsAt"
-        type="datetime-local"
-        onChange={onChange}
-        required
-      />
-      <input
-        name="location"
-        placeholder="Location"
-        onChange={onChange}
-        required
-      />
-      <input
-        name="capacity"
-        type="number"
-        placeholder="Capacity"
-        onChange={onChange}
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        onChange={onChange}
-      />
+      <section className="form-section">
+        <label>
+          <span>TITLE</span>
+          <input name="title" placeholder="title" onChange={onChange} required/>
+        </label>
 
-      <button>Create</button>
+        <label>
+          <span>DATE</span>
+          <input name="startsAt" type="datetime-local" onChange={onChange} required/>
+        </label>
+      
+        <label>
+          <span>CAPACITY</span>
+          <input name="capacity" type="number" placeholder="0000" onChange={onChange}/>
+        </label>
+
+        {/*<label>
+          <span>CATEGORY</span>
+        </label>*/}
+
+        <label>
+          <span>LOCATION</span>
+          <input name="location" placeholder="Add location" onChange={onChange} required/>
+        </label>
+
+        <label>
+          <span>Description</span>
+          <textarea name="description" placeholder="Description" onChange={onChange}/>
+        </label>
+      </section>
+      
+      <button className="publish-btn" type="submit"> Publish</button>
     </form>
   );
 };
