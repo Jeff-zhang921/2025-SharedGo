@@ -30,7 +30,7 @@ export const Categories = Object.values(Category);
 //publish event logic
 //you can post on /events/create
 // --- COMMENT OUT requireSession, TO TEST WITHOUT LOGIN ---
-router.post("/create", requireSession, async (req, res) => {
+router.post("/create", /*requireSession,*/ async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
 //if anything is undefine in josn input, it will throw 
