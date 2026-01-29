@@ -130,6 +130,7 @@ router.get("/:hostId/overview", async (req, res) => {
     }),
 
 
+    //it has the intersect of authorevent object with a intersect with review
     prisma.review.findMany({ 
       where: { hostId }, 
       include: { author: true, event: true }, 
@@ -139,10 +140,14 @@ router.get("/:hostId/overview", async (req, res) => {
   ]);
 
 
+
 //reduce is a method that iterates through an array and accumulates a single value based on a provided function.
+//total all participants accross the events hosted by that host
   const totalAttendees = eventsForStats.reduce( 
+    //the reduce start at 0 and add
+  //for each event, calculate the length of participant have in that event
     (sums: number, event: { participants: unknown[] }) => sums + event.participants.length, 
-    0, 
+    0
   );
 
   //for later average fill 
@@ -157,7 +162,7 @@ router.get("/:hostId/overview", async (req, res) => {
       ? Number((totalAttendees / capacityTotal).toFixed(2))
       : null; 
 
-
+      //what is the usecase of 
   const allRatings = eventsForStats 
     .flatMap((event: { reviews: { rating: number | null }[] }) => event.reviews)//glue all event together 
     .map((event: { rating: number | null }) => event.rating) // Take rating values.
@@ -194,6 +199,7 @@ router.get("/:hostId/overview", async (req, res) => {
     reviews: recentReviews.map(mapReview), 
   });
 });
+
 
 
 

@@ -16,6 +16,7 @@ This section documents the endpoints used by **Frontend**
   - [0.2 Verify Email Code](#02-verify-email-code)
   - [0.3 Current User](#03-current-user)
 - [1. Event Endpoints](#1-event-endpoints)
+  - [1.0 List Events (Nearby / All)](#10-list-events-nearby--all)
   - [1.1 Create Event](#11-create-event)
   - [1.2 Get Event Details](#12-get-event-details)
   - [1.3 Join Event](#13-join-event)
@@ -24,6 +25,17 @@ This section documents the endpoints used by **Frontend**
   - [2.1 Host Overview](#21-host-overview)
   - [2.2 Host Events (Upcoming / Past / All)](#22-host-events-upcoming--past--all)
   - [2.3 Host Reviews (Paginated)](#23-host-reviews-paginated)
+- [3. Home Endpoints](#3-home-endpoints)
+  - [3.1 Home dashboard](#31-home-dashboard-feed)
+  - [3.2 List All Categories](#32-list-all-categories)
+  - [3.3 Events by Category](#33-events-by-category)
+  - [3.4 Upcoming Events](#34-upcoming-events) 
+- [4. Profile Endpoints (Me)](#4-profile-endpoints-me)
+  - [4.1 Current Profile](#41-current-profile)
+  - [4.2 Update Profile](#42-update-profile)
+  - [4.3 Profile Overview](#43-profile-overview)
+  - [4.4 My Events (Paginated)](#44-my-events-paginated)
+  - [4.5 My Reviews (Paginated)](#45-my-reviews-paginated)
 
 ---
 
@@ -82,6 +94,33 @@ This section documents the endpoints used by **Frontend**
 
 All POST endpoints require an authenticated session cookie from /auth/email/verify.
 
+### 1.0 List Events (Nearby / All)
+
+**GET** `/events`
+
+**Query params**
+
+| Param       | Type   | Description |
+|-------------|--------|-------------|
+| `latitude`  | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
+
+**Notes**
+
+- You only need to send location once per session. After that, `/events` will reuse the session location.
+- If no user location is available, `distance` will be `null` and results are returned in `createdAt` descending order.
+
+**Response**
+
+Returns a list of events. Each item includes:
+
+- Event fields (including `category`, `latitude`, `longitude`)
+- Host info
+- `attendeeCount`
+- `distance` (km) or `null`
+
+---
+
 ### 1.1 Create Event
 
 **POST** `/events/create`
@@ -100,6 +139,9 @@ Create a new event for a host.
 | `imageUrl`   | string | no       | URL of event image                   |
 | `externalUrl`| string | no       | URL for external registration/info   |
 | `capacity`   | number | no       | Max attendees; `null` = no limit     |
+| `category`   | string | no       | Must be a Category enum value. Defaults to `Other`. |
+| `latitude`   | number | no       | Optional latitude (can be null).     |
+| `longitude`  | number | no       | Optional longitude (can be null).    |
 
 **Response**
 
@@ -108,6 +150,7 @@ Returns the created event, including:
 - Event fields
 - Host info
 - `attendeeCount` (number of participants)
+- `category`, `latitude`, `longitude`
 
 ---
 
@@ -127,6 +170,7 @@ Includes:
 
 - Event fields
 - Host info
+- `category`, `latitude`, `longitude`
 - `attendees`: list of `{ id, name, email, joinedAt }`
 - `attendeeCount`
 - `seatsRemaining` (if capacity set)
@@ -397,3 +441,294 @@ This endpoint powers the **Reviews** tab for a host.
 - `total` is the total number of reviews for this host.
 
 - Each review includes both the `author` and a short `event summary` so the UI can show which event the review belongs to.
+
+## 3. Home Endpoints
+This provides search functionality, recommended events, category based filtering and upcoming events.
+
+### 3.1 Home Dashboard
+**GET** `/home`
+
+**Query params**
+
+| Param    | Type   | Description  |    
+|----------|--------|--------------|
+| `search` | string | filter by title, description and location (case-insensitive) |
+| `latitude` | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
+
+**Example requests**
+-  search 
+  `GET /home/?search=coffee`
+
+- with coordinates of user  
+  `GET /home/?latitude=51.4574&longitude=-2.6078`
+
+**Notes**
+
+- You only need to send location once per session. After that, `/home` will reuse the session location.
+- `recommendedEvents` uses the logged-in user's most joined past category, then returns the top 5 by attendance within 10 km when location is available. If the user has no past joins (or is not logged in), it returns the top 5 by attendance within 10 km when location is available.
+- `upcomingPreview` returns the 5 soonest events within 10 km when location is available; otherwise it returns the 5 soonest overall.
+
+**Response**
+```jsonc
+{"recommendedEvents":[{
+  "id":6,
+  "title":"Group Study Session ",
+  "description":null,
+  "startsAt":"2026-02-20T10:00:00.000Z",
+  "category":"Educational",
+  "location":"Wills Memorial Building",
+  "imageUrl":null,
+  "host":{
+    "id":1,
+    "name":"Bristol Host ",
+    "email":""},
+    "attendeeCount":0,
+    "seatsRemaining":"Unlimited",
+    "distance":0.411}
+  //next 4 recommended
+  ],
+
+  "categories": [
+    //categories
+  ],
+  "upcomingPreview": [
+    //Top 5 events starting soonest (within 10 km if location is available)
+  ]
+}
+```
+### 3.2 List All Categories 
+**GET** `/home/categories`
+returns all event categories
+
+**Response** 
+```json
+{"categories":["Physical_Activities","Festivals","Educational","Networking","Arts_Culture","Food_Drink","Music_Concerts","Tech_Gaming","Wellness_Meditation","Volunteer_Charity","Other"]}
+```
+
+### 3.3 Events by Category
+**GET** `/home/categories/:categoryName`
+returns all future events within a specific category
+
+**URL params**
+
+| Param    | Type   | Required | Description    |
+|----------|--------|----------|----------------|
+| `categoryName` | string | yes      | Enum value (e.g Networking) |
+
+**Example Request**
+  `GET /home/categories/Networking`
+
+**Example Response**
+```jsonc
+{"events":[{
+  "id":1,
+  "title":"Tech Networking",
+  "description":null,
+  "startsAt":"2026-02-18T15:00:00.000Z",
+  "category":"Networking",
+  "location":"Engine Shed",
+  "imageUrl":null,
+  "host":{
+    "id":1,
+    "name":"Bristol Host ",
+    "email":""},
+    "attendeeCount":0,
+    "seatsRemaining":"Unlimited",
+    "distance":null}]}
+```
+### 3.4 Upcoming Events
+**GET** `/home/upcoming?page=`
+list of all future events with pagination (soonest to latest)
+**Query params**
+| Param   | Type   | Default | Description                                   |
+|---------|--------|---------|-----------------------------------------------|
+| `page`  | number | `1`     | Page number for pagination    |
+| `latitude` | number | Optional. User latitude. If provided with `longitude`, it is stored in the session. |
+| `longitude` | number | Optional. User longitude. If provided with `latitude`, it is stored in the session. |
+
+**Notes**
+
+- If location is available (query or session), results are limited to events within 100 km.
+- If no location is available, all upcoming events are returned and `distance` is `null`.
+
+**Example Request**
+`/home/upcoming?page=1`
+
+**Response**
+```json
+{"pagination":{
+  "page":1,
+  "limit":10,
+  "total":7
+  },
+  "events":[{
+    "id":4,
+    "title":"Stokes Croft Art Walk ",
+    "description":"Explore street art",
+    "startsAt":"2026-02-10T13:00:00.000Z",
+    "category":"Arts_Culture",
+    "location":"Stokes Croft",
+    "imageUrl":null,
+    "host":{
+      "id":1,
+      "name":"Bristol Host ",
+      "email":""},
+      "attendeeCount":0,
+      "seatsRemaining":"Unlimited",
+      "distance":null}],
+}
+```
+
+## 4. Profile Endpoints (Me)
+These endpoints power the **Profile / Me** page.
+All require the session cookie from `/auth/email/verify`.
+
+### 4.1 Current Profile
+**GET** `/profile/me`
+
+**Response**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name"
+  }
+}
+```
+
+---
+
+### 4.2 Update Profile
+**PATCH** `/profile/me`
+
+**Request body (JSON)**
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `name` | string \| null | yes | Trimmed; empty string becomes null |
+
+**Response**
+```json
+{
+  "message": "Profile updated.",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "New Name"
+  }
+}
+```
+
+---
+
+### 4.3 Profile Overview
+**GET** `/profile/me/overview`
+
+**Response**
+```jsonc
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name"
+  },
+  "stats": {
+    "upcomingCount": 2,
+    "pastCount": 5
+  },
+  "upcomingEvents": [
+    {
+      "id": 10,
+      "title": "Event title",
+      "startsAt": "2026-02-21T18:00:00.000Z",
+      "capacity": 20,
+      "seatsRemaining": 8,
+      "category": "Networking",
+      "location": "Bristol",
+      "latitude": 51.4518,
+      "longitude": -2.5902,
+      "imageUrl": null,
+      "externalUrl": null,
+      "attendeeCount": 12,
+      "host": { "id": 1, "name": "Host", "email": "host@example.com" },
+      "isHost": true,
+      "isAttendee": false,
+      "joinedAt": null
+    }
+  ],
+  "pastEvents": []
+}
+```
+
+---
+
+### 4.4 My Events (Paginated)
+**GET** `/profile/me/events?status=&limit=&page=`
+
+**Query params**
+
+| Param    | Type   | Default     | Description |
+|----------|--------|-------------|-------------|
+| `status` | string | "upcoming" | `"upcoming"`, `"past"`, or `"all"` |
+| `limit`  | number | `10`        | Max `50` |
+| `page`   | number | `1`         | 1-based page number |
+
+**Response**
+```jsonc
+{
+  "pagination": { "page": 1, "limit": 10, "total": 7 },
+  "events": [
+    {
+      "id": 10,
+      "title": "Event title",
+      "startsAt": "2026-02-21T18:00:00.000Z",
+      "capacity": 20,
+      "seatsRemaining": 8,
+      "category": "Networking",
+      "location": "Bristol",
+      "latitude": 51.4518,
+      "longitude": -2.5902,
+      "imageUrl": null,
+      "externalUrl": null,
+      "attendeeCount": 12,
+      "host": { "id": 1, "name": "Host", "email": "host@example.com" },
+      "isHost": true,
+      "isAttendee": false,
+      "joinedAt": null
+    }
+  ]
+}
+```
+
+---
+
+### 4.5 My Reviews (Paginated)
+**GET** `/profile/me/reviews?limit=&page=`
+
+**Query params**
+
+| Param   | Type   | Default | Description |
+|---------|--------|---------|-------------|
+| `limit` | number | `10`    | Max `50` |
+| `page`  | number | `1`     | 1-based page number |
+
+**Response**
+```jsonc
+{
+  "pagination": { "page": 1, "limit": 10, "total": 3 },
+  "reviews": [
+    {
+      "id": 1,
+      "rating": 5,
+      "comment": "Great event!",
+      "createdAt": "2026-01-15T12:00:00.000Z",
+      "author": { "id": 1, "name": "User", "email": "user@example.com" },
+      "host": { "id": 2, "name": "Host", "email": "host@example.com" },
+      "event": { "id": 3, "title": "Past event", "startsAt": "2025-12-01T18:00:00.000Z" }
+    }
+  ]
+}
+```
+

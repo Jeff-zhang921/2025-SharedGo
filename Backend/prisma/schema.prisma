@@ -91,3 +91,46 @@ enum Category {
   Volunteer_Charity
   Other
 }
+
+model EventParticipant { // Join table linking users to events they attend.
+  id        Int      @id @default(autoincrement()) 
+  eventId   Int // Foreign key referencing the event joined.
+  userId    Int // Foreign key referencing the user who joined.
+  joinedAt  DateTime @default(now())
+
+
+  event Event @relation(fields: [eventId], references: [id]) // Relation to fetch the associated event.
+  user  User  @relation(fields: [userId], references: [id]) // Relation to fetch the associated user.
+
+  @@unique([eventId, userId]) // Prevent duplicate participation records for the same user and event.
+} 
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int?
+  comment   String?
+  eventId   Int
+  hostId    Int
+  authorId  Int
+  createdAt DateTime @default(now())
+
+  event  Event @relation(fields: [eventId], references: [id])
+  host   User  @relation("HostReviews", fields: [hostId], references: [id])
+  author User  @relation("UserReviews", fields: [authorId], references: [id])
+
+// The combination of (eventId, authorId) must be unique.
+  @@unique([eventId, authorId])
+  @@index([hostId, createdAt])
+}
+
+model LoginCode {
+  id        Int      @id @default(autoincrement())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, expiresAt])
+}

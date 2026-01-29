@@ -8,6 +8,7 @@ import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
 
+//Testing CI frontend
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
       {/* set the path for the chat page */}
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}
-      <Route path="/host" element={<HostPage />} />
+      <Route path="/host/:hostId" element={<HostPage />} />
     </Routes>
 
   );

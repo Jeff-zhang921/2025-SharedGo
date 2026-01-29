@@ -1,16 +1,32 @@
 //this is the backend logic
-import { Router, Request, Response  } from "express"; 
-import { PrismaClient } from "@prisma/client";
+import { Router, Request, Response } from "express"; 
+import { PrismaClient, Category } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
 
-export const Categories = [
-  "Physical Activities", "Festivals", "Educational", "Networking", "Arts & Culture", 
-  "Food & Drink", "Music & Concerts", "Tech & Gaming", "Wellness & Meditation", "Volunteer & Charity", "Other"
-];
+//parse coodinate make sure that coodinate is number
+const parseCoordinate = (raw: unknown): number | null => {
+  if (raw === undefined || raw === null || raw === "") return null;
+  const parsed = typeof raw === "number" ? raw : Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 
+// Haversine formula to calculate distance between two lat/lon points
+function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
+export const Categories = Object.values(Category);
 //publish event logic
 //you can post on /events/create
 // --- COMMENT OUT requireSession TO TEST WITHOUT LOGIN ---
@@ -47,9 +63,13 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
     ? externalUrlRaw.trim()
     : null;
 
-  const category = Categories.includes(categoryRaw) ? categoryRaw : "Other";
-  const latitude = latitudeRaw !== undefined ? Number(latitudeRaw) : 0;
-  const longitude = longitudeRaw !== undefined ? Number(longitudeRaw) : 0;
+    //treat categoryRaw as if it were already a valid Category type so that the .includes() function accepts it
+    //and test whether or not it is inside the category list
+  const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
+    ? (categoryRaw as Category)
+    : Category.Other;
+const latitude = parseCoordinate(latitudeRaw);
+  const longitude = parseCoordinate(longitudeRaw);
 
   
  // Basic required-field validation. If invalid, return 400 and stop.
@@ -154,10 +174,41 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
   });
 });
 
+
+
+
 //Logic to return list of ALL events
 //can get at just /events so it lists all the events rather than just 1 for each id
+//what it return is base on the user location, if location is provided, order by the nearest location event to far
 router.get("/", async (req, res) => {
   try {
+    const queryLatitude = parseCoordinate(
+      typeof req.query.latitude === "string" ? req.query.latitude : undefined,
+    );
+    const queryLongitude = parseCoordinate(
+      typeof req.query.longitude === "string" ? req.query.longitude : undefined,
+    );
+    //bool
+    const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+
+    if (hasQueryCoords) {
+      req.session.location = {
+        latitude: queryLatitude,
+        longitude: queryLongitude,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    const sessionLocation = req.session.location;
+
+    const userLatitude = hasQueryCoords
+      ? queryLatitude
+      : sessionLocation?.latitude ?? null;
+    const userLongitude = hasQueryCoords
+      ? queryLongitude
+      //"If the thing on the left is null or undefined, give me the thing on the right
+      : sessionLocation?.longitude ?? null;
+
     const events = await prisma.event.findMany({
       include: {
         host: true,
@@ -168,30 +219,65 @@ router.get("/", async (req, res) => {
       },
     });
 
-    //map the data so it matches the EventData interface in frontend
-    const formattedEvents = events.map((event) => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      startsAt: event.startsAt,
-      capacity: event.capacity,
-      location: event.location,
-      imageUrl: event.imageUrl,
-      externalUrl: event.externalUrl,
-      host: {
-        id: event.host.id,
-        name: event.host.name,
-        email: event.host.email,
-      },
-      attendeeCount: event.participants.length,
-    }));
+    const formattedEvents = events.map((event) => {
+      let distance: number | null = null;
+      if (
+        userLatitude !== null &&
+        userLongitude !== null &&
+        event.latitude !== null &&
+        event.longitude !== null
+      ) {
+        distance = distanceInKm(
+          userLatitude,
+          userLongitude,
+          event.latitude,
+          event.longitude,
+        );
+      }
 
-    res.json(formattedEvents); //Send back the event details as JSON so the front end can show it
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        startsAt: event.startsAt,
+        capacity: event.capacity,
+        category: event.category,
+        location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        imageUrl: event.imageUrl,
+        externalUrl: event.externalUrl,
+        host: {
+          id: event.host.id,
+          name: event.host.name,
+          email: event.host.email,
+        },
+        attendeeCount: event.participants.length,
+        distance: distance !== null ? Number(distance.toFixed(3)) : null,
+      };
+    });
+
+    let result = formattedEvents;
+
+    if (userLatitude !== null && userLongitude !== null) {
+      result = [...result].sort((a, b) => {
+        const distanceA = a.distance !== null ? a.distance : Infinity;
+        const distanceB = b.distance !== null ? b.distance : Infinity;
+        //in ascending order
+        return distanceA - distanceB;
+      });
+    }
+
+    res.json(result);
   } catch (error) {
     console.error("Error fetching events", error);
     res.status(500).json({ message: "Internal server error while fetching events." });
   }
 });
+
+
+
+
 
 
 //return json object with event id....
