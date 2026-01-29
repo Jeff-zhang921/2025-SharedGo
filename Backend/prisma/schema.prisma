@@ -38,8 +38,8 @@ model Event {
   capacity     Int? // Optional maximum number of attendees allowed.
   category     Category   @default(Other)
   location     String // Text field noting where the event takes place.
-  latitude  Float @default(0)
-  longitude Float @default(0)
+  latitude  Float?
+  longitude Float?
   imageUrl     String? // Optional image URL rendered in the UI.
   externalUrl  String? // Optional link to an external page with more details.
   hostId       Int // Foreign key pointing to the User who hosts the event.
@@ -65,7 +65,6 @@ enum Category {
 }
 
 model EventParticipant { // Join table linking users to events they attend.
-  id        Int      @id @default(autoincrement()) 
   eventId   Int // Foreign key referencing the event joined.
   userId    Int // Foreign key referencing the user who joined.
   joinedAt  DateTime @default(now())
