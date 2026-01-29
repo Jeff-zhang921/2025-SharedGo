@@ -32,50 +32,11 @@ model Event {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   category     Category           @default(Other)
-  latitude     Float
-  longitude    Float
+  latitude     Float?
+  longitude    Float?
   host         User               @relation(fields: [hostId], references: [id])
   participants EventParticipant[]
   reviews      Review[]
-}
-
-model EventParticipant {
-  id       Int      @id @default(autoincrement())
-  eventId  Int
-  userId   Int
-  joinedAt DateTime @default(now())
-  event    Event    @relation(fields: [eventId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
-
-  @@unique([eventId, userId])
-}
-
-model Review {
-  id        Int      @id @default(autoincrement())
-  rating    Int?
-  comment   String?
-  eventId   Int
-  hostId    Int
-  authorId  Int
-  createdAt DateTime @default(now())
-  author    User     @relation("UserReviews", fields: [authorId], references: [id])
-  event     Event    @relation(fields: [eventId], references: [id])
-  host      User     @relation("HostReviews", fields: [hostId], references: [id])
-
-  @@unique([eventId, authorId])
-  @@index([hostId, createdAt])
-}
-
-model LoginCode {
-  id        Int       @id @default(autoincrement())
-  email     String
-  codeHash  String
-  expiresAt DateTime
-  attempts  Int       @default(0)
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-
-  @@index([email, expiresAt])
 }
 
 enum Category {

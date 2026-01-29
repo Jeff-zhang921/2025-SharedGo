@@ -68,22 +68,21 @@ const CreateEventPage = () => {
           hostId: 1, // place-holder of Host Id
           hostEmail: "host@sharego.dev", // place-holder for Host email
           capacity: form.capacity === "" ? null:Number(form.capacity),
-          latitude: form.latitude === "" ? null:Number(form.latitude),
-          longitude: form.longitude === "" ? null:Number(form.longitude),
+          latitude: form.latitude === "" ? undefined:Number(form.latitude),
+          longitude: form.longitude === "" ? undefined:Number(form.longitude),
           description: form.description || null,
-          category: form.category || null,
+          category: form.category || undefined,
           imageUrl: form.imageUrl || null,
           externalUrl: form.externalUrl || null,
         }),
       });
 
+      const text = await res.text();
       if (!res.ok) {
-        const event = await res.json();
-        throw new Error(event.message || "Failed to create event");
+        console.error("Create event failed:", text);
+        throw new Error(text || "Failed to create event");
       }
-     
-      const createdEvent = await res.json();
-      console.log("Event created:", createdEvent);
+      const createdEvent = JSON.parse(text);
 
       // Redirect to event details page
       navigate(`/eventDetails/${createdEvent.event.id}`);

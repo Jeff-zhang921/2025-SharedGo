@@ -68,7 +68,7 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
   const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
     ? (categoryRaw as Category)
     : Category.Other;
-const latitude = parseCoordinate(latitudeRaw);
+  const latitude = parseCoordinate(latitudeRaw);
   const longitude = parseCoordinate(longitudeRaw);
 
   
@@ -113,7 +113,6 @@ const latitude = parseCoordinate(latitudeRaw);
     capacity = Math.floor(parsedCapacity);
   }
 
-
  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
@@ -121,19 +120,18 @@ const latitude = parseCoordinate(latitudeRaw);
     update: {},
     create: { email: hostEmail },
   });
-
-
-// Create the event row in the database and also include related data in the result.
+  
+  // Create the event row in the database and also include related data in the result.
   const event = await prisma.event.create({
     data: {
       title,
       description,
       startsAt,
       capacity,
-      category,
+      category: category ?? undefined,
       location,
-      latitude,
-      longitude,
+      latitude: latitude ?? null as any,
+      longitude: longitude ?? null as any,
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
@@ -149,6 +147,7 @@ const latitude = parseCoordinate(latitudeRaw);
       },
     },
   });
+
  // Send Created with a clean response
   res.status(201).json({
     message: "Event created successfully.",
@@ -291,50 +290,8 @@ router.get("/:id", async (req, res) => {
     return; 
   }
 
-  // // --- POST for creating new events ---
-  // router.post("/", async (req: Request, res: Response): Promise<Response> => {
-  //   try {
-  //     const {
-  //       title,
-  //       description,
-  //       startsAt,
-  //       capacity,
-  //       category,
-  //       location,
-  //       latitude,
-  //       longitude,
-  //       imageUrl,
-  //       externalUrl,
-  //       hostId,
-  //     } = req.body;
 
-  //     // Validation
-  //     if (!title || !startsAt || !location || !hostId) {
-  //       return res.status(400).json({message: "Missing required fields"});
-  //     }
 
-  //     const newEvent = await prisma.event.create({
-  //       data: {
-  //         title,
-  //         description: description || null,
-  //         startsAt: new Date(startsAt),
-  //         capacity: capacity ?? null,
-  //         location,
-  //         category,
-  //         latitude,
-  //         longitude,
-  //         imageUrl: imageUrl || null,
-  //         externalUrl: externalUrl || null,
-  //         hostId,
-  //       } ,
-  //     });
-
-  //     return res.status(201).json(newEvent); // send the created event back
-  //   } catch (error) {
-  //     console.error("Error creating event:", error);
-  //     return res.status(500).json({ message: "Internal server error" });
-  //   }
-  // });
 
 
   //find database
