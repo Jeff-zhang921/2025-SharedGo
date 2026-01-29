@@ -698,5 +698,70 @@ router.patch("/:id", requireSession, async (req, res) => {
     res.status(400).json({ message: "Location cannot be empty." });
     return;
   }
-}
+
+//It sets the starting value to an Empty Object.
+  const updateData: {
+    title?: string;
+    startsAt?: Date;
+    location?: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    externalUrl?: string | null;
+    capacity?: number | null;
+    category?: Category;
+    latitude?: number | null;
+    longitude?: number | null;
+  } = {};
+
+
+  if (title !== undefined) updateData.title = title;
+  if (startsAt !== undefined) updateData.startsAt = startsAt;
+  if (location !== undefined) updateData.location = location;
+  if (description !== undefined) updateData.description = description || null;
+  if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
+  if (externalUrl !== undefined) updateData.externalUrl = externalUrl || null;
+  if (capacity !== undefined) updateData.capacity = capacity;
+  if (category !== undefined) updateData.category = category;
+  if (latitude !== undefined) updateData.latitude = latitude;
+  if (longitude !== undefined) updateData.longitude = longitude;
+
+  //if there is no field
+  if (Object.keys(updateData).length === 0) {
+    res.status(400).json({ message: "No valid fields provided." });
+    return;
+  }
+
+  //use update if event must created, can be found
+  const updatedEvent = await prisma.event.update({
+    where: { id: eventId },
+    data: updateData,
+    include: {
+      host: true,
+      participants: true,
+    },
+  });
+
+  res.json({
+    message: "Event updated successfully.",
+    event: {
+      id: updatedEvent.id,
+      title: updatedEvent.title,
+      description: updatedEvent.description,
+      startsAt: updatedEvent.startsAt,
+      capacity: updatedEvent.capacity,
+      category: updatedEvent.category,
+      location: updatedEvent.location,
+      latitude: updatedEvent.latitude,
+      longitude: updatedEvent.longitude,
+      imageUrl: updatedEvent.imageUrl,
+      externalUrl: updatedEvent.externalUrl,
+      host: {
+        id: updatedEvent.host.id,
+        name: updatedEvent.host.name,
+        email: updatedEvent.host.email,
+      },
+      attendeeCount: updatedEvent.participants.length,
+    },
+  });
+});
 export default router; // Export the router so index.ts can mount the /events routes.
