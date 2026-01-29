@@ -1,41 +1,49 @@
-generator client {
-  provider = "prisma-client-js"
+//this is the structure of database
+
+//migrate file is the communication let prisma and database stay sync, if prisma want create list after migrate. it will create a on database
+
+//npx prisma migrate dev --name init
+//applies the Prisma schema to your dev database: creates/updates tables, records a new migration named init, and checks against a shadow database if configured.
+
+// npx prisma generate 
+// regenerates the Prisma Client code from the current schema so your app can use the latest models/queries
+
+generator client { // Configure the Prisma Client generator block.
+  provider = "prisma-client-js" // Use the JavaScript Prisma Client implementation.
 }
 
-datasource db {
+datasource db { // Configure the primary database connection for Prisma.
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Read the connection string from the environment file.
 }
 
 model User {
   id              Int                @id @default(autoincrement())
   email           String             @unique
   name            String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  eventsHosted    Event[]
-  registrations   EventParticipant[]
+  createdAt       DateTime           @default(now()) // Timestamp capturing when the user record was created.
+  updatedAt       DateTime           @updatedAt // Timestamp automatically updated whenever the record changes.
+  eventsHosted    Event[] // Relation listing the events this user has created.
+  registrations   EventParticipant[] // Relation listing participation records for events the user joined.
   authoredReviews Review[]           @relation("UserReviews")
   hostReviews     Review[]           @relation("HostReviews")
 }
 
 model Event {
-  id           Int                @id @default(autoincrement())
-  title        String
-  description  String?
-  startsAt     DateTime
-  capacity     Int?
-  location     String
-  imageUrl     String?
-  externalUrl  String?
-  hostId       Int
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  category     Category           @default(Other)
-  latitude     Float?
-  longitude    Float?
-  host         User               @relation(fields: [hostId], references: [id])
-  participants EventParticipant[]
+  id           Int                @id @default(autoincrement()) 
+  title        String 
+  description  String? 
+  startsAt     DateTime // Scheduled start date and time.
+  capacity     Int? // Optional maximum number of attendees allowed.
+  category     Category   @default(Other)
+  location     String // Text field noting where the event takes place.
+  latitude  Float?
+  longitude Float?
+  imageUrl     String? // Optional image URL rendered in the UI.
+  externalUrl  String? // Optional link to an external page with more details.
+  hostId       Int // Foreign key pointing to the User who hosts the event.
+  host         User               @relation(fields: [hostId], references: [id]) // Relation tying the event to its host user.
+  participants EventParticipant[] // Relation exposing everyone registered for the event.
   reviews      Review[]
 }
 
