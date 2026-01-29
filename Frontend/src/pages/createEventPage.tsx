@@ -1,39 +1,50 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import './createEventPage.css';
 //import Button from "./../components/Button"
 
 type EventForm = {
   title: string;
+  description?: string;
   startsAt: string;
   location: string;
   hostEmail?: string;
-  description?: string;
   imageUrl?: string;
   externalUrl?: string;
   capacity?: number | "";
   category?: string;
   latitude?: number | "";
   longitude?: number | "";
+  attendees?: Array<{ //Attendees section as backend also included this (maybe implement into page later)
+    id?: number;
+    name?: string | null;
+    email?: string;
+    joinedAt?: string;
+  }>;
+  attendeeCount?: number;
+  averageRating?: number | null;
 };
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = React.useState<EventForm>({
+  const [form, setForm] = useState<EventForm>({
     title: "",
+    description: "",
     startsAt: "",
     location: "",
     hostEmail: "",
-    description: "",
     imageUrl: "",
     externalUrl: "",
     capacity: "",
     category: "",
     latitude: "",
     longitude: "",
+    //Attendees section as backend also included this (maybe implement into page later)
+    attendees: [],
+    attendeeCount: 0,
+    averageRating: null,
   });
-  const [error, setError] = React.useState("Error occurred: useState\n");
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
 
   // handle changes on input
   const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
@@ -47,7 +58,6 @@ const CreateEventPage = () => {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const res = await fetch(`${backendBaseURL}/events/create`, {
@@ -76,10 +86,9 @@ const CreateEventPage = () => {
       console.log("Event created:", createdEvent);
 
       // Redirect to event details page
-      navigate(`/events/${createdEvent.event.id}`);
+      navigate(`/eventDetails/${createdEvent.event.id}`);
     } catch (err: any) {
       console.error(err);
-      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -90,12 +99,11 @@ const CreateEventPage = () => {
       <header className="form-header">
         <h1>Create Event</h1>
       </header>
-      {error && <p className="error">{error}</p>}
 
       <section className="form-section">
         <label>
           <span>TITLE</span>
-          <input name="title" placeholder="title" onChange={onChange} required/>
+          <input name="title" placeholder="Title" onChange={onChange} required/>
         </label>
 
         <label>
@@ -105,12 +113,13 @@ const CreateEventPage = () => {
       
         <label>
           <span>CAPACITY</span>
-          <input name="capacity" type="number" placeholder="0000" onChange={onChange}/>
+          <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
         </label>
 
-        {/*<label>
+        <label>
           <span>CATEGORY</span>
-        </label>*/}
+          <input name="category" placeholder="None" onChange={onChange}/>
+        </label>
 
         <label>
           <span>LOCATION</span>
@@ -119,7 +128,7 @@ const CreateEventPage = () => {
 
         <label>
           <span>Description</span>
-          <textarea name="description" placeholder="Description" onChange={onChange}/>
+          <textarea name="description" placeholder="No description provided" onChange={onChange}/>
         </label>
       </section>
       

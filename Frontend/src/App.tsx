@@ -22,7 +22,6 @@ function App() {
       <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} /> 
       {/* set the paths for the create event page */}
       <Route path="/createEvent" element={<CreateEventPage />} />
-      <Route path="/event/create" element={<CreateEventPage />} />
       {/* set the path for the chat page */}
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}

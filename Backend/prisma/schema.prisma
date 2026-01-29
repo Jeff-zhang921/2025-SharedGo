@@ -1,54 +1,82 @@
-//this is the structure of database
+generator client {
+  provider = "prisma-client-js"
+}
 
-//migrate file is the communication let prisma and database stay sync, if prisma want create list after migrate. it will create a on database
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-//npx prisma migrate dev --name init
-//applies the Prisma schema to your dev database: creates/updates tables, records a new migration named init, and checks against a shadow database if configured.
-
-// npx prisma generate 
-// regenerates the Prisma Client code from the current schema so your app can use the latest models/queries
-
-generator client { // Configure the Prisma Client generator block.
-  provider = "prisma-client-js" // Use the JavaScript Prisma Client implementation.
-} 
-
-datasource db { // Configure the primary database connection for Prisma.
-  provider = "postgresql" 
-  url      = env("DATABASE_URL") // Read the connection string from the environment file.
-} 
-
-model User { 
-  id             Int                 @id @default(autoincrement())  
-  email          String              @unique 
-  name           String? 
-  createdAt      DateTime            @default(now()) // Timestamp capturing when the user record was created.
-  updatedAt      DateTime            @updatedAt // Timestamp automatically updated whenever the record changes.
-  eventsHosted   Event[]             // Relation listing the events this user has created.
-  registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
+model User {
+  id              Int                @id @default(autoincrement())
+  email           String             @unique
+  name            String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  eventsHosted    Event[]
+  registrations   EventParticipant[]
   authoredReviews Review[]           @relation("UserReviews")
   hostReviews     Review[]           @relation("HostReviews")
-  }
+}
 
-
-model Event { 
-  id           Int                @id @default(autoincrement()) 
-  title        String 
-  description  String? 
-  startsAt     DateTime // Scheduled start date and time.
-  capacity     Int? // Optional maximum number of attendees allowed.
-  category     Category   @default(Other)
-  location     String // Text field noting where the event takes place.
+model Event {
+  id           Int                @id @default(autoincrement())
+  title        String
+  description  String?
+  startsAt     DateTime
+  capacity     Int?
+  location     String
+  imageUrl     String?
+  externalUrl  String?
+  hostId       Int
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  category     Category           @default(Other)
   latitude     Float
   longitude    Float
-  imageUrl     String? // Optional image URL rendered in the UI.
-  externalUrl  String? // Optional link to an external page with more details.
-  hostId       Int // Foreign key pointing to the User who hosts the event.
-  host         User               @relation(fields: [hostId], references: [id]) // Relation tying the event to its host user.
-  participants EventParticipant[] // Relation exposing everyone registered for the event.
+  host         User               @relation(fields: [hostId], references: [id])
+  participants EventParticipant[]
   reviews      Review[]
-  createdAt    DateTime           @default(now()) 
-  updatedAt    DateTime           @updatedAt 
-} 
+}
+
+model EventParticipant {
+  id       Int      @id @default(autoincrement())
+  eventId  Int
+  userId   Int
+  joinedAt DateTime @default(now())
+  event    Event    @relation(fields: [eventId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int?
+  comment   String?
+  eventId   Int
+  hostId    Int
+  authorId  Int
+  createdAt DateTime @default(now())
+  author    User     @relation("UserReviews", fields: [authorId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+  host      User     @relation("HostReviews", fields: [hostId], references: [id])
+
+  @@unique([eventId, authorId])
+  @@index([hostId, createdAt])
+}
+
+model LoginCode {
+  id        Int       @id @default(autoincrement())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int       @default(0)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email, expiresAt])
+}
 
 enum Category {
   Physical_Activities
@@ -62,47 +90,4 @@ enum Category {
   Wellness_Meditation
   Volunteer_Charity
   Other
-}
-
-model EventParticipant { // Join table linking users to events they attend.
-  id        Int      @id @default(autoincrement()) 
-  eventId   Int // Foreign key referencing the event joined.
-  userId    Int // Foreign key referencing the user who joined.
-  joinedAt  DateTime @default(now())
-
-
-  event Event @relation(fields: [eventId], references: [id]) // Relation to fetch the associated event.
-  user  User  @relation(fields: [userId], references: [id]) // Relation to fetch the associated user.
-
-  @@unique([eventId, userId]) // Prevent duplicate participation records for the same user and event.
-} 
-
-model Review {
-  id        Int      @id @default(autoincrement())
-  rating    Int?
-  comment   String?
-  eventId   Int
-  hostId    Int
-  authorId  Int
-  createdAt DateTime @default(now())
-
-  event  Event @relation(fields: [eventId], references: [id])
-  host   User  @relation("HostReviews", fields: [hostId], references: [id])
-  author User  @relation("UserReviews", fields: [authorId], references: [id])
-
-// The combination of (eventId, authorId) must be unique.
-  @@unique([eventId, authorId])
-  @@index([hostId, createdAt])
-}
-
-model LoginCode {
-  id        Int      @id @default(autoincrement())
-  email     String
-  codeHash  String
-  expiresAt DateTime
-  attempts  Int      @default(0)
-  usedAt    DateTime?
-  createdAt DateTime @default(now())
-
-  @@index([email, expiresAt])
 }
