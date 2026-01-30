@@ -68,7 +68,7 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
   const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
     ? (categoryRaw as Category)
     : Category.Other;
-  const latitude = parseCoordinate(latitudeRaw);
+const latitude = parseCoordinate(latitudeRaw);
   const longitude = parseCoordinate(longitudeRaw);
 
   
@@ -113,6 +113,7 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
     capacity = Math.floor(parsedCapacity);
   }
 
+
  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
@@ -120,7 +121,8 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
     update: {},
     create: { email: hostEmail },
   });
-  
+
+
   // Create the event row in the database and also include related data in the result.
   const event = await prisma.event.create({
     data: {
@@ -147,7 +149,6 @@ router.post("/create", /*requireSession,*/ async (req, res) => {
       },
     },
   });
-
  // Send Created with a clean response
   res.status(201).json({
     message: "Event created successfully.",
@@ -289,10 +290,6 @@ router.get("/:id", async (req, res) => {
     res.status(400).json({ message: "Event id must be a number." }); 
     return; 
   }
-
-
-
-
 
   //find database
   const event = await prisma.event.findUnique({ 

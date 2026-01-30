@@ -22,14 +22,13 @@ interface EventData {
   imageUrl: string | null;
   externalUrl: string | null;
   host: User; //Whomever hosted the event
-
   attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
     id: number;
     name: string | null;
     email: string;
     joinedAt: string;
   }>;
-  
+
   attendeeCount: number;
   averageRating: number | null;
 }
