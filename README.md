@@ -76,7 +76,7 @@
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
 
 ## CI/CD diagram
-![CI/CD Diagram](https://github.com/spe-uob/2025-SharedGo/raw/main/Docs/Architecture/ci,cd.png)
+![CI/CD Diagram](Docs/Architecture/ci,cd.png)
 
 ## Flow Steps
 * #### Indivisual user
