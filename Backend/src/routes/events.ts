@@ -1,5 +1,5 @@
 //this is the backend logic
-import { Router } from "express"; 
+import { Router, Request, Response } from "express"; 
 import { PrismaClient, Category } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
@@ -129,10 +129,10 @@ const latitude = parseCoordinate(latitudeRaw);
       description,
       startsAt,
       capacity,
-      category,
+      category: category ?? undefined,
       location,
-      latitude,
-      longitude,
+      latitude: latitude ?? null as any,
+      longitude: longitude ?? null as any,
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted

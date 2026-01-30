@@ -3,3 +3,7 @@
 /Backend/node_modules
 /Frontend/node_modules
 /node_modules
+/generated/prisma
+package-lock.json
+package.json
+.env
