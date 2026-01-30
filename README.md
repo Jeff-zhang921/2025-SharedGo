@@ -12,6 +12,7 @@
 * [User Stories](#user-stories)
 * [Project structure](#project-structure)
 * [Tech Stack](#teckstack)
+* [CI/CD diagram] (#ci/cd-diagram)
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
 
@@ -73,6 +74,9 @@
 ### MVP Architecture
 
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
+
+## CI/CD diagram
+[CI/CD Diagram](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/ci,cd.png)
 
 ## Flow Steps
 * #### Indivisual user
