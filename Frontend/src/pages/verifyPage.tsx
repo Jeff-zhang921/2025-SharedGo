@@ -3,7 +3,7 @@ import "./verifyPage.css"
 //import { Link } from "react-router-dom";
 //import App from '../App';
 
-const CreateLoginPage = () => {
+const CreateVerifyPage = () => {
      const [code, setCode] = useState(new Array(6).fill("")) //Array for verification code
      const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -49,3 +49,5 @@ const CreateLoginPage = () => {
       </div>
     );
   };
+
+export default CreateVerifyPage

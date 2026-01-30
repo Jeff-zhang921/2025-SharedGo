@@ -8,6 +8,7 @@ import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
 import LoginPage from './pages/loginPage'
+import VerifyPage from './pages/verifyPage'
 
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
       {/* set the path for the login page */}
       <Route path="/login" element={<LoginPage />} />
       {/* set the path for the verify page */}
-      <Route path="/verify" element={<LoginPage />} />
+      <Route path="/verify" element={<VerifyPage />} />
     </Routes>
 
   );
