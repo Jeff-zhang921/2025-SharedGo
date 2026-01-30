@@ -123,7 +123,7 @@ const latitude = parseCoordinate(latitudeRaw);
   });
 
 
-  // Create the event row in the database and also include related data in the result.
+// Create the event row in the database and also include related data in the result.
   const event = await prisma.event.create({
     data: {
       title,

@@ -7,3 +7,5 @@
 package-lock.json
 package.json
 .env
+/prisma
+prisma.config.ts
