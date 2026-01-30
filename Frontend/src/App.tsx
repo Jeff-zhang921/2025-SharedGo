@@ -29,6 +29,8 @@ function App() {
       <Route path="/host/:hostId" element={<HostPage />} />
       {/* set the path for the login page */}
       <Route path="/login" element={<LoginPage />} />
+      {/* set the path for the verify page */}
+      <Route path="/verify" element={<LoginPage />} />
     </Routes>
 
   );

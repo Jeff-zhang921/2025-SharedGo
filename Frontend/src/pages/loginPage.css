@@ -20,3 +20,47 @@
     padding: 20px;
     text-align: center;
 }
+
+.headerGroup {
+    margin-bottom: 30px;
+}
+
+.createAccount {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.helperText {
+    font-size: 14px;
+    color: #666;
+}
+
+.inputGroup {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.emailField {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    color: gray;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+.blackButton {
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
