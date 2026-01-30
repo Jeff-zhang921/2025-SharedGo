@@ -764,4 +764,47 @@ router.patch("/:id", requireSession, async (req, res) => {
     },
   });
 });
+
+
+// Host-only delete event
+router.delete("/:id", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, hostId: true },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the host can delete this event." });
+    return;
+  }
+
+  await prisma.$transaction([
+    //delete many rows
+    prisma.review.deleteMany({ where: { eventId } }),
+    prisma.eventParticipant.deleteMany({ where: { eventId } }),
+    prisma.event.delete({ where: { id: eventId } }),
+  ]);
+
+  res.json({ message: "Event deleted successfully." });
+});
+
 export default router; // Export the router so index.ts can mount the /events routes.
