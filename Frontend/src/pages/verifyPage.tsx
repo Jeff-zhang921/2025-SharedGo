@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import "./verifyPage.css"
-//import { Link } from "react-router-dom";
+import "./loginPage.css" //Same css file for consistency
+import { useLocation, useNavigate } from "react-router-dom";
 //import App from '../App';
 
 const CreateVerifyPage = () => {
+     const location = useLocation();
+     const navigate = useNavigate();
+    
+     //Get email from the navigation state sent by LoginPage
+     const email = location.state?.email || "";
      const [code, setCode] = useState(new Array(6).fill("")) //Array for verification code
      const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -30,8 +35,8 @@ const CreateVerifyPage = () => {
        };
 
     return (
-       <div className="verifyPage">
-        <div className='verifyBox'>
+       <div className="loginPage"> {/*Same name for consistency*/}
+        <div className='loginBox'>
         {code.map((digit, index) => (
             <input
               key={index}
