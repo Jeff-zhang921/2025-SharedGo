@@ -162,21 +162,34 @@ router.get("/:hostId/overview", async (req, res) => {
       ? Number((totalAttendees / capacityTotal).toFixed(2))
       : null; 
 
-      //what is the usecase of 
-  const allRatings = eventsForStats 
-    .flatMap((event: { reviews: { rating: number | null }[] }) => event.reviews)//glue all event together 
-    .map((event: { rating: number | null }) => event.rating) // Take rating values.
-    .filter((value: number | null): value is number => typeof value === "number"); 
+
+ const allRatings = eventsForStats 
+  //Flat: Takes those separate arrays and "glues" them into one single long list.
+  //[
+  //[Review 1, Review 2],  // From Event A
+  // [Review 3],            // From Event B
+  // []                     // From Event C
+    //]
+    //to [Review 1, Review 2, Review 3]
+  //reviews is array that contains key value pair which key is rating value is number
+    .flatMap((event:{reviews:{rating:number|null}[]})=>event.reviews)//glue all event together 
+    //you can change to .flatmap((event)=>event.reviews)
+    .map((reviews:{rating:number|null})=>reviews.rating) // Take rating values.
+    //value is number is the typeguard
+    //'is' is the key word narrow from type any to number,if the function is true then gaurentee that function retunr number
+    //: (Colon) is for Naming & Defining (Static)
+    //=> (Arrow) is for Action & Logic (Active).
+    .filter((value: number|null):value is number=>typeof value ==="number"); 
 
 
     
   const averageRating =
     allRatings.length > 0
       ? Number(
-          (allRatings.reduce((sum: number, value: number) => sum + value, 0) / allRatings.length).toFixed(2), 
+        //toFix(2) is average to...
+          (allRatings.reduce((sum:number,value:number)=>sum+value,0)/ allRatings.length).toFixed(2), 
         )
       : null; 
-
 
 
   res.json({ 

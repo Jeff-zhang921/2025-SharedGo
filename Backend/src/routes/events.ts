@@ -596,4 +596,215 @@ router.post("/:id/reviews", requireSession, async (req, res) => {
   });
 });
 
+
+
+// Host-only update event
+router.patch("/:id", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  //convert to number
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the host can update this event!" });
+    return;
+  }
+
+  const titleRaw = req.body?.title;
+  const startsAtRaw = req.body?.startsAt;
+  const locationRaw = req.body?.location;
+  const descriptionRaw = req.body?.description;
+  const imageUrlRaw = req.body?.imageUrl;
+  const externalUrlRaw = req.body?.externalUrl;
+  const capacityRaw = req.body?.capacity;
+  const categoryRaw = req.body?.category;
+  const latitudeRaw = req.body?.latitude;
+  const longitudeRaw = req.body?.longitude;
+//trim remove invisible whitespace (spaces, tabs, newlines) from the start and end of a string.
+  const title = typeof titleRaw === "string" ? titleRaw.trim() : undefined;
+  const startsAtInput = typeof startsAtRaw==="string"?startsAtRaw.trim():undefined
+  const location = typeof locationRaw === "string" ? locationRaw.trim() : undefined;
+  const description = typeof descriptionRaw === "string"
+    ? descriptionRaw.trim()
+    : undefined;
+  const imageUrl = typeof imageUrlRaw === "string"
+    ? imageUrlRaw.trim()
+    : undefined;
+  const externalUrl = typeof externalUrlRaw === "string"
+    ? externalUrlRaw.trim()
+    : undefined;
+
+  let startsAt: Date | undefined;
+  if (startsAtInput !== undefined) {
+    //convert to a object that have many method
+    startsAt = new Date(startsAtInput);
+    
+    //NAN: not a number
+    if (Number.isNaN(startsAt.getTime())) {
+      res.status(400).json({ message: "Start date/time is invalid." });
+      return;
+    }
+  }
+
+  let capacity: number | null | undefined;
+  if (capacityRaw !== undefined) {
+    if (capacityRaw === null || capacityRaw === "") {
+      capacity = null;
+    } else {
+      const parsedCapacity = Number(capacityRaw);
+      if (!Number.isFinite(parsedCapacity) || parsedCapacity < 0) {
+        res.status(400).json({ message: "Capacity must be a positive number." });
+        return;
+      }
+      capacity = Math.floor(parsedCapacity);
+    }
+  }
+
+  let category: Category | undefined;
+  if (typeof categoryRaw === "string") {
+    category=Categories.includes(categoryRaw as Category)
+      ? (categoryRaw as Category)
+      : Category.Other;
+  }
+
+  const latitude = latitudeRaw !== undefined ? parseCoordinate(latitudeRaw) : undefined;
+  const longitude = longitudeRaw !== undefined ? parseCoordinate(longitudeRaw) : undefined;
+
+  if (title !== undefined && title.length === 0) {
+    res.status(400).json({ message: "Title cannot be empty." });
+    return;
+  }
+
+  if (location !== undefined && location.length === 0) {
+    res.status(400).json({ message: "Location cannot be empty." });
+    return;
+  }
+
+//It sets the starting value to an Empty Object.
+  const updateData: {
+    title?: string;
+    startsAt?: Date;
+    location?: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    externalUrl?: string | null;
+    capacity?: number | null;
+    category?: Category;
+    latitude?: number | null;
+    longitude?: number | null;
+  } = {};
+
+
+  if (title !== undefined) updateData.title = title;
+  if (startsAt !== undefined) updateData.startsAt = startsAt;
+  if (location !== undefined) updateData.location = location;
+  if (description !== undefined) updateData.description = description || null;
+  if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
+  if (externalUrl !== undefined) updateData.externalUrl = externalUrl || null;
+  if (capacity !== undefined) updateData.capacity = capacity;
+  if (category !== undefined) updateData.category = category;
+  if (latitude !== undefined) updateData.latitude = latitude;
+  if (longitude !== undefined) updateData.longitude = longitude;
+
+  //if there is no field
+  if (Object.keys(updateData).length === 0) {
+    res.status(400).json({ message: "No valid fields provided." });
+    return;
+  }
+
+  //use update if event must created, can be found
+  const updatedEvent = await prisma.event.update({
+    where: { id: eventId },
+    data: updateData,
+    include: {
+      host: true,
+      participants: true,
+    },
+  });
+
+  res.json({
+    message: "Event updated successfully.",
+    event: {
+      id: updatedEvent.id,
+      title: updatedEvent.title,
+      description: updatedEvent.description,
+      startsAt: updatedEvent.startsAt,
+      capacity: updatedEvent.capacity,
+      category: updatedEvent.category,
+      location: updatedEvent.location,
+      latitude: updatedEvent.latitude,
+      longitude: updatedEvent.longitude,
+      imageUrl: updatedEvent.imageUrl,
+      externalUrl: updatedEvent.externalUrl,
+      host: {
+        id: updatedEvent.host.id,
+        name: updatedEvent.host.name,
+        email: updatedEvent.host.email,
+      },
+      attendeeCount: updatedEvent.participants.length,
+    },
+  });
+});
+
+
+// Host-only delete event
+router.delete("/:id", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, hostId: true },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the host can delete this event." });
+    return;
+  }
+
+  await prisma.$transaction([
+    //delete many rows
+    prisma.review.deleteMany({ where: { eventId } }),
+    prisma.eventParticipant.deleteMany({ where: { eventId } }),
+    prisma.event.delete({ where: { id: eventId } }),
+  ]);
+
+  res.json({ message: "Event deleted successfully." });
+});
+
 export default router; // Export the router so index.ts can mount the /events routes.

@@ -21,6 +21,8 @@ This section documents the endpoints used by **Frontend**
   - [1.2 Get Event Details](#12-get-event-details)
   - [1.3 Join Event](#13-join-event)
   - [1.4 Create Review for Event](#14-create-review-for-event)
+  - [1.5 Update Event (Host Only)](#15-update-event-host-only)
+  - [1.6 Delete Event (Host Only)](#16-delete-event-host-only)
 - [2. Host Endpoints (Tabs)](#2-host-endpoints-tabs)
   - [2.1 Host Overview](#21-host-overview)
   - [2.2 Host Events (Upcoming / Past / All)](#22-host-events-upcoming--past--all)
@@ -237,6 +239,43 @@ Includes:
   - `id`, `rating`, `comment`, `createdAt`
   - `author` summary
   - `event` summary
+
+---
+### 1.5 Update Event (Host Only)
+
+**PATCH** `/events/:id`
+
+**Auth**: Requires session cookie. Only the host can update their own event.
+
+**Request body (JSON)** — any of the following fields:
+
+| Field        | Type              | Notes |
+|--------------|-------------------|-------|
+| `title`      | string            | Optional, non-empty if provided |
+| `startsAt`   | string            | Optional ISO datetime |
+| `location`   | string            | Optional, non-empty if provided |
+| `description`| string \| null     | Optional; empty string becomes null |
+| `imageUrl`   | string \| null     | Optional; empty string becomes null |
+| `externalUrl`| string \| null     | Optional; empty string becomes null |
+| `capacity`   | number \| null     | Optional; null clears capacity |
+| `category`   | string            | Optional; must be a Category enum |
+| `latitude`   | number \| null     | Optional |
+| `longitude`  | number \| null     | Optional |
+
+**Response**
+
+- `{ message: "Event updated successfully.", event: { ... } }`
+
+---
+### 1.6 Delete Event (Host Only)
+
+**DELETE** `/events/:id`
+
+**Auth**: Requires session cookie. Only the host can delete their own event.
+
+**Response**
+
+- `{ message: "Event deleted successfully." }`
 
 ---
 
