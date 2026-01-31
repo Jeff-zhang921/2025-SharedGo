@@ -15,6 +15,28 @@
     padding: 2rem 0;
   }
 
+.login-link {
+  position: absolute; /* places it relative to the page */
+  top: 20px;
+  left: 20px;
+}
+
+.login-link a {
+    text-decoration: none;
+    color: white;       
+    background-color: black;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.login-link a:hover {
+    background-color: #2f2f2f; /*hover effect*/
+}
+
   .nav-links {
     display: flex;
     flex-direction: row; /* Links horizontally next to each other */

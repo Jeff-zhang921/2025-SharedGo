@@ -39,7 +39,6 @@ const CreateVerifyPage = () => {
     const handleSubmit = async () => {
         const fullCode = code.join(""); //Merges 6 digit code into a single string
         setStatus("Verifying");
-        
         try {
             const response = await fetch("http://localhost:3000/auth/email/verify", { 
                 method: "POST", //Send data to auth/email/verify endpoint
@@ -82,7 +81,7 @@ const CreateVerifyPage = () => {
                 />
             ))}
             </div>
-            <button className="blackButton submitBtn">Submit</button>
+            <button className="blackButton submitBtn" onClick={handleSubmit}>Submit</button>
         </div> 
       </div>
     );

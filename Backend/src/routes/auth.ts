@@ -109,7 +109,7 @@ await mailer.sendMail({
 
 // Endpoint to start email login (sends code)
 router.post("/email/start", async (req, res) => {
-  console.log("DEBUGGING, Received body:", req.body); //Debugging why its saying invalid email
+
   const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
   //const name = typeof req.body?.name === "string" ? req.body.name.trim():"";
   if (!EMAIL_REGEX.test(email)) {
