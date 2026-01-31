@@ -27,8 +27,8 @@ const CreateLoginPage = () => {
         }
     };
     return (
-       <div className="loginPage">
-        <div className="loginCard">
+       <div className="authPage">
+        <div className="authCard">
             <h1 className="AppTitle">SharedGo</h1>
                 <div className="headerGroup">
                  <h2 className="createAccount">Create an account</h2>

@@ -1,4 +1,4 @@
-.loginPage {
+.authPage {
     position: fixed; /*white background fills screen*/
     display: flex;
     justify-content: center;
@@ -11,7 +11,7 @@
     background-color: white;
 }
 
-.loginCard {
+.authCard {
     display: flex;
     flex-direction: column; /*Keeping design consistent in centre*/
     align-items: center;
@@ -65,3 +65,41 @@
     cursor: pointer;
 }
 
+.verifyPage {
+    background-color: white;
+    display: flex;
+    position: fixed; /*white background fills screen*/
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw; /*Ensures entire background white*/
+    height: 100dvh;
+    top: 0;
+    left: 0;
+
+}
+
+.verifyBox {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.verificationInput {
+    width: 45px;
+    height: 55px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: lightgray;
+    color: #000;
+}
+
+.verificationInput:focus {
+    border: 2px solid #3b82f6; /*Blue highlight from design*/
+    outline: none;
+}
