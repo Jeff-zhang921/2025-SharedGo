@@ -22,8 +22,8 @@ function App() {
       <Route path="/personal" element={<PersonalPage />} />
       {/* set the path for the event details page, now with id system to route to distinct event details pages */}
       <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} /> 
-      {/* set the path for the create event page */}
-      <Route path="/creatEvent" element={<CreateEventPage />} />
+      {/* set the paths for the create event page */}
+      <Route path="/createEvent" element={<CreateEventPage />} />
       {/* set the path for the chat page */}
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}

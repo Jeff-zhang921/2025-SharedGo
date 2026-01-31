@@ -3,6 +3,11 @@ import { PrismaClient, Category, Prisma } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
+const parseCoordinate = (raw: unknown): number | null => {
+    if (typeof raw !== "string") return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+};
 
 // Haversine formula to calculate distance between two lat/lon points
 function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -24,7 +29,7 @@ function mapEvent(
 ) {
     const attendeeCount = event.participants.length;
     let distance: number | null = null;
-    if (userLatitude !== null && userLongitude !== null && event.latitude && event.longitude) {
+    if (userLatitude !== null && userLongitude !== null && event.latitude !== null && event.longitude !== null) {
         distance = distanceInKm(
             userLatitude,
             userLongitude,
@@ -51,14 +56,34 @@ function mapEvent(
     };
 }       
 
+
+
 //home dashboard returns recommended (top 5), categories list, and upcoming events
 router.get("/", async (req: Request, res: Response) => {
     try {
         const now = new Date();  //get current date
         // Extract query parameters
+        //search should move to filter???????
         const search = typeof req.query.search === "string" ? req.query.search : null;
-        const userLatitude = req.query.latitude ? Number(req.query.latitude) : null;
-        const userLongitude = req.query.longitude ? Number(req.query.longitude) : null;
+        const queryLatitude = parseCoordinate(req.query.latitude);
+        const queryLongitude = parseCoordinate(req.query.longitude);
+
+        const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+        if (hasQueryCoords) {
+            req.session.location = {
+                latitude: queryLatitude,
+                longitude: queryLongitude,
+                updatedAt: new Date().toISOString(),
+            };
+        }
+
+        const sessionLocation = req.session.location;
+        const userLatitude = hasQueryCoords
+            ? queryLatitude
+            : sessionLocation?.latitude ?? null;
+        const userLongitude = hasQueryCoords
+            ? queryLongitude
+            : sessionLocation?.longitude ?? null;
 
         const whereClause: Prisma.EventWhereInput = {
             startsAt: { gte: now },
@@ -75,26 +100,100 @@ router.get("/", async (req: Request, res: Response) => {
             where: whereClause,
             include : {
                 host: true,
-                participants: { select: { id: true } }, //only need participant count
+                participants: { select: { userId: true } }, //only need participant count
             },
             orderBy : { startsAt: 'asc'}, // sort by date ascending
         });
 
         const mapped = events.map(event => mapEvent(event, userLatitude, userLongitude));
-        const recommendedEvents = [...mapped]
-            .sort ((a, b) => {
-                const distanceA = a.distance !== null ? a.distance : Infinity;
-                const distanceB = b.distance !== null ? b.distance : Infinity;
-                if (distanceA !== distanceB) {
-                    return distanceA - distanceB; // Nearest first
+      
+        const sessionUser = req.session.user;
+        const hasUserLocation = userLatitude !== null && userLongitude !== null;
+        const recommendedMaxDistanceKm = 10;
+
+
+        const baseRecommended = hasUserLocation
+            ? mapped.filter((event) => event.distance !== null && event.distance <= recommendedMaxDistanceKm)
+            : mapped;//<= inclusive smaller than
+
+        let recommendedEvents: typeof mapped = [];
+        if (sessionUser) {
+            //eventId | userId | joinedAt
+        // ------- | ------ | -------------------------
+        // 10      | 5      | 2026-01-05T12:34:56.000Z
+        // 11      | 5      | 2026-01-06T09:10:11.000Z
+        // 10      | 6      | 2026-01-05T13:00:00.000Z
+        // 11      | 6      | 2026-01-06T09:30:00.000Z
+
+            const joined = await prisma.eventParticipant.findMany({
+                where: {
+                    userId: sessionUser.id,
+                    event: { startsAt: { lt: now } },
+                },
+                select: { event: { select: { category: true } } },
+            });
+            //Record is a object that contains key: string value: number
+          
+            //record is the each category
+            const categoryCounts: Record<string, number> = {};
+            for (const record of joined) {
+                //loop rach joined, fetch the key, if key is equal to some other key already inside the categorycount, add one
+                const key = record.event.category;
+                categoryCounts[key] = (categoryCounts[key] ?? 0) + 1;
+            }
+
+
+           //get the top count
+            let topCategory: Category | undefined;
+            let topCount = -1;
+            
+            for (const key in categoryCounts) {
+            
+                if ((categoryCounts[key] ?? 0) > topCount) {
+                    topCount = categoryCounts[key]??0;
+                    topCategory = key as Category;
                 }
-                return b.attendeeCount - a.attendeeCount; // Most popular next
-            })
-            .slice(0, 5); // Top 5 recommended
-    
-        const upcomingPreview = [...mapped]
-            .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()) // Soonest first
-            .slice(0, 5); // Next 5 upcoming events
+            }
+
+            if (topCategory) {
+                recommendedEvents = [...baseRecommended]
+                    .filter((event) => event.category === topCategory)
+                    .sort((a, b) => {
+                        const attendeeDelta = b.attendeeCount - a.attendeeCount;
+                        if (attendeeDelta !== 0) return attendeeDelta;
+                        return a.startsAt.getTime() - b.startsAt.getTime();
+                    })
+                    .slice(0, 5);
+            }
+        }
+
+        if (recommendedEvents.length === 0) {
+            recommendedEvents = baseRecommended
+            //to sroted returns a sorted copy array
+            
+                .toSorted((a, b) => {
+                    const attendeeDelta = b.attendeeCount - a.attendeeCount;
+                    if (attendeeDelta !== 0) return attendeeDelta;
+                    return a.startsAt.getTime() - b.startsAt.getTime();
+                })
+                .slice(0, 5);
+        }
+
+            //soonest within 10 km
+        const upcomingPreviewLimit = 5;
+        const upcomingPreviewMaxDistanceKm = 10;
+        let upcomingPreview: typeof mapped = [];
+        if (userLatitude !== null && userLongitude !== null) {
+            upcomingPreview = mapped
+                .filter((event) => {
+                    const distance = event.distance;
+                    return distance !== null && distance <= upcomingPreviewMaxDistanceKm;
+                })
+                //.slice(startindex,endindex)
+                .slice(0, upcomingPreviewLimit);
+        } else {
+            upcomingPreview = mapped.slice(0, upcomingPreviewLimit);
+        }
 
         res.json({ 
             recommendedEvents,  
@@ -107,6 +206,10 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
+
+
+
+
 //get list of all categories
 router.get("/categories", (req: Request, res: Response) => {
     try {
@@ -116,7 +219,7 @@ router.get("/categories", (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to load categories" });
     }
 });
-
+//move to filter
 //filter events by category
 router.get("/categories/:categoryName", async (req: Request, res: Response) => {
     const categoryName = req.params.categoryName as Category;  
@@ -125,7 +228,7 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
             where: { category: categoryName, startsAt: { gte: new Date() } },
             include : {
                 host: true,
-                participants: {select: { id: true } }, 
+                participants: {select: { userId: true } }, 
             },
             orderBy: { startsAt: 'asc' },
         });
@@ -139,25 +242,50 @@ router.get("/categories/:categoryName", async (req: Request, res: Response) => {
 
 //upcoming events list to see all events
 //support pagination (10 per page)
+//move to filter
+//make sure that the upcoming event is the sorted in order that is within 100 km 
 router.get("/upcoming", async (req: Request, res: Response) => {
     const page = req.query.page ? Math.max(1, Number(req.query.page)) : 1;
     const limit = 10;
+    const maxDistanceKm = 100;
     const skip = (page - 1) * limit;
 
-    try{
-        const [events, total] = await Promise.all([
-            prisma.event.findMany({
-                where: { startsAt: { gte: new Date() } },
-                include : {
-                    host: true,
-                    participants: true,
-                },
-                orderBy: { startsAt: 'asc' },
-                skip,
-                take: limit,
-            }),
-            prisma.event.count({ where: { startsAt: { gte: new Date() } } }),
-        ]);
+    const queryLatitude = parseCoordinate(req.query.latitude);
+    const queryLongitude = parseCoordinate(req.query.longitude);
+    const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+    if (hasQueryCoords) {
+        req.session.location = {
+            latitude: queryLatitude,
+            longitude: queryLongitude,
+            updatedAt: new Date().toISOString(),
+        };
+    }
+
+    const sessionLocation = req.session.location;
+    const userLatitude = hasQueryCoords
+        ? queryLatitude
+        : sessionLocation?.latitude ?? null;
+    const userLongitude = hasQueryCoords
+        ? queryLongitude
+        : sessionLocation?.longitude ?? null;
+
+    try {
+        const events = await prisma.event.findMany({
+            where: { startsAt: { gte: new Date() } },
+            include: {
+                host: true,
+                participants: true,
+            },
+            orderBy: { startsAt: 'asc' },
+        });
+
+        const mapped = events.map((event) => mapEvent(event, userLatitude, userLongitude));
+        const filtered = userLatitude !== null && userLongitude !== null
+            ? mapped.filter((event) => event.distance !== null && event.distance <= maxDistanceKm)
+            : mapped;
+
+        const total = filtered.length;
+        const paged = filtered.slice(skip, skip + limit);
 
         res.json({
             pagination: {
@@ -165,7 +293,7 @@ router.get("/upcoming", async (req: Request, res: Response) => {
                 limit,
                 total,
             },
-            events: events.map(event => mapEvent(event, null, null)),
+            events: paged,
         });
     } catch (error) {
         res.status(500).json({ error: "Failed to load upcoming events" });
