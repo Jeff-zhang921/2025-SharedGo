@@ -65,19 +65,6 @@
     cursor: pointer;
 }
 
-.verifyPage {
-    background-color: white;
-    display: flex;
-    position: fixed; /*white background fills screen*/
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100vw; /*Ensures entire background white*/
-    height: 100dvh;
-    top: 0;
-    left: 0;
-
-}
 
 .verifyBox {
     display: flex;
@@ -95,8 +82,8 @@
     text-align: center;
     font-size: 1.5rem;
     font-weight: bold;
-    background-color: lightgray;
-    color: #000;
+    background-color: lightgray; /*gray background inside boxes*/
+    color: #000; /*Black text*/
 }
 
 .verificationInput:focus {
