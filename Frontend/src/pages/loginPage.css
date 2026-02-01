@@ -1,0 +1,92 @@
+.authPage {
+    position: fixed; /*white background fills screen*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw; /*Ensures entire background white*/
+    height: 100dvh;
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+.authCard {
+    display: flex;
+    flex-direction: column; /*Keeping design consistent in centre*/
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+    text-align: center;
+}
+
+.headerGroup {
+    margin-bottom: 30px;
+}
+
+.createAccount {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.helperText {
+    font-size: 14px;
+    color: #666;
+}
+
+.inputGroup {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.emailField {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    color: gray;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+.blackButton {
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+.verifyBox {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.verificationInput {
+    width: 45px;
+    height: 55px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: lightgray; /*gray background inside boxes*/
+    color: #000; /*Black text*/
+}
+
+.verificationInput:focus {
+    border: 2px solid #3b82f6; /*Blue highlight from design*/
+    outline: none;
+}

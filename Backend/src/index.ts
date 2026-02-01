@@ -9,7 +9,10 @@ import homeRouter from "./routes/home";
 import profileRouter from "./routes/profile";
 
 const app = express();
-app.use(cors()) //prevent browser from blocking frontend requests
+app.use(cors({
+    origin: 'http://localhost:5173', //frontend URL
+    credentials: true,               //Allows the browser to see the response and save cookies
+  }));
 app.use(express.json());
 
 app.use(session({
