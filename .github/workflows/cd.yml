@@ -6,8 +6,8 @@ on:
 env:
   AWS_REGION: eu-north-1
   ECR_REPOSITORY: sharedgo
-  ECS_CLUSTER: sharedgo-cluster
-  ECS_SERVICE: sharedgo-service
+  ECS_CLUSTER: sharedgo_cluster
+  ECS_SERVICE: sharedgo_service
   IMAGE_TAG: ${{ github.sha }}
 
 permissions:
