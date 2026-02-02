@@ -7,6 +7,7 @@ import EventDetailsPage from './pages/eventDetailsPage';
 import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
+import HostProfile from './pages/profilePage';
 import LoginPage from './pages/loginPage'
 import VerifyPage from './pages/verifyPage'
 
@@ -28,6 +29,8 @@ function App() {
       <Route path="/chat" element={<ChatPage />} />
       {/* set the path for the host page */}
       <Route path="/host/:hostId" element={<HostPage />} />
+       {/* set the path for the profile page */}
+      <Route path="/profile" element={<HostProfile />} />
       {/* set the path for the login page */}
       <Route path="/login" element={<LoginPage />} />
       {/* set the path for the verify page */}
