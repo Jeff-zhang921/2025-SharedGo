@@ -10,6 +10,10 @@ function HomePage() {
         <h2>A real-time activity map</h2>
       </div>
 
+      <div className='login-link'>
+        <Link to="/login">Login</Link>
+      </div>
+
       <div className='nav-links'>
       <Link to="/map">MapPage </Link>
       <Link to="/eventDetails">EventDetailsPage </Link>
