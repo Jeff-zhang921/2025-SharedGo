@@ -1,4 +1,4 @@
-import { Router,Request,Response } from "express";
+import { Router,Request,Response,} from "express";
 import { PrismaClient,Category } from "@prisma/client"
 
 export const Categories = Object.values(Category);
@@ -6,12 +6,12 @@ const router=Router()
 const prisma = new PrismaClient()
 
 
-function calcevent(event:any,userLat:number,userLong:number){
+function calcevent(event:any,userLat:number|null,userLong:number|null){
      let distance: number | null = null;
      let attendeeCount=event.participants.length
-//    if (event.latitude!==null && event.longitude!==null&& userLat!==null && userLong!==null){
+    if (event.latitude!==null && event.longitude!==null&& userLat!==null && userLong!==null){
     distance=distanceKM(userLat,userLong,event.latitude,event.longitude)
-   // }
+   }
     return{
         event,
         distance:distance,
@@ -70,14 +70,14 @@ if (hasValidCoords){
         where:{startsAt:{gte:new Date()}},
         include:{host:true,participants:true}
     })
-    const mapped=events.map(event=>calcevent(event,userLatitude as number,userLongitude as number))
+    const mapped=events.map(event=>calcevent(event,userLatitude ,userLongitude))
     const filtered:typeof mapped=[];
     for (const item of mapped){
         if (item.distance!==null && item.distance<=10){ //within 10 km
             filtered.push(item)
         }
     }
-    res.json({filtered})
+    res.json(filtered)
 }else{
     res.status(400).json({message:"Valid lat and long are required"})
 }
@@ -100,8 +100,8 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
     const hasValidCoords=latitude!==null && longitude!==null
     if (hasValidCoords){
         req.session.location={
-            latitude:latitude as number,
-            longitude:longitude as number,
+            latitude:latitude ,
+            longitude:longitude ,
             updatedAt:new Date().toISOString()
         }
     }
@@ -120,52 +120,26 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
         }
     ,include:{host:true,participants:true}
     })
+    let distanceNum: number =Number(distance)
+    let attendeeCountMinNum:number=Number(attendeeCountMin)
 
-    let mapped= events.map(event=>calcevent(event,userLatitude as number,userLongitude as number))
-    let basedistanceevent: typeof mapped=[]
-    
-
-
-    if (distance!==""||distance!==null){
-    for (const item of mapped){
-        if (item.distance!==null&&item.distance<Number(distance)){
-            basedistanceevent.push(item)
-        }
-    }
+    let mapped= events.map(event=>calcevent(event,userLatitude,userLongitude))
+    if (distance!==""&&distance!==null){
+           mapped=mapped.filter((event)=>event.distance!==null && event.distance<=distanceNum)
 }
 
-
-let basenameevent:typeof mapped=basedistanceevent
-    if(name!==""||name!==null){
-  for (const item of mapped){
-        if (item.event.title.toLowerCase().includes(name.toLowerCase())){
-            basenameevent.push(item)
-        }
-  }
+    if(name!==""&&name!==null){
+           mapped=mapped.filter((events)=>events.event.title.toLowerCase().includes(name.toLowerCase()))
 }
 
- let baseattendeeevent:typeof basenameevent=basenameevent
- if (attendeeCountMin!==""||attendeeCountMin!==null){
-    for (const item of mapped){
-        if (item.attendeeCount>=Number(attendeeCountMin)){
-            baseattendeeevent.push(item)
-        }
-    }
+ if (attendeeCountMin!==""&&attendeeCountMin!==null){
+         mapped=mapped.filter((events)=>events.attendeeCount>=attendeeCountMinNum)
 }
 
-let basecategoryevent:typeof mapped=baseattendeeevent
-if (category!==""||category!==null){
-    for (const item of mapped){
-        if (item.event.category===category){
-            basecategoryevent.push(item)
-        }
-    }
+if (category!==""&&category!==null){
+       mapped=mapped.filter((events)=>events.event.category===category)
 }
-
-const filteredevent=new Set(basecategoryevent)
-
-    return res.json(filteredevent)
-
+    return res.json(mapped)
 })
 
 
