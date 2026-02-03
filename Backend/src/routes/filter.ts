@@ -2,10 +2,22 @@ import { Router,Request,Response } from "express";
 import { PrismaClient,Category } from "@prisma/client"
 
 const router=Router()
-const prisma = new PrismaClient
+const prisma = new PrismaClient()
 
 
-function pharseCoords(raw:unknown):Number|null{
+function calcevent(event:any,userLat:number,userLong:number){
+     let distance: number | null = null;
+     let attendeeCount=event.participants.length
+//    if (event.latitude!==null && event.longitude!==null&& userLat!==null && userLong!==null){
+    distance=distanceKM(userLat,userLong,event.latitude,event.longitude)
+   // }
+    return{
+        event,
+        distance:distance,
+        attendeeCount:attendeeCount
+    }
+}
+function pharseCoords(raw:unknown):number|null{
    if (typeof raw !=="string"){
     return null
    }
@@ -18,9 +30,9 @@ function pharseCoords(raw:unknown):Number|null{
 }
 
 function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number|null{
-if (lat1===null || long1===null || lat2===null || long2===null){
-    return null
-}
+// if (lat1===null || long1===null || lat2===null || long2===null){
+//     return null
+// }
 const R = 6371; // Radius of the Earth in km    
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (long2 - long1) * (Math.PI / 180);
@@ -33,19 +45,42 @@ const R = 6371; // Radius of the Earth in km
 }
 
 router.get("/nearby",async (req:Request,res:Response)=>{
-    const lat=pharseCoords(req.query.lat)
-    const long=pharseCoords(req.query.long)
-const hasValidCoords=lat!==null && long!==null
+    const latitude=pharseCoords(req.query.latitude)
+    const longitude=pharseCoords(req.query.longitude)
+const hasValidCoords=latitude!==null && longitude!==null
 if (hasValidCoords){
-    req.session.location={latitude:lat as number,
-        longitude:long as number,
+    req.session.location={latitude:latitude as number,
+        longitude:longitude as number,
         updatedAt:new Date().toISOString()
     }
-    const events=await prisma.event.findMany({
-    })
+    const sessionlocation=req.session.location
+    const userLatitude=hasValidCoords?
+    latitude:
+    sessionlocation?.latitude??null;
+    const userLongitude=hasValidCoords?
+    longitude:
+    sessionlocation?.longitude??null;
 
+    if (userLatitude===null || userLongitude===null){
+        res.status(400).json({message:"Valid lat and long are required"})
+        return
+    }
+    const events=await prisma.event.findMany({
+        where:{startsAt:{gte:new Date()}},
+        include:{host:true,participants:true}
+    })
+    const mapped=events.map(event=>calcevent(event,userLatitude as number,userLongitude as number))
+    const filtered:typeof mapped=[];
+    for (const item of mapped){
+        if (item.distance!==null && item.distance<=10){ //within 10 km
+            filtered.push(item)
+        }
+    }
+    res.json({filtered})
+}else{
+    res.status(400).json({message:"Valid lat and long are required"})
 }
-    
+
 
 })
 //search by name, category, location

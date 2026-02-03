@@ -148,7 +148,6 @@ router.get("/", async (req: Request, res: Response) => {
             let topCount = -1;
             
             for (const key in categoryCounts) {
-            
                 if ((categoryCounts[key] ?? 0) > topCount) {
                     topCount = categoryCounts[key]??0;
                     topCategory = key as Category;
@@ -182,7 +181,8 @@ router.get("/", async (req: Request, res: Response) => {
             //soonest within 10 km
         const upcomingPreviewLimit = 5;
         const upcomingPreviewMaxDistanceKm = 10;
-        let upcomingPreview: typeof mapped = [];
+        let upcomingPreview: typeof 
+        mapped = [];
         if (userLatitude !== null && userLongitude !== null) {
             upcomingPreview = mapped
                 .filter((event) => {
