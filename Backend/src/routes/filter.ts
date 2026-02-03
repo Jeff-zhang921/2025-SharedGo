@@ -1,6 +1,7 @@
 import { Router,Request,Response } from "express";
 import { PrismaClient,Category } from "@prisma/client"
 
+export const Categories = Object.values(Category);
 const router=Router()
 const prisma = new PrismaClient()
 
@@ -80,28 +81,90 @@ if (hasValidCoords){
 }else{
     res.status(400).json({message:"Valid lat and long are required"})
 }
-
-
 })
+
+
+
 //search by name, category, location
 router.get("/search",async (req:Request,res:Response)=>{
     //type of blablabla is equal to string?
- const name=typeof req.query.name==="string" ?req.query.name.trim():""
+const name=typeof req.query.name==="string"?req.query.name.trim():""
+ const distance=typeof req.query.distance==="string"?req.query.distance.trim():""
  const category=typeof req.query.category==="string" ?req.query.category.trim():""
- const lat=pharseCoords(req.query.lat)
-    const long=pharseCoords(req.query.long)
-    if (name.length===0||!name){
-        
-         res.status(400).json({message:"Name query is required"})
-    }
-    const events=await prisma.event.findMany({
-        where:{title:
-            //no matter capital or not
-            {contains:name,mode:"insensitive"}
+ const latitude=pharseCoords(req.query.latitude)
+ const longitude=pharseCoords(req.query.longitude)
+const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
+
+
+
+    const hasValidCoords=latitude!==null && longitude!==null
+    if (hasValidCoords){
+        req.session.location={
+            latitude:latitude as number,
+            longitude:longitude as number,
+            updatedAt:new Date().toISOString()
         }
+    }
+    const sessionlocation=req.session.location
+    const userLatitude=hasValidCoords?
+    latitude:
+    sessionlocation?.latitude??null;
+
+    const userLongitude=hasValidCoords?
+    longitude:
+    sessionlocation?.longitude??null;
+    
+    const events=await prisma.event.findMany({
+        where:{
+            startsAt:{gte:new Date()},
+        }
+    ,include:{host:true,participants:true}
     })
 
-    return res.json({events})
+    let mapped= events.map(event=>calcevent(event,userLatitude as number,userLongitude as number))
+    let basedistanceevent: typeof mapped=[]
+    
+
+
+    if (distance!==""||distance!==null){
+    for (const item of mapped){
+        if (item.distance!==null&&item.distance<Number(distance)){
+            basedistanceevent.push(item)
+        }
+    }
+}
+
+
+let basenameevent:typeof mapped=basedistanceevent
+    if(name!==""||name!==null){
+  for (const item of mapped){
+        if (item.event.title.toLowerCase().includes(name.toLowerCase())){
+            basenameevent.push(item)
+        }
+  }
+}
+
+ let baseattendeeevent:typeof basenameevent=basenameevent
+ if (attendeeCountMin!==""||attendeeCountMin!==null){
+    for (const item of mapped){
+        if (item.attendeeCount>=Number(attendeeCountMin)){
+            baseattendeeevent.push(item)
+        }
+    }
+}
+
+let basecategoryevent:typeof mapped=baseattendeeevent
+if (category!==""||category!==null){
+    for (const item of mapped){
+        if (item.event.category===category){
+            basecategoryevent.push(item)
+        }
+    }
+}
+
+const filteredevent=new Set(basecategoryevent)
+
+    return res.json(filteredevent)
 
 })
 
