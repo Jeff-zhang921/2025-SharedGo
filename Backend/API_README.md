@@ -145,8 +145,8 @@ Create a new event for a host.
 | `externalUrl`| string | no       | URL for external registration/info   |
 | `capacity`   | number | no       | Max attendees; `null` = no limit     |
 | `category`   | string | no       | Must be a Category enum value. Defaults to `Other`. |
-| `latitude`   | number | no       | Optional latitude (can be null).     |
-| `longitude`  | number | no       | Optional longitude (can be null).    |
+| `latitude`   | number | yes      | Required latitude.                   |
+| `longitude`  | number | yes      | Required longitude.                  |
 
 **Response**
 
@@ -262,8 +262,8 @@ Includes:
 | `externalUrl`| string \| null     | Optional; empty string becomes null |
 | `capacity`   | number \| null     | Optional; null clears capacity |
 | `category`   | string            | Optional; must be a Category enum |
-| `latitude`   | number \| null     | Optional |
-| `longitude`  | number \| null     | Optional |
+| `latitude`   | number            | Optional; must be provided together with `longitude` if updating location |
+| `longitude`  | number            | Optional; must be provided together with `latitude` if updating location |
 
 **Response**
 

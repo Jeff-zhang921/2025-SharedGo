@@ -67,7 +67,7 @@ router.post("/create", requireSession, async (req, res) => {
   const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
     ? (categoryRaw as Category)
     : Category.Other;
-const latitude = parseCoordinate(latitudeRaw);
+  const latitude = parseCoordinate(latitudeRaw);
   const longitude = parseCoordinate(longitudeRaw);
 
   
@@ -96,6 +96,11 @@ const latitude = parseCoordinate(latitudeRaw);
 
   if (!hostEmail) {
     res.status(400).json({ message: "Host email is required to publish an event." });
+    return;
+  }
+
+  if (latitude === null || longitude === null) {
+    res.status(400).json({ message: "Latitude and longitude are required." });
     return;
   }
 
@@ -131,8 +136,8 @@ const latitude = parseCoordinate(latitudeRaw);
       capacity,
       category: category ?? undefined,
       location,
-      latitude: latitude ?? null as any,
-      longitude: longitude ?? null as any,
+      latitude,
+      longitude,
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
@@ -686,8 +691,25 @@ router.patch("/:id", requireSession, async (req, res) => {
       : Category.Other;
   }
 
-  const latitude = latitudeRaw !== undefined ? parseCoordinate(latitudeRaw) : undefined;
-  const longitude = longitudeRaw !== undefined ? parseCoordinate(longitudeRaw) : undefined;
+  const latitudeProvided = latitudeRaw !== undefined;
+  const longitudeProvided = longitudeRaw !== undefined;
+  let latitude: number | undefined;
+  let longitude: number | undefined;
+
+  if (latitudeProvided || longitudeProvided) {
+    if (!latitudeProvided || !longitudeProvided) {
+      res.status(400).json({ message: "Latitude and longitude must be provided together." });
+      return;
+    }
+    const parsedLatitude = parseCoordinate(latitudeRaw);
+    const parsedLongitude = parseCoordinate(longitudeRaw);
+    if (parsedLatitude === null || parsedLongitude === null) {
+      res.status(400).json({ message: "Latitude and longitude must be valid numbers." });
+      return;
+    }
+    latitude = parsedLatitude;
+    longitude = parsedLongitude;
+  }
 
   if (title !== undefined && title.length === 0) {
     res.status(400).json({ message: "Title cannot be empty." });
@@ -709,8 +731,8 @@ router.patch("/:id", requireSession, async (req, res) => {
     externalUrl?: string | null;
     capacity?: number | null;
     category?: Category;
-    latitude?: number | null;
-    longitude?: number | null;
+    latitude?: number;
+    longitude?: number;
   } = {};
 
 
