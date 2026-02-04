@@ -41,6 +41,10 @@ npx prisma generate
 ```
 npx prisma migrate dev
 ```
+* Initialise your database
+```
+npx ts-node src/seed.ts
+```
 ## 5. Run Backend
 ```
 npm run dev

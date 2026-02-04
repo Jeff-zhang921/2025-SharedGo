@@ -38,6 +38,9 @@ This section documents the endpoints used by **Frontend**
   - [4.3 Profile Overview](#43-profile-overview)
   - [4.4 My Events (Paginated)](#44-my-events-paginated)
   - [4.5 My Reviews (Paginated)](#45-my-reviews-paginated)
+- [5. Filter Endpoints](#5-filter-endpoints)
+  - [5.1 Nearby Events](#51-nearby-events)
+  - [5.2 Search Events (Combined Filters)](#52-search-events-combined-filters)
 
 ---
 
@@ -142,8 +145,8 @@ Create a new event for a host.
 | `externalUrl`| string | no       | URL for external registration/info   |
 | `capacity`   | number | no       | Max attendees; `null` = no limit     |
 | `category`   | string | no       | Must be a Category enum value. Defaults to `Other`. |
-| `latitude`   | number | no       | Optional latitude (can be null).     |
-| `longitude`  | number | no       | Optional longitude (can be null).    |
+| `latitude`   | number | yes      | Required latitude.                   |
+| `longitude`  | number | yes      | Required longitude.                  |
 
 **Response**
 
@@ -259,8 +262,8 @@ Includes:
 | `externalUrl`| string \| null     | Optional; empty string becomes null |
 | `capacity`   | number \| null     | Optional; null clears capacity |
 | `category`   | string            | Optional; must be a Category enum |
-| `latitude`   | number \| null     | Optional |
-| `longitude`  | number \| null     | Optional |
+| `latitude`   | number            | Optional; must be provided together with `longitude` if updating location |
+| `longitude`  | number            | Optional; must be provided together with `latitude` if updating location |
 
 **Response**
 
@@ -770,4 +773,69 @@ All require the session cookie from `/auth/email/verify`.
   ]
 }
 ```
+
+## 5. Filter Endpoints
+These endpoints support filtering events from a single endpoint using optional query params.
+
+**Notes**
+
+- These routes are implemented in `Backend/src/routes/filter.ts`.
+- The backend must mount the router at `/filter` for these endpoints to be available.
+
+### 5.1 Nearby Events
+**GET** `/filter/nearby`
+
+Returns upcoming events within **10 km** of the provided coordinates.
+
+**Query params**
+
+| Param       | Type   | Required | Description |
+|-------------|--------|----------|-------------|
+| `latitude`  | number | yes      | User latitude. Stored in session if valid. |
+| `longitude` | number | yes      | User longitude. Stored in session if valid. |
+
+**Behavior**
+
+- Only events with `latitude` and `longitude` set can be matched.
+- Filters to future events: `startsAt >= now`.
+
+**Response**
+
+Returns an array of objects:
+
+- `event`: full Event record (includes `host` and `participants`)
+- `distance`: number (km) or `null`
+- `attendeeCount`: number
+
+**Example request**
+
+`GET /filter/nearby?latitude=51.4574&longitude=-2.6078`
+
+### 5.2 Search Events (Combined Filters)
+**GET** `/filter/search`
+
+Search and filter upcoming events. Any provided filters are combined with **AND**.
+
+**Query params**
+
+| Param              | Type   | Required | Description |
+|-------------------|--------|----------|-------------|
+| `name`            | string | no       | Case-insensitive match against `title`. |
+| `category`        | string | no       | Must match a `Category` enum value (e.g. `Food_Drink`). |
+| `attendeeCountMin`| number | no       | Minimum number of attendees (participants). |
+| `distance`        | number | no       | Max distance (km). Requires coordinates from query or session. |
+| `latitude`        | number | no       | User latitude. Stored in session if provided with `longitude`. |
+| `longitude`       | number | no       | User longitude. Stored in session if provided with `latitude`. |
+
+**Response**
+
+Returns an array of objects:
+
+- `event`: full Event record (includes `host` and `participants`)
+- `distance`: number (km) or `null`
+- `attendeeCount`: number
+
+**Example request**
+
+`GET /filter/search?name=coffee&category=Food_Drink&attendeeCountMin=3&distance=10&latitude=51.4574&longitude=-2.6078`
 
