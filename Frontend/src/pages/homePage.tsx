@@ -10,8 +10,11 @@ function HomePage() {
         <h2>A real-time activity map</h2>
       </div>
 
-      <div className='login-link'>
-        <Link to="/login">Login</Link>
+
+      <div className='profile-page'>
+        <Link to="/profile">
+          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
+        </Link>
       </div>
 
       <div className='nav-links'>
