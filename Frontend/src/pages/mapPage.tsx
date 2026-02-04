@@ -42,7 +42,13 @@ const MapPage = () => {
     3: { top: "80%", left: "75%" },
     4: { top: "50%", left: "80%" },
     5: { top: "50%", left: "33%" },
-    6: { top: "60%", left: "40%" }
+    6: { top: "60%", left: "40%" },
+    7: { top: "10%", left: "60%" },
+    8: { top: "20%", left: "90%" },
+    9: { top: "44%", left: "32%" },
+    10: { top: "22%", left: "76%" },
+    11: { top: "10%", left: "33%" },
+    12: { top: "20%", left: "40%" }
   };
 
   useEffect(() => {
@@ -80,6 +86,10 @@ const MapPage = () => {
           text="Home"
           size={60}                       // Adjust size in pixels
         />
+      </div>
+
+      <div className='create-event'>
+        <Link to="/createEvent">Create Event</Link>
       </div>
 
       {dbEvents.map((event) => {

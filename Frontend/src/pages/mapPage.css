@@ -16,3 +16,25 @@
     padding: 0;
     overflow: hidden; /* prevents scrolling completely */
   }
+
+.create-event {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+}
+
+.create-event a {
+  text-decoration: none;
+  color: white;       
+  background-color: black;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.create-event a:hover {
+  background-color: #2f2f2f; /*hover effect*/
+}
