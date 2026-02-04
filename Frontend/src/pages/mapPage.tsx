@@ -92,6 +92,13 @@ const MapPage = () => {
         <Link to="/createEvent">Create Event</Link>
       </div>
 
+      <div className='profile-page'>
+        <Link to="/profile">
+          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
+        </Link>
+      </div>
+
+
       {dbEvents.map((event) => {
         // Find the coordinates for this specific DB ID
         // If the ID isn't in our lookup, give it a default middle position
