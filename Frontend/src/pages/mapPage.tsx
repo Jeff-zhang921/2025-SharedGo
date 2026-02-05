@@ -81,16 +81,14 @@ const MapPage = () => {
         }}
       >
         <Button
-          link="/"                // Link to the home page
+          link="/home"                // Link to the home page
           imgSrc="/src/assets/home.svg"       // Path to home icon
           text="Home"
           size={60}                       // Adjust size in pixels
         />
       </div>
 
-      <div className='create-event'>
-        <Link to="/createEvent">Create Event</Link>
-      </div>
+      <Link to="/createEvent" className='create-event'>Create Event</Link>
 
       <div className='profile-page'>
         <Link to="/profile">
