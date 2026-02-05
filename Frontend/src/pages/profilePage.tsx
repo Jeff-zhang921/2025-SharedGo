@@ -28,6 +28,80 @@ export default function ProfilePage() {
         <div></div>
       </div>
 
+      {/* Host Profile Information Section */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '1.5rem 1.25rem',
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <div style={{ marginRight: '1.5rem' }}>
+          <img
+            src="/user-avatar.png"
+            alt="Host Profile"
+            style={{ 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', 
+              objectFit: 'cover',
+              border: '1px solid #e5e7eb'
+            }}
+          />
+        </div>
+        
+        <div style={{ flex: 1 }}>
+          <h1 style={{ 
+            margin: 0, 
+            fontSize: '1.25rem', 
+            fontWeight: '600', 
+            color: '#111827' 
+          }}>
+            Unknown User
+          </h1>
+          <p style={{ 
+            margin: '0.25rem 0 0.5rem 0', 
+            fontSize: '0.875rem', 
+            color: '#6b7280' 
+          }}>
+            no-email@example.com
+          </p>
+          <button style={{
+            padding: '0.25rem 0.75rem',
+            fontSize: '0.75rem',
+            backgroundColor: '#f3f4f6',
+            border: '1px solid #e5e7eb',
+            borderRadius: '0.375rem',
+            cursor: 'pointer',
+            color: '#374151'
+          }}>
+            Edit Profile
+          </button>
+        </div>
+      </div>
+
+      {/* User/Host Role Tags */}
+      <div style={{
+        padding: '0 1.25rem',
+        backgroundColor: 'white',
+        display: 'flex',
+        gap: '0.75rem',
+        paddingBottom: '1rem'
+      }}>
+        <span style={{
+          color: '#10b981',
+          fontWeight: '500',
+          fontSize: '0.875rem'
+        }}>User</span>
+        <span style={{
+          backgroundColor: 'black',
+          color: 'white',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '9999px',
+          fontSize: '0.875rem',
+          fontWeight: '500'
+        }}>Host</span>
+      </div>
+
       {/* Bottom Navigation Bar */}
       <div style={{
         position: 'fixed',
