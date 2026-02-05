@@ -4,6 +4,12 @@ import { PrismaClient,Category } from "@prisma/client";
 export const Categories = Object.values(Category);
 const router=Router()
 const prisma = new PrismaClient()
+function pharseDateTimeparam(raw:unknown):Date|null{
+    if (typeof raw !== "string") return null;
+    const parsed = Date.parse(raw);
+    if (isNaN(parsed)) return null;
+    return new Date(parsed);
+}
 
 
 function calcevent(event:any,userLat:number|null,userLong:number|null){
@@ -20,7 +26,7 @@ function calcevent(event:any,userLat:number|null,userLong:number|null){
 }
 function pharseCoords(raw:unknown):number|null{
  if (raw === undefined || raw === null || raw === "") return null;
- 
+
    const coords= Number(raw)
    if (!Number.isFinite(coords)){
     return null
@@ -91,8 +97,13 @@ const name=typeof req.query.name==="string"?req.query.name.trim():""
  const latitude=pharseCoords(req.query.latitude)
  const longitude=pharseCoords(req.query.longitude)
 const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
-
+const rawdate=typeof req.query.startdate==="string"?req.query.startdate.trim().toLowerCase():""
+const rawenddate=typeof req.query.enddate==="string"?req.query.enddate.trim().toLowerCase():""  
 const category=Categories.includes(rawcategory as Category)?rawcategory as Category:""
+
+const filterdate=pharseDateTimeparam(rawdate)
+const enddate=pharseDateTimeparam(rawenddate)
+
 
     const hasValidCoords=latitude!==null && longitude!==null
     if (hasValidCoords){
@@ -137,6 +148,12 @@ const category=Categories.includes(rawcategory as Category)?rawcategory as Categ
 
 if (category!==""&&category!==null){
        mapped=mapped.filter((events)=>events.event.category===category)
+}
+if (rawdate!==""&&filterdate!==null){
+    mapped=mapped.filter((events)=>events.event.startsAt===filterdate)
+}
+if (rawenddate!==""&&enddate!==null){
+    mapped=mapped.filter((events)=>events.event.startsAt<=enddate)
 }
     return res.json(mapped)
 })
