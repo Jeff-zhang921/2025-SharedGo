@@ -1,5 +1,5 @@
-import { Router,Request,Response,} from "express";
-import { PrismaClient,Category } from "@prisma/client"
+import { Router,Request,Response} from "express";
+import { PrismaClient,Category } from "@prisma/client";
 
 export const Categories = Object.values(Category);
 const router=Router()
@@ -15,13 +15,12 @@ function calcevent(event:any,userLat:number|null,userLong:number|null){
     return{
         event,
         distance:distance,
-        attendeeCount:attendeeCount
+        attendeeCount:attendeeCount,
     }
 }
 function pharseCoords(raw:unknown):number|null{
-   if (typeof raw !=="string"){
-    return null
-   }
+ if (raw === undefined || raw === null || raw === "") return null;
+ 
    const coords= Number(raw)
    if (!Number.isFinite(coords)){
     return null
@@ -30,7 +29,7 @@ function pharseCoords(raw:unknown):number|null{
    }
 }
 
-function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number|null{
+function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number{
 // if (lat1===null || long1===null || lat2===null || long2===null){
 //     return null
 // }
@@ -54,6 +53,7 @@ if (hasValidCoords){
         longitude:longitude as number,
         updatedAt:new Date().toISOString()
     }
+}
     const sessionlocation=req.session.location
     const userLatitude=hasValidCoords?
     latitude:
@@ -78,9 +78,6 @@ if (hasValidCoords){
         }
     }
     res.json(filtered)
-}else{
-    res.status(400).json({message:"Valid lat and long are required"})
-}
 })
 
 
@@ -90,12 +87,12 @@ router.get("/search",async (req:Request,res:Response)=>{
     //type of blablabla is equal to string?
 const name=typeof req.query.name==="string"?req.query.name.trim():""
  const distance=typeof req.query.distance==="string"?req.query.distance.trim():""
- const category=typeof req.query.category==="string" ?req.query.category.trim():""
+ const rawcategory=typeof req.query.category==="string" ?req.query.category.trim():""
  const latitude=pharseCoords(req.query.latitude)
  const longitude=pharseCoords(req.query.longitude)
 const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
 
-
+const category=Categories.includes(rawcategory as Category)?rawcategory as Category:""
 
     const hasValidCoords=latitude!==null && longitude!==null
     if (hasValidCoords){
@@ -122,9 +119,11 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
     })
     let distanceNum: number =Number(distance)
     let attendeeCountMinNum:number=Number(attendeeCountMin)
+    const hasValidDistance=Number.isFinite(distanceNum)
+    const hasValidAttendeeCountMin=Number.isFinite(attendeeCountMinNum)
 
     let mapped= events.map(event=>calcevent(event,userLatitude,userLongitude))
-    if (distance!==""&&distance!==null){
+    if (distance!==""&&distance!==null && hasValidDistance){
            mapped=mapped.filter((event)=>event.distance!==null && event.distance<=distanceNum)
 }
 
@@ -132,7 +131,7 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
            mapped=mapped.filter((events)=>events.event.title.toLowerCase().includes(name.toLowerCase()))
 }
 
- if (attendeeCountMin!==""&&attendeeCountMin!==null){
+ if (attendeeCountMin!==""&&attendeeCountMin!==null && hasValidAttendeeCountMin){
          mapped=mapped.filter((events)=>events.attendeeCount>=attendeeCountMinNum)
 }
 
