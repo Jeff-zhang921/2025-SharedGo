@@ -18,12 +18,7 @@ function HomePage() {
       </div>
 
       <div className='nav-links'>
-      <Link to="/map">Map </Link>
-     {/* <Link to="/eventDetails">EventDetailsPage </Link>
-      <Link to="/personal">PersonalPage </Link> */}
-      <Link to="/createEvent">CreateEvent </Link>
-      {/* <Link to="/chat">ChatPage </Link>
-      <Link to="/profile">ProfilePage </Link> */}
+      <Link to="/map" className="enter-button">Go! </Link>
       </div>
     </div>
   );

@@ -55,3 +55,25 @@
   .top-section h2 {
     margin-top: -0.2rem;
   }
+
+
+.enter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: black;
+    color: white;
+    padding: 18px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 50px; /*Rounded shape*/
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.enter-button:hover {
+    transform: translateY(-3px); /*Lifts up slightly*/
+    background-color: #222;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
