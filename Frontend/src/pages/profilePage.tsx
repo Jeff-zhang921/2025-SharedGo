@@ -1,5 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+// Define the interface for returning data from the API
+interface User {
+  id: number;
+  email: string;
+  name: string;
+}
+
+interface Stats {
+  upcomingCount: number;
+  pastCount: number;
+}
+
+interface Event {
+  id: number;
+  title: string;
+  startsAt: string;
+  capacity: number;
+  seatsRemaining: number;
+  category: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  imageUrl: string | null;
+  externalUrl: string | null;
+  attendeeCount: number;
+  host: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  isHost: boolean;
+  isAttendee: boolean;
+  joinedAt: string | null;
+}
+
+interface ProfileOverviewResponse {
+  user: User;
+  stats: Stats;
+  upcomingEvents: Event[];
+  pastEvents: Event[];
+}
+
+// The original card/comment interface (the comment section temporarily retains static data, which can be expanded in the future)
 interface CardItem {
   id: number;
   title: string;
@@ -13,17 +56,111 @@ interface ReviewItem {
   msg: string;
 }
 
+// Date formatting tool function: Converts ISO time to a friendly prompt (such as "Starts in 3 days")
+const formatEventDate = (isoDateString: string): string => {
+  try {
+    const eventDate = new Date(isoDateString);
+    const now = new Date();
+    const diffTime = eventDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return `Ended ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} ago`;
+    if (diffDays === 0) return 'Starts today';
+    if (diffDays === 1) return 'Starts tomorrow';
+    return `Starts in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+  } catch (err) {
+    return 'Date unavailable';
+  }
+};
+
+// Main ProfilePage component
 export default function ProfilePage() {
+  // API data status
+  const [profileData, setProfileData] = useState<ProfileOverviewResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Tab navigation status
   const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
   const [selectedTag, setSelectedTag] = useState<number>(0);
 
-  const upcomingEventCards: CardItem[] = [];
-  const pastEventCards: CardItem[] = [];
-  
+  // Static comment data (which can be retrieved from the API later)
   const reviewList: ReviewItem[] = [
     { id: 1, userName: "User1", msg: "Great event experience!" },
     { id: 2, userName: "User2", msg: "Highly recommended to attend!" },
   ];
+
+  // Asynchronous acquisition of personal profile data
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch("/profile/me/overview");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProfileData(data);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load profile data");
+        console.error("Profile fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  // Adapt API data to card format
+  const upcomingEventCards: CardItem[] = profileData?.upcomingEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    date: formatEventDate(event.startsAt),
+    image: event.imageUrl || "/watermelon.png"
+  })) || [];
+
+  const pastEventCards: CardItem[] = profileData?.pastEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    date: formatEventDate(event.startsAt),
+    image: event.imageUrl || "/watermelon.png"
+  })) || [];
+
+  // Loading/Error State Rendering
+  if (loading) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: '#f9fafb' 
+      }}>
+        <p>Loading profile data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: '#f9fafb',
+        padding: '1.25rem'
+      }}>
+        <p style={{ color: '#ef4444' }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  // Default user data (fallback)
+  const fallbackUser = { id: 0, name: "Unknown User", email: "no-email@example.com" };
+  const user = profileData?.user || fallbackUser;
+  const stats = profileData?.stats || { upcomingCount: 0, pastCount: 0 };
 
   return (
     <div style={{ 
@@ -32,7 +169,7 @@ export default function ProfilePage() {
       fontFamily: 'sans-serif',
       overflowY: 'auto',
       boxSizing: 'border-box',
-      paddingBottom: '60px'
+      paddingBottom: '60px' //Leave space for the bottom navigation
     }}>
       {/* Header Navigation Bar */}
       <div style={{
@@ -80,14 +217,14 @@ export default function ProfilePage() {
             fontWeight: '600', 
             color: '#111827' 
           }}>
-            Unknown User
+            {user.name}
           </h1>
           <p style={{ 
             margin: '0.25rem 0 0.5rem 0', 
             fontSize: '0.875rem', 
             color: '#6b7280' 
           }}>
-            no-email@example.com
+            {user.email}
           </p>
           <button style={{
             padding: '0.25rem 0.75rem',
@@ -135,12 +272,13 @@ export default function ProfilePage() {
         gap: '1rem',
         flexWrap: 'wrap'
       }}>
+        {/* Upcoming Events Stat */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>0</div>
+          }}>{stats.upcomingCount}</div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6b7280',
@@ -148,12 +286,13 @@ export default function ProfilePage() {
           }}>upcoming events</div>
         </div>
         
+        {/* Past Events Stat */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>0</div>
+          }}>{stats.pastCount}</div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6b7280',
@@ -161,6 +300,7 @@ export default function ProfilePage() {
           }}>past events</div>
         </div>
         
+        {/* Retain the original average rating placeholder (which can be extended from the API later) */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
@@ -174,6 +314,7 @@ export default function ProfilePage() {
           }}>(140 reviews)</div>
         </div>
         
+        {/* Maintain the original average attendance rate placeholders (which can be expanded from the API later) */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
@@ -354,7 +495,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Reviews Section */}
+      {/* Reviews Section (Retain the original static data and it can be expanded with the API in the future.) */}
       {selectedTag === 2 && (
         <div style={{
           padding: '1rem 1.25rem',
