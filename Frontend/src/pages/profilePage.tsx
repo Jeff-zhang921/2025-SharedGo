@@ -1,6 +1,9 @@
 import { useState } from "react";
 
 export default function ProfilePage() {
+  const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
+  const [selectedTag, setSelectedTag] = useState<number>(0);
+
   return (
     <div style={{ 
       height: '100vh', 
@@ -100,6 +103,96 @@ export default function ProfilePage() {
           fontSize: '0.875rem',
           fontWeight: '500'
         }}>Host</span>
+      </div>
+
+      {/* Host Statistics Cards */}
+      <div style={{
+        padding: '1rem 1.25rem',
+        backgroundColor: 'white',
+        marginTop: '0.5rem',
+        display: 'flex',
+        gap: '1rem',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ flex: 1, minWidth: '80px' }}>
+          <div style={{
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            color: '#111827'
+          }}>0</div>
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginTop: '0.25rem'
+          }}>upcoming events</div>
+        </div>
+        
+        <div style={{ flex: 1, minWidth: '80px' }}>
+          <div style={{
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            color: '#111827'
+          }}>0</div>
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginTop: '0.25rem'
+          }}>past events</div>
+        </div>
+        
+        <div style={{ flex: 1, minWidth: '80px' }}>
+          <div style={{
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            color: '#111827'
+          }}>4.1</div>
+          <div style={{
+            fontSize: '0.75rem',
+            color: '#6b7280',
+            marginTop: '0.25rem'
+          }}>(140 reviews)</div>
+        </div>
+        
+        <div style={{ flex: 1, minWidth: '80px' }}>
+          <div style={{
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            color: '#111827'
+          }}>85</div>
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginTop: '0.25rem'
+          }}>avg attendance</div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div style={{
+        padding: '1rem 1.25rem 0',
+        display: 'flex',
+        gap: '0.5rem'
+      }}>
+        {tagsArr.map((tag, index) => (
+          <button
+            key={index}
+            onClick={() => setSelectedTag(index)}
+            style={{
+              padding: '0.5rem 1.25rem',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: selectedTag === index ? 'black' : '#f3f4f6',
+              color: selectedTag === index ? 'white' : '#111827',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              flex: 1,
+              maxWidth: '120px'
+            }}
+          >
+            {tag}
+          </button>
+        ))}
       </div>
 
       {/* Bottom Navigation Bar */}
