@@ -6,9 +6,17 @@ const router=Router()
 const prisma = new PrismaClient()
 function pharseDateTimeparam(raw:unknown):Date|null{
     if (typeof raw !== "string") return null;
+    //nan is math error
     const parsed = Date.parse(raw);
     if (isNaN(parsed)) return null;
     return new Date(parsed);
+}
+
+function startOfUtcDay(date: Date): Date {
+    const copy = new Date(date);
+    //set hour to zero
+    copy.setUTCHours(0, 0, 0, 0);
+    return copy;
 }
 
 
@@ -97,7 +105,7 @@ const name=typeof req.query.name==="string"?req.query.name.trim():""
  const latitude=pharseCoords(req.query.latitude)
  const longitude=pharseCoords(req.query.longitude)
 const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
-const rawdate=typeof req.query.startdate==="string"?req.query.startdate.trim().toLowerCase():""
+const rawdate=typeof req.query.rawdate==="string"?req.query.rawdate.trim().toLowerCase():""
 const rawenddate=typeof req.query.enddate==="string"?req.query.enddate.trim().toLowerCase():""  
 const category=Categories.includes(rawcategory as Category)?rawcategory as Category:""
 
@@ -146,15 +154,18 @@ const enddate=pharseDateTimeparam(rawenddate)
          mapped=mapped.filter((events)=>events.attendeeCount>=attendeeCountMinNum)
 }
 
-if (category!==""&&category!==null){
+ if (category!==""&&category!==null){
        mapped=mapped.filter((events)=>events.event.category===category)
-}
-if (rawdate!==""&&filterdate!==null){
-    mapped=mapped.filter((events)=>events.event.startsAt===filterdate)
-}
-if (rawenddate!==""&&enddate!==null){
-    mapped=mapped.filter((events)=>events.event.startsAt<=enddate)
-}
+ }
+ if (rawdate!==""&&filterdate!==null){
+    //getTime returns the number of milliseconds since January 1, 1970, 00:00:00 UTC. By comparing these values, we can determine if the event starts on the same day as the filter date.
+     const startMs = startOfUtcDay(filterdate).getTime()
+     mapped=mapped.filter((events)=>events.event.startsAt.getTime()===startMs)
+ }
+ if (rawenddate!==""&&enddate!==null){
+     const endExclusiveMs = startOfUtcDay(enddate).getTime() + (24*60*60*1000)
+     mapped=mapped.filter((events)=>events.event.startsAt.getTime()<endExclusiveMs)
+ }
     return res.json(mapped)
 })
 

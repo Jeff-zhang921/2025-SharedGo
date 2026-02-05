@@ -7,6 +7,7 @@ import cors from 'cors';
 import authRouter from "./routes/auth";
 import homeRouter from "./routes/home";
 import profileRouter from "./routes/profile";
+import filterRouter from "./routes/filter";
 
 const app = express();
 app.use(cors({
@@ -30,6 +31,7 @@ app.use("/events", eventsRouter);
 app.use("/hosts", hostsRouter);
 app.use("/profile", profileRouter);
 app.use("/home", homeRouter);
+app.use("/filter", filterRouter);
 
 app.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});

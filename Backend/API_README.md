@@ -780,7 +780,7 @@ These endpoints support filtering events from a single endpoint using optional q
 **Notes**
 
 - These routes are implemented in `Backend/src/routes/filter.ts`.
-- The backend must mount the router at `/filter` for these endpoints to be available.
+- These routes are mounted at `/filter` in `Backend/src/index.ts`.
 
 ### 5.1 Nearby Events
 **GET** `/filter/nearby`
@@ -791,11 +791,13 @@ Returns upcoming events within **10 km** of the provided coordinates.
 
 | Param       | Type   | Required | Description |
 |-------------|--------|----------|-------------|
-| `latitude`  | number | yes      | User latitude. Stored in session if valid. |
-| `longitude` | number | yes      | User longitude. Stored in session if valid. |
+| `latitude`  | number | no       | User latitude. Stored in session if provided with `longitude`. |
+| `longitude` | number | no       | User longitude. Stored in session if provided with `latitude`. |
 
 **Behavior**
 
+- If query coordinates are not provided, the endpoint will reuse the session location (if available).
+- If no coordinates are available from either query or session, the endpoint returns `400`.
 - Only events with `latitude` and `longitude` set can be matched.
 - Filters to future events: `startsAt >= now`.
 
@@ -826,6 +828,14 @@ Search and filter upcoming events. Any provided filters are combined with **AND*
 | `distance`        | number | no       | Max distance (km). Requires coordinates from query or session. |
 | `latitude`        | number | no       | User latitude. Stored in session if provided with `longitude`. |
 | `longitude`       | number | no       | User longitude. Stored in session if provided with `latitude`. |
+| `rawdate`       | string | no       | Date-only `YYYY-MM-DD`. Includes events starting on/after this day (UTC). |
+| `enddate`         | string | no       | Date-only `YYYY-MM-DD`. Includes events starting up to and including this day (UTC). |
+
+**Date filtering notes**
+
+- `rawdate` is interpreted as the event that happen on that UTC day.
+- `rawdate` is use to filter the event that HAPPEN ON THAT DATE. 
+- `enddate` is interpreted as the event that HAPPEN BEFORE(INCLUDE) THAT DATE FROM NOW.
 
 **Response**
 
