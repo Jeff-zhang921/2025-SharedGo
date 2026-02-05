@@ -1,8 +1,29 @@
 import { useState } from "react";
 
+interface CardItem {
+  id: number;
+  title: string;
+  date: string;
+  image?: string;
+}
+
+interface ReviewItem {
+  id: number;
+  userName: string;
+  msg: string;
+}
+
 export default function ProfilePage() {
   const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
   const [selectedTag, setSelectedTag] = useState<number>(0);
+
+  const upcomingEventCards: CardItem[] = [];
+  const pastEventCards: CardItem[] = [];
+  
+  const reviewList: ReviewItem[] = [
+    { id: 1, userName: "User1", msg: "Great event experience!" },
+    { id: 2, userName: "User2", msg: "Highly recommended to attend!" },
+  ];
 
   return (
     <div style={{ 
@@ -194,6 +215,190 @@ export default function ProfilePage() {
           </button>
         ))}
       </div>
+
+      {/* Upcoming Events Section */}
+      {selectedTag === 0 && (
+        <div style={{
+          padding: '1rem 1.25rem',
+          backgroundColor: 'white',
+          marginTop: '0.5rem',
+          borderRadius: '0.5rem',
+          margin: '0.5rem 1.25rem'
+        }}>
+          {upcomingEventCards.length === 0 ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem 0' }}>No upcoming events found</p>
+          ) : (
+            upcomingEventCards.map((card) => (
+              <div key={card.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem 0',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                <div style={{ marginRight: '1rem' }}>
+                  <img
+                    src={card.image || '/default-event.png'}
+                    alt={card.title}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '0.5rem',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#111827'
+                  }}>{card.title}</h3>
+                  <p style={{
+                    margin: '0.25rem 0 0.5rem 0',
+                    fontSize: '0.875rem',
+                    color: '#6b7280'
+                  }}>{card.date}</p>
+                  <button style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    backgroundColor: '#f3f4f6',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    color: '#374151'
+                  }}>
+                    Edit event
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+
+          <button style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginTop: '1rem',
+            backgroundColor: '#f9fafb',
+            border: '1px dashed #d1d5db',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+            color: '#374151',
+            fontWeight: '500'
+          }}>
+            + Create new event
+          </button>
+        </div>
+      )}
+
+      {/* Past Events Section */}
+      {selectedTag === 1 && (
+        <div style={{
+          padding: '1rem 1.25rem',
+          backgroundColor: 'white',
+          marginTop: '0.5rem',
+          borderRadius: '0.5rem',
+          margin: '0.5rem 1.25rem'
+        }}>
+          {pastEventCards.length === 0 ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem 0' }}>No past events found</p>
+          ) : (
+            pastEventCards.map((card) => (
+              <div key={card.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem 0',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                <div style={{ marginRight: '1rem' }}>
+                  <img
+                    src={card.image || '/default-event.png'}
+                    alt={card.title}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '0.5rem',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#111827'
+                  }}>{card.title}</h3>
+                  <p style={{
+                    margin: '0.25rem 0 0.5rem 0',
+                    fontSize: '0.875rem',
+                    color: '#6b7280'
+                  }}>{card.date}</p>
+                  <button style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    backgroundColor: '#f3f4f6',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    color: '#374151'
+                  }}>
+                    View details
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Reviews Section */}
+      {selectedTag === 2 && (
+        <div style={{
+          padding: '1rem 1.25rem',
+          backgroundColor: 'white',
+          marginTop: '0.5rem',
+          borderRadius: '0.5rem',
+          margin: '0.5rem 1.25rem'
+        }}>
+          {reviewList.map((review) => (
+            <div key={review.id} style={{
+              padding: '1rem 0',
+              borderBottom: '1px solid #e5e7eb'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: '#e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: '1rem'
+                }}>
+                  <span style={{ color: '#6b7280' }}>{review.userName.charAt(0)}</span>
+                </div>
+                
+                <h4 style={{
+                  margin: 0,
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
+                }}>{review.userName}</h4>
+              </div>
+              
+              <p style={{
+                margin: 0,
+                fontSize: '0.875rem',
+                color: '#4b5563',
+                paddingLeft: '50px'
+              }}>{review.msg}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Bottom Navigation Bar */}
       <div style={{
