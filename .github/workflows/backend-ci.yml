@@ -41,6 +41,9 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Run linting
+        run: npm run lint
+
       - name: Prisma generate
         run: npx prisma generate
 
@@ -48,6 +51,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://sharedgo_user:sharegopass@localhost:5432/sharedgo_ci?schema=public
         run: npx prisma migrate deploy
+      
+      - name: Run Jest tests
+        env:
+          DATABASE_URL: postgresql://sharedgo_user:sharegopass@localhost:5432/sharedgo_ci?schema=public
+        run: npm test
 
       - name: Type-check build
         env:
