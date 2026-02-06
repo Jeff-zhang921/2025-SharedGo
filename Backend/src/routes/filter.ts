@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 
 function calcevent(event:any,userLat:number|null,userLong:number|null){
      let distance: number | null = null;
-     let attendeeCount=event.participants.length
+     const attendeeCount=event.participants.length
     if (event.latitude!==null && event.longitude!==null&& userLat!==null && userLong!==null){
     distance=distanceKM(userLat,userLong,event.latitude,event.longitude)
    }
@@ -120,8 +120,8 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
         }
     ,include:{host:true,participants:true}
     })
-    let distanceNum: number =Number(distance)
-    let attendeeCountMinNum:number=Number(attendeeCountMin)
+    const distanceNum: number =Number(distance)
+    const attendeeCountMinNum:number=Number(attendeeCountMin)
 
     let mapped= events.map(event=>calcevent(event,userLatitude,userLongitude))
     if (distance!==""&&distance!==null){

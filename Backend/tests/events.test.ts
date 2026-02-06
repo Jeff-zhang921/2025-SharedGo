@@ -25,10 +25,6 @@ jest.mock("../src/generated/prisma", () => ({
   PrismaClient: jest.fn(() => mockPrisma),
 }));
 
-//mocking requireSession to bypass authentication for testing
-jest.mock("../src/middleware/requireSession", () => ({
-  requireSession: (req: any, res: any, next: any) => next(),
-}));
 
 // Clear mock call history between tests to ensure isolation.
 beforeEach(async () => {
@@ -37,7 +33,6 @@ beforeEach(async () => {
 });
 //importing app after mock 
 import app from "../src/index";
-import { Prisma } from "@prisma/client";
 
 afterAll(async () => { //disconnect after tests are done
   await mockPrisma.$disconnect();
