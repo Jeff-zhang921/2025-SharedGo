@@ -48,7 +48,6 @@ beforeEach(async () => {
 });
 //importing app after mock 
 import app from "../src/index";
-import { Category } from "@prisma/client";
 
 afterAll(async () => { //disconnect after tests are done
   await mockPrisma.$disconnect();
