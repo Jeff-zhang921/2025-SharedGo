@@ -20,9 +20,24 @@ const mockPrisma = {
   
 };
 
+//define Enum for the mock
+const MockCategory = {
+  PHYSICAL_ACTIVITIES: "Physical Activities",
+  FESTIVALS: "Festivals",
+  EDUCATIONAL: "Educational",
+  NETWORKING: "Networking",
+  ARTS_CULTURE: "Arts & Culture",
+  FOOD_DRINK: "Food & Drink",
+  MUSIC_CONCERTS: "Music & Concerts",
+  TECH_GAMING: "Tech & Gaming",
+  WELLNESS_MEDITATION: "Wellness & Meditation",
+  VOLUNTEER_CHARITY: "Volunteer & Charity",
+  OTHER: "Other"
+};
 // Replace the real PrismaClient export with our mock implementation.
-jest.mock("../src/generated/prisma", () => ({
+jest.mock("@prisma/client", () => ({
   PrismaClient: jest.fn(() => mockPrisma),
+  Category: MockCategory,
 }));
 
 
@@ -33,6 +48,7 @@ beforeEach(async () => {
 });
 //importing app after mock 
 import app from "../src/index";
+import { Category } from "@prisma/client";
 
 afterAll(async () => { //disconnect after tests are done
   await mockPrisma.$disconnect();
