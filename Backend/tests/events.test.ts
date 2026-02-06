@@ -1,4 +1,5 @@
 import request from "supertest";
+import { Request, Response, NextFunction } from "express";
 
 // Mock Prisma client, without using real database
 // Each method used by the route handlers is replaced by a Jest mock
@@ -40,11 +41,13 @@ jest.mock("@prisma/client", () => ({
   Category: MockCategory,
 }));
 
+jest.mock("../src/middleware/requireSession", () => ({
+  requireSession: (req: Request, res: Response, next: NextFunction) => next(),
+}));
 
 // Clear mock call history between tests to ensure isolation.
 beforeEach(async () => {
   jest.clearAllMocks();
-  await mockPrisma.eventParticipant.deleteMany({});
 });
 //importing app after mock 
 import app from "../src/index";
@@ -54,7 +57,7 @@ afterAll(async () => { //disconnect after tests are done
 });
 
 describe("Event API", () => {
-  let eventId: number;
+  let eventId: number = 123; 
   //mock user upsert, need to ensure host user exist before event creation
   it("should create a new event", async () => {
       mockPrisma.user.upsert.mockResolvedValue({
@@ -70,9 +73,10 @@ describe("Event API", () => {
       description: "This is a test event",
       startsAt: new Date("2024-12-31T22:00:00.000Z"),
       capacity: 50,
+      category: "Other",
       location: "Test Location",
-      imageUrl: null,
-      externalUrl: null,
+      latitude: 0,
+      longitude: 0,
       hostId: 1,
       host: {
         id: 1,
@@ -92,9 +96,10 @@ describe("Event API", () => {
         description: "This is a test event",
         startsAt: "2024-12-31T22:00:00.000Z",
         capacity: 50,
+        category: "Other",
         location: "Test Location",
-        imageUrl: null,
-        externalUrl: null,
+        latitude: 0,
+        longitude: 0,
         hostEmail: "host@example.com",
       });
 
@@ -256,7 +261,7 @@ describe("Event API", () => {
   // Retrieving event details
   it("should get event details", async () => {
     const mockEvent = {
-      id: eventId,
+      id: 123,
       title: "Test Event",
       description: "This is a test event",
       startsAt: new Date("2024-12-31T22:00:00.000Z"),
@@ -279,6 +284,7 @@ describe("Event API", () => {
           },
         },
       ],
+      reviews: [],
     };
 
     mockPrisma.event.findUnique.mockResolvedValue(mockEvent);
