@@ -41,6 +41,7 @@ This section documents the endpoints used by **Frontend**
 - [5. Filter Endpoints](#5-filter-endpoints)
   - [5.1 Nearby Events](#51-nearby-events)
   - [5.2 Search Events (Combined Filters)](#52-search-events-combined-filters)
+  - [5.3 Name Search (Hosts/Users)](#53-name-search-hostsusers)
 
 ---
 
@@ -848,4 +849,23 @@ Returns an array of objects:
 **Example request**
 
 `GET /filter/search?name=coffee&category=Food_Drink&attendeeCountMin=3&distance=10&latitude=51.4574&longitude=-2.6078`
+
+### 5.3 Name Search (Hosts/Users)
+**GET** `/filter/name`
+
+Returns a list of user/host names that contain the provided query.
+
+**Query params**
+
+| Param | Type   | Required | Description |
+|-------|--------|----------|-------------|
+| `name` | string | yes      | Case-insensitive substring match against `User.name`. |
+
+**Response**
+
+Returns an array of names (strings). Note: `User.name` can be `null`, so the list may include `null` values.
+
+**Example request**
+
+`GET /filter/name?name=alex`
 

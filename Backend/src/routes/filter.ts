@@ -169,5 +169,18 @@ const enddate=pharseDateTimeparam(rawenddate)
     return res.json(mapped)
 })
 
+router.get("/name",async (req:Request,res:Response)=>{
+    const name=typeof req.query.name==="string"?req.query.name.trim():""
+    if (name===""){
+        res.status(400).json({message:"Name query parameter is required"})
+        return
+    }
+    const host=await prisma.user.findMany({
+        where:{name:{contains:name,mode:"insensitive"}
+        }
+    })
+    const hostname=host.map((user)=>user.name)
+    res.json(hostname)
+})
 
 export default router
