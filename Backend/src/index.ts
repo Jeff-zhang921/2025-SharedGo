@@ -1,6 +1,5 @@
 import "./types/express-session";
-import express,{Request,Response} from "express";
-import session from "express-session";
+import express, { Request, Response } from "express";
 import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
 import cors from 'cors';
@@ -8,6 +7,7 @@ import authRouter from "./routes/auth";
 import homeRouter from "./routes/home";
 import profileRouter from "./routes/profile";
 import filterRouter from "./routes/filter";
+import sessionMiddleware from "./session";
 
 const app = express();
 app.use(cors({
@@ -16,12 +16,7 @@ app.use(cors({
   }));
 app.use(express.json());
 
-app.use(session({
-     secret:'sharego',
-     //reduce load
-     saveUninitialized:false,
-     resave:false
-}));
+app.use(sessionMiddleware);
 
 const PORT = Number(process.env.PORT) || 3000;
 
