@@ -47,7 +47,57 @@ router.post("/threads",async (req:Request,res:Response)=>{
 })
 
 
+router.get("/threads",async (req:Request,res:Response)=>{
+    const userId=req.session.user?.id
+    
+    if(!userId){
+        res.status(401).json({message:"Unauthorized"})
+        return
+    }
+    const threads=await prisma.chatThread.findMany({
+        where:{
+            OR:[
+                {hostId:userId},
+                {guestId:userId}]
+        }
+    })
+    res.json(threads)
+}
 
+)
+
+router.get("/threads/:threadId/messages",async (req:Request,res:Response)=>{
+    const userId=req.session.user?.id
+    if(!userId){
+        res.status(401).json({message:"Unauthorized"})
+        return
+    }
+    const threadId=Number(req.params.threadId)
+    if (!Number.isInteger(threadId)||threadId<=0||isNaN(threadId)){
+        res.status(400).json({message:"Valid threadId is required"})
+        return
+    }
+    const thread=await prisma.chatThread.findUnique({
+        where:{id:threadId},
+        select:{id:true,hostId:true,guestId:true}
+    })
+    if (!thread){
+        res.status(404).json({message:"Thread not found"})
+        return
+    }
+    if (thread.hostId!==userId && thread.guestId!==userId){
+        res.status(403).json({message:"Forbidden"})
+        return
+    }
+    const messages=await prisma.chatMessage.findMany({
+        where:{threadId},
+        orderBy:{createdAt:"asc"}
+    })
+    res.json(messages)
+
+
+
+})
 // //Execution Order
 
 // Install Socket.IO deps
