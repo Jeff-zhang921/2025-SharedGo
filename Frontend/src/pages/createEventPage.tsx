@@ -68,8 +68,8 @@ const CreateEventPage = () => {
           hostId: 1, // place-holder of Host Id
           hostEmail: "host@sharego.dev", // place-holder for Host email
           capacity: form.capacity === "" ? null:Number(form.capacity),
-          latitude: form.latitude === "" ? undefined:Number(form.latitude),
-          longitude: form.longitude === "" ? undefined:Number(form.longitude),
+          latitude: 1,
+          longitude: 2,
           description: form.description || null,
           category: form.category || undefined,
           imageUrl: form.imageUrl || null,
