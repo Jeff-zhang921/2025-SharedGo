@@ -39,11 +39,13 @@ app.get("/",(request:Request,response:Response)=>{
 
 // Only start the server if this file is run directly (not when imported)
 //create a server and attach app to it, then pass that server to initsocket
+if (require.main === module) {
   const server = http.createServer(app);
   initSocket(server);
   server.listen(PORT, () => {
     console.log(`running on port ${PORT} `);
   });
+}
 
 // What app.listen(3000) does internally:
 // const server = http.createServer(this);
