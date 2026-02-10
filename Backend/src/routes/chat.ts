@@ -1,7 +1,6 @@
 import{Router,Request,Response} from "express"
 import { PrismaClient } from "@prisma/client";
 
-
 const router=Router()
 const prisma= new PrismaClient()
 
@@ -33,9 +32,8 @@ router.post("/threads",async (req:Request,res:Response)=>{
     //find existing thread
     let thread=await prisma.chatThread.findFirst({
         where:{
-            OR:[
-                {hostId,guestId},
-                {hostId:guestId,guestId:hostId} ]  
+            hostId,
+            guestId,
         }
     })
     if (!thread){
@@ -144,8 +142,11 @@ router.get("/threads/:threadId/messages",async (req:Request,res:Response)=>{
 // POST /chat/threads/:id/read (mark read)
 // Use requireSession for auth.
 
+
 // Mount routes
 // In index.ts, mount /chat router.
+
+
 
 // Wire Socket.IO to HTTP server
 // Replace app.listen with http.createServer(app).listen.
