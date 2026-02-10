@@ -70,12 +70,63 @@ export function initSocket(server: HttpServer) {
 }
 //client side emit chat messsage"connection" server listen,catach and take action
 socket.on("thread:join", async (threadIdRaw) => {
-     const thread=ensureThreadValid(threadIdRaw)
-      if (!thread) {
+     const threadid=ensureThreadValid(threadIdRaw)
+      if (!threadid) {
         socket.emit("error", "Invalid thread ID.");
         return;
       }
-      
+      const membership=await ensureMembership(threadid,sessionUser.id)
+
+      if (!membership) {
+        socket.emit("error", "You are not a member of this thread.");
+        return;
+      }
+      if (membership.hostId===sessionUser.id){
+        socket.data.role="host"
+      }else{
+        socket.data.role="guest"
+      }
+      socket.join(`thread:${threadid}`);
+    }
+
+)
+
+socket.on("message:send", async (data) => {
+  const {threadId,body}=data
+  const threadid=ensureThreadValid(threadId)
+  if (!threadid) {
+    socket.emit("error", "Invalid thread ID.");
+    return;
+  }
+  const membership=await ensureMembership(threadid,sessionUser.id)
+  if (!membership) {
+    socket.emit("error", "You are not a member of this thread.");
+    return;
+  }
+  if (typeof body !== "string" || body.trim() === "") {
+    socket.emit("error", "Message body must be a non-empty string.");
+    return;
+  }
+  const message=await prisma.chatMessage.create({
+    //generate a new row in database
+    data:{
+      threadId:threadid,
+      senderId:sessionUser.id,
+      body:body.trim(),
+    }
+  })
+  //io as the intercom system for the whole building(sending to all), and socket as the individual's radio.
+  //io.to It looks up the key "thread:123" in its Map. It finds the list of IDs: ["Socket_A", "Socket_B"]. and send the msg
+  io.to(`thread:${threadid}`)  .emit("message:new",{
+    id:message.id,
+    threadId:message.threadId,
+    senderId:message.senderId,
+    body:message.body,
+    createdAt:message.createdAt,
+  })
+
+
+
 })
 
 
