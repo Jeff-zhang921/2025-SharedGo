@@ -7,7 +7,7 @@ import authRouter from "./routes/auth";
 import homeRouter from "./routes/home";
 import profileRouter from "./routes/profile";
 import filterRouter from "./routes/filter";
-import sessionMiddleware from "./session";
+import { sessionMiddleware } from "./session";
 import http from "http";
 import { initSocket } from "./socket";
 

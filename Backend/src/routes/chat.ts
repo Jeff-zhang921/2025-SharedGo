@@ -32,7 +32,8 @@
 // Define socket event flow
 // thread:join → validate thread membership → join room.
 // message:send → validate → persist message → emit message:new.
-// Optional: message:read, typing:start, typing:stop.
+
+
 
 // Add chat REST routes
 // Create chat.ts.
