@@ -41,6 +41,13 @@ This section documents the endpoints used by **Frontend**
 - [5. Filter Endpoints](#5-filter-endpoints)
   - [5.1 Nearby Events](#51-nearby-events)
   - [5.2 Search Events (Combined Filters)](#52-search-events-combined-filters)
+  - [5.3 Name Search (Hosts/Users)](#53-name-search-hostsusers)
+- [6. Chat (REST + Socket)](#6-chat-rest--socket)
+  - [6.1 Create Or Find Thread](#61-create-or-find-thread)
+  - [6.2 List My Threads](#62-list-my-threads)
+  - [6.3 Thread Messages](#63-thread-messages)
+  - [6.4 Socket Events](#64-socket-events)
+  - [6.5 Manual Test Sequence](#65-manual-test-sequence)
 
 ---
 
@@ -848,4 +855,104 @@ Returns an array of objects:
 **Example request**
 
 `GET /filter/search?name=coffee&category=Food_Drink&attendeeCountMin=3&distance=10&latitude=51.4574&longitude=-2.6078`
+
+### 5.3 Name Search (Hosts/Users)
+**GET** `/filter/name`
+
+Returns a list of user/host names that contain the provided query.
+
+**Query params**
+
+| Param | Type   | Required | Description |
+|-------|--------|----------|-------------|
+| `name` | string | yes      | Case-insensitive substring match against `User.name`. |
+
+**Response**
+
+Returns an array of names (strings). Note: `User.name` can be `null`, so the list may include `null` values.
+
+**Example request**
+
+`GET /filter/name?name=alex`
+
+---
+
+## 6. Chat (REST + Socket)
+
+All chat endpoints require a valid session cookie from `/auth/email/verify`.
+
+### 6.1 Create Or Find Thread
+**POST** `/chat/threads`
+
+**Request body (JSON)**
+
+| Field   | Type   | Required | Notes |
+|---------|--------|----------|-------|
+| `hostId` | number | yes      | The host user id |
+
+**Response**
+```json
+{ "threadId": 12 }
+```
+
+---
+
+### 6.2 List My Threads
+**GET** `/chat/threads`
+
+**Response**
+Returns all threads where the current user is either host or guest.
+
+---
+
+### 6.3 Thread Messages
+**GET** `/chat/threads/:threadId/messages`
+
+**URL params**
+
+| Param      | Type   | Required |
+|------------|--------|----------|
+| `threadId` | number | yes      |
+
+**Response**
+Returns messages in ascending `createdAt` order.
+
+---
+
+### 6.4 Socket Events
+
+**Connection**
+- Client connects to Socket.IO on the same base URL.
+- The session cookie must be present.
+- If no session user, connection is rejected.
+
+**thread:join**
+- Client emits: `{ threadId }` (server also accepts a raw number)
+- Server validates membership
+- Server joins room `thread:<id>`
+
+**message:send**
+- Client emits: `{ threadId, body }`
+- Server validates membership
+- Server saves message
+- Server updates `lastMessageAt`
+- Server emits `message:new` to the room
+
+**message:new**
+- Server emits: `{ id, threadId, senderId, body, createdAt }`
+
+**chat:error**
+- Server emits errors as `chat:error` with a string message.
+
+---
+
+### 6.5 Manual Test Sequence
+
+1. Login via `/auth/email/verify`.
+2. Create or fetch a thread with `POST /chat/threads`.
+3. Connect Socket.IO and emit `thread:join`.
+4. Emit `message:send` and confirm:
+   - Message saved in DB
+   - `message:new` received by both users
+5. Load history with `GET /chat/threads/:threadId/messages`.
 

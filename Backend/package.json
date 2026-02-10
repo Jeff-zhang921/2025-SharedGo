@@ -17,7 +17,12 @@
     "transform": {
       "^.+\\.tsx$": "ts-jest"
     },
-    "moduleFileExtensions": ["ts", "js", "json", "node"]
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -29,7 +34,8 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "express-validator": "^7.2.1",
-    "nodemailer": "^6.10.1"
+    "nodemailer": "^6.10.1",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
