@@ -74,7 +74,11 @@ export function initSocket(server: HttpServer) {
 //client side emit chat messsage"connection" server listen,catach and take action
 socket.on("thread:join", async (payload) => {
   
-     const threadid=ensureThreadValid(payload?.threadId)
+     const hasObjectPayload = payload && typeof payload === "object";
+     //If the payload is an object, we expect it to have a threadId property. If it's not an object, we treat the entire payload as the thread ID.
+     const payloadObject = hasObjectPayload ? (payload as { threadId?: unknown }) : null;
+     const rawThreadId = payloadObject ? payloadObject.threadId : payload;
+     const threadid=ensureThreadValid(rawThreadId)
       if (!threadid) {
         socket.emit("chat:error", "Invalid thread ID.");
         return;

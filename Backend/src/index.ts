@@ -10,7 +10,7 @@ import filterRouter from "./routes/filter";
 import { sessionMiddleware } from "./session";
 import http from "http";
 import { initSocket } from "./socket";
-
+import chatRouter from "./routes/chat";
 
 const app = express();
 app.use(
@@ -32,6 +32,7 @@ app.use("/hosts", hostsRouter);
 app.use("/profile", profileRouter);
 app.use("/home", homeRouter);
 app.use("/filter", filterRouter);
+app.use("/chat", chatRouter);
 
 app.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});

@@ -95,7 +95,7 @@ router.get("/threads/:threadId/messages",async (req:Request,res:Response)=>{
 
 })
 
-
+export default router
 // //Execution Order
 
 // Install Socket.IO deps
