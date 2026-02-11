@@ -68,31 +68,44 @@ const MapPage = () => {
 
   return (
     <div className="map-container">
-      {/*HOME BUTTON*/}
-      <div 
-        style={{
-          position: "absolute",
-          top: "20px",        // Positioning 
-          left: "20px",
-          zIndex: 10          // layer above the map and icons
-        }}
+      <div className="ui-overlay">
+        {/*HOME BUTTON*/}
+        <div className="home-btn"
+          style={{
+            position: "absolute",
+            top: "20px",        // Positioning 
+            left: "20px",
+            zIndex: 10          // layer above the map and icons
+          }}
+        >
+          <Button
+            link="/home"                // Link to the home page
+            imgSrc="/src/assets/home.svg"       // Path to home icon
+            text="Home"
+            size={60}                       // Adjust size in pixels
+          />
+        </div>
+
+        <Link to="/createEvent" className='create-event'>Create Event</Link>
+
+        <div className='profile-page'>
+          <Link to="/profile">
+            <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
+          </Link>
+        </div>
+      </div>
+
+      <MapContainer
+        center={[51.5, -2.6]} //Centre of bristol
+        zoom={13}
+        zoomControl={false} //Users can still zoom in and out using trackpad
+        style={{ height: "100vh", width: "100vw" }} //Takes up whole page
       >
-        <Button
-          link="/home"                // Link to the home page
-          imgSrc="/src/assets/home.svg"       // Path to home icon
-          text="Home"
-          size={60}                       // Adjust size in pixels
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
+          attribution='&copy; OpenStreetMap contributors'
         />
-      </div>
-
-      <Link to="/createEvent" className='create-event'>Create Event</Link>
-
-      <div className='profile-page'>
-        <Link to="/profile">
-          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
-        </Link>
-      </div>
-
+      </MapContainer>
 
       {dbEvents.map((event) => {
         // Find the coordinates for this specific DB ID
