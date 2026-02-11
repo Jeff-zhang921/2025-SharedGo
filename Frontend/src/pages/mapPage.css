@@ -33,6 +33,39 @@
   pointer-events: auto;
 }
 
+.event-circle-marker {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.event-circle-marker:hover {
+  transform: scale(1.05);
+  background-color: #f0f0f0;
+}
+
+.event-circle-marker span {
+  font-size: 13px;
+  font-weight: 800;
+  color: black;
+  line-height: 1.2;
+  /* ... if it's too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .create-event {
   position: fixed;
