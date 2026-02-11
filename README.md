@@ -70,11 +70,12 @@
 
 >For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
+```text
 SharedGO/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/           # Custom issue reporting forms
-│   ├── PULL_REQUEST_TEMPLATE/    # PR checklists and guidelines
-│   └── workflows/                # CI/CD automation files (GitHub Actions)
+│   ├── PULL_REQUEST_TEMPLATE/    # PR template
+│   └── workflows/                # CI/CD automation files 
 ├── Backend/                      # Node.js/Express server logic
 │   ├── prisma/                   # Database schema and migrations
 │   ├── src/
@@ -101,13 +102,15 @@ SharedGO/
 │   ├── vite.config.ts            # Vite build configuration
 │   └── README.md                 # Frontend-specific documentation
 └── Docs/                         # Project management & design
-    ├── Architecture/             # System diagrams and logic flow
-    ├── database/                 # DB diagrams
-    ├── design/                   # Figma designs
-    ├── Minutes/                  # Client and team meeting notes
-    ├── Presentations/            # Slide materials
-    ├── AI Tools.md               # Log of AI usage in development
-    └── testing_day_survey.pdf    # User testing feedback & results
+│   ├── Architecture/             # System diagrams and logic flow
+│   ├── database/                 # DB diagrams
+│   ├── design/                   # Figma designs
+│   ├── Minutes/                  # Client and team meeting notes
+│   ├── Presentations/            # Slide materials
+│   ├── AI Tools.md               # Log of AI usage in development
+│   └── testing_day_survey.pdf    # User testing feedback & results
+├── README.md                     # Project documentation
+```
 
 ## TechStack
 ### MVP Architecture
