@@ -34,23 +34,34 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build the Docker image
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG Backend/
           # Tag the image to ECR
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG
           # Push the image to ECR
-          docker push ${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      
+      - name: Fill in new image ID in the ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with: 
+          task-definition: Backend/task-definition.json
+          container-name: backend_container
+          image: ${{ steps.build-image.outputs.image }}
+        
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with: 
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
 
-      - name: Deploy to ECS
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          ECS_CLUSTER: ${{ env.ECS_CLUSTER }}
-          ECS_SERVICE: ${{ env.ECS_SERVICE }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
-        run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+        
