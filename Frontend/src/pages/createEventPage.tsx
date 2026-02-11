@@ -63,6 +63,7 @@ const CreateEventPage = () => {
       const res = await fetch(`${backendBaseURL}/events/create`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
+        credentials: "include",
         body: JSON.stringify({
           ...form,
           hostId: 1, // place-holder of Host Id
