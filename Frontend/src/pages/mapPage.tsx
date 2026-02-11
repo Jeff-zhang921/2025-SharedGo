@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface User {
   id: number;
@@ -34,22 +37,7 @@ interface EventData {
 
 const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
-
-  //Hardcoded event positions for now, will change later
-  const positionLookup: { [key: number]: { top: string; left: string } } = {
-    1: { top: "40%", left: "60%" },
-    2: { top: "20%", left: "10%" },
-    3: { top: "80%", left: "75%" },
-    4: { top: "50%", left: "80%" },
-    5: { top: "50%", left: "33%" },
-    6: { top: "60%", left: "40%" },
-    7: { top: "10%", left: "60%" },
-    8: { top: "20%", left: "90%" },
-    9: { top: "44%", left: "32%" },
-    10: { top: "22%", left: "76%" },
-    11: { top: "10%", left: "33%" },
-    12: { top: "20%", left: "40%" }
-  };
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Fetch events from backend
@@ -62,9 +50,18 @@ const MapPage = () => {
         console.error("Failed to fetch events:", err);
       }
     };
-
     fetchEvents();
   }, []);
+
+  // Circle Icons
+  const createEventIcon = (title: string) => {
+    return new L.DivIcon({
+      className: 'custom-div-icon',
+      html: `<div class="event-circle-marker"><span>${title}</span></div>`, //Inserts title of event into marker
+      iconSize: [100, 100],
+      iconAnchor: [50, 50], //Centre circle exactly on top of coordinates
+    });
+  };
 
   const ICON_DIAMETER = 100; // Diameter of the circle in pixels
   const FONT_SIZE = '16px';
