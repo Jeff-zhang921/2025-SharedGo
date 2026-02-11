@@ -27,6 +27,13 @@ All uses of AI have been thoroughly checked by the programmers to avoid any erro
 - CSS Styling: "Provide a rough template for a .css container/input-form"
 
 
+**Oliver**
+- Debugging: "Its giving me this error... Can you suggest how to fix it?"
+
+- Coding: "How can I make this button look a certain way?"
+
+- General advice: "What is the best Map API I could use for this project"
+
 **Quality Assurance:**
 - Manual validation: Every word proposed by AI underwent a mandatory manual review by a programmer
 

@@ -47,6 +47,10 @@
   h1, h2 {
     color: black;
   }
+
+  .top-section {
+    margin-top: -50px;
+  }
   
   .top-section h1 {
     margin-bottom: 0.3rem; /* Bring h1 closer to h2 */
