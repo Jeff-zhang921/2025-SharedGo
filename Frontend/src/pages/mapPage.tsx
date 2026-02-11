@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
 import { Link, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -63,6 +63,17 @@ const MapPage = () => {
     });
   };
 
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: (e) => {
+        const { lat, lng } = e.latlng;
+        console.log(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
+        //Functionality to save coordinates from clicking the map
+      },
+    });
+    return null;
+  }
+
   const ICON_DIAMETER = 100; // Diameter of the circle in pixels
   const FONT_SIZE = '16px';
 
@@ -105,6 +116,8 @@ const MapPage = () => {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
         />
+
+        <MapClickHandler />
       </MapContainer>
 
       {dbEvents.map((event) => {
