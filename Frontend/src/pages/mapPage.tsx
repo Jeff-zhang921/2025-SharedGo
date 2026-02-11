@@ -20,6 +20,8 @@ interface EventData {
   startsAt: string;
   capacity: number | null;
   location: string;
+  latitude: number;
+  longitude: number;
   imageUrl: string | null;
   externalUrl: string | null;
   host: User; //Whomever hosted the event
@@ -118,40 +120,19 @@ const MapPage = () => {
         />
 
         <MapClickHandler />
-      </MapContainer>
 
-      {dbEvents.map((event) => {
-        // Find the coordinates for this specific DB ID
-        // If the ID isn't in our lookup, give it a default middle position
-        const pos = positionLookup[event.id] || { top: "50%", left: "50%" };
-
-        return (
-          <Link
-            key={event.id}
-            to={`/eventDetails/${event.id}`} //Uses event id from the database
-            style={{
-              position: "absolute",
-              top: pos.top,
-              left: pos.left,
-              cursor: "pointer",
-              textDecoration: 'none', //remove blue underline
-              transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location 
-              width: ICON_DIAMETER,
-              height: ICON_DIAMETER,
-              borderRadius: '50%',
-              backgroundColor: 'white', //colour of circle event icons 
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
-              display: 'flex', //Flexbox to centre text inside circle 
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ color: 'black', fontSize: FONT_SIZE, textAlign: 'center' }}>
-              {event.title} {/*Displays title from prisma*/}
-            </span>
-          </Link>
-        );
-      })}
+      {dbEvents.map((event) => (
+        <Marker 
+          key={event.id} 
+          position={[event.latitude, event.longitude]} 
+          icon={createEventIcon(event.title)}
+          eventHandlers={{
+            click: () => navigate(`/eventDetails/${event.id}`)
+          }}
+        >
+        </Marker>
+      ))}
+    </MapContainer>
     </div>
   );
 };
