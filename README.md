@@ -70,6 +70,45 @@
 
 >For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
+SharedGO/
+├── .github/
+│   ├── ISSUE_TEMPLATE/           # Custom issue reporting forms
+│   ├── PULL_REQUEST_TEMPLATE/    # PR checklists and guidelines
+│   └── workflows/                # CI/CD automation files (GitHub Actions)
+├── Backend/                      # Node.js/Express server logic
+│   ├── prisma/                   # Database schema and migrations
+│   ├── src/
+│   │   ├── generated/            # Auto-generated types/files
+│   │   ├── middleware/           # Auth and request validation
+│   │   ├── routes/               # API endpoints
+│   │   ├── socket/               # Real-time communication (Socket.io)
+│   │   ├── types/                # express session
+│   │   ├── index.ts              # Server entry point
+│   │   ├── seed.ts               # Database seeding script
+│   │   └── session.ts            # Session management
+│   ├── tests/                    # Backend unit tests
+│   ├── Dockerfile                # Containerization config
+│   ├── API_README.md             # Documentation for API endpoints
+│   └── DEVELOPER_README.md       # Setup guide for backend devs
+├── Frontend/                     # React/Vite web application
+│   ├── public/                   # Static assets
+│   ├── src/
+│   │   ├── assets/               # Icons
+│   │   ├── components/           # Reusable UI components
+│   │   ├── pages/                # View/Screen components
+│   │   ├── App.tsx               # Main application component
+│   │   └── main.tsx              # React entry point
+│   ├── vite.config.ts            # Vite build configuration
+│   └── README.md                 # Frontend-specific documentation
+└── Docs/                         # Project management & design
+    ├── Architecture/             # System diagrams and logic flow
+    ├── database/                 # DB diagrams
+    ├── design/                   # Figma designs
+    ├── Minutes/                  # Client and team meeting notes
+    ├── Presentations/            # Slide materials
+    ├── AI Tools.md               # Log of AI usage in development
+    └── testing_day_survey.pdf    # User testing feedback & results
+
 ## TechStack
 ### MVP Architecture
 
