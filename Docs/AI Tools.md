@@ -14,14 +14,20 @@
 All uses of AI have been thoroughly checked by the programmers to avoid any errors.
 
 **Examples of Prompt we input:**
+**Jeff:**
 - System Design: "Provide a general requirement analysis and a recommended tech stack for designing a real-time map system."
 
 - Why my code in /search endpoint not work as I expected, what function of an array have that i can use to filter the object inside
 
 - the endpoint need ... as input and will output ..., base on what i said, help me improve the API_readme
 
+**Thibault:**
+- Debugging: "I have come across this error ... can you pin-point the problem?"
+
+- CSS Styling: "Provide a rough template for a .css container/input-form"
+
 
 **Quality Assurance:**
-- Manual validation: Every word proposed by AI underwent a mandatory manuak review by a programmer
+- Manual validation: Every word proposed by AI underwent a mandatory manual review by a programmer
 
-- Must declare where you use AI inside team so team mate can more careful when dealing with that.
+- Must declare where you use AI inside team so team-mate can be more careful when dealing with that.
