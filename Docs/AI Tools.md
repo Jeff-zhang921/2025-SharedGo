@@ -21,6 +21,13 @@ All uses of AI have been thoroughly checked by the programmers to avoid any erro
 - the endpoint need ... as input and will output ..., base on what i said, help me improve the API_readme
 
 
+**Oliver**
+- Debugging: "Its giving me this error... Can you suggest how to fix it?"
+
+- Coding: "How can I make this button look a certain way?"
+
+- General advice: "What is the best Map API I could use for this project"
+
 **Quality Assurance:**
 - Manual validation: Every word proposed by AI underwent a mandatory manuak review by a programmer
 
