@@ -15,14 +15,13 @@
       "portMappings": [
         {
           "containerPort": 3000,
-          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
       "secrets": [
         {
             "name": "DATABASE_URL",
-            "valueFrom": "arn:aws:ssm:eu-north-1:123456789012:parameter/database_url"
+            "valueFrom": "arn:aws:secretsmanager:eu-north-1:588738568626:secret:database-url-rb618K:DATABASE_URL::"
         }
       ],
       "logConfiguration": {
@@ -30,7 +29,8 @@
         "options": {
           "awslogs-group": "/ecs/sharedgo",
           "awslogs-region": "eu-north-1",
-          "awslogs-stream-prefix": "ecs"
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
         }
       }
     }
