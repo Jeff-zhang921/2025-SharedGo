@@ -79,6 +79,9 @@
 
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
 
+### Architecture diagram
+![Architecture](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/Architecture2.0.jpg)
+
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
 
