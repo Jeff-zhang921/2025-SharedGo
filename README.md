@@ -80,10 +80,11 @@
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
 
 ### Architecture diagram
-![Architecture](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/Architecture2.0.jpg)
+![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.jpg)
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
+![chat system](https://www.figma.com/board/vaHsRx0KFEjaxIuOOEOMLQ/Chat-Workflow--REST---Socket.IO-?node-id=0-1)
 
 ## Flow Steps
 * #### Indivisual user
