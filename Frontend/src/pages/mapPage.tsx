@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface User {
   id: number;
@@ -17,6 +20,8 @@ interface EventData {
   startsAt: string;
   capacity: number | null;
   location: string;
+  latitude: number;
+  longitude: number;
   imageUrl: string | null;
   externalUrl: string | null;
   host: User; //Whomever hosted the event
@@ -34,22 +39,7 @@ interface EventData {
 
 const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
-
-  //Hardcoded event positions for now, will change later
-  const positionLookup: { [key: number]: { top: string; left: string } } = {
-    1: { top: "40%", left: "60%" },
-    2: { top: "20%", left: "10%" },
-    3: { top: "80%", left: "75%" },
-    4: { top: "50%", left: "80%" },
-    5: { top: "50%", left: "33%" },
-    6: { top: "60%", left: "40%" },
-    7: { top: "10%", left: "60%" },
-    8: { top: "20%", left: "90%" },
-    9: { top: "44%", left: "32%" },
-    10: { top: "22%", left: "76%" },
-    11: { top: "10%", left: "33%" },
-    12: { top: "20%", left: "40%" }
-  };
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Fetch events from backend
@@ -62,73 +52,87 @@ const MapPage = () => {
         console.error("Failed to fetch events:", err);
       }
     };
-
     fetchEvents();
   }, []);
+
+  // Circle Icons
+  const createEventIcon = (title: string) => {
+    return new L.DivIcon({
+      className: 'custom-div-icon',
+      html: `<div class="event-circle-marker"><span>${title}</span></div>`, //Inserts title of event into marker
+      iconSize: [100, 100],
+      iconAnchor: [50, 50], //Centre circle exactly on top of coordinates
+    });
+  };
+
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: (e) => {
+        const { lat, lng } = e.latlng;
+        console.log(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
+        //Functionality to save coordinates from clicking the map
+      },
+    });
+    return null;
+  }
 
   const ICON_DIAMETER = 100; // Diameter of the circle in pixels
   const FONT_SIZE = '16px';
 
   return (
     <div className="map-container">
-      {/*HOME BUTTON*/}
-      <div 
-        style={{
-          position: "absolute",
-          top: "20px",        // Positioning 
-          left: "20px",
-          zIndex: 10          // layer above the map and icons
-        }}
-      >
-        <Button
-          link="/home"                // Link to the home page
-          imgSrc="/src/assets/home.svg"       // Path to home icon
-          text="Home"
-          size={60}                       // Adjust size in pixels
-        />
-      </div>
+      <div className="ui-overlay">
+        {/*HOME BUTTON*/}
+        <div className="home-btn"
+          style={{
+            position: "absolute",
+            top: "20px",        // Positioning 
+            left: "20px",
+            zIndex: 10          // layer above the map and icons
+          }}
+        >
+          <Button
+            link="/home"                // Link to the home page
+            imgSrc="/src/assets/home.svg"       // Path to home icon
+            text="Home"
+            size={60}                       // Adjust size in pixels
+          />
+        </div>
 
-      <Link to="/createEvent" className='create-event'>Create Event</Link>
+        <Link to="/createEvent" className='create-event'>Create Event</Link>
 
-      <div className='profile-page'>
-        <Link to="/profile">
-          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
-        </Link>
-      </div>
-
-
-      {dbEvents.map((event) => {
-        // Find the coordinates for this specific DB ID
-        // If the ID isn't in our lookup, give it a default middle position
-        const pos = positionLookup[event.id] || { top: "50%", left: "50%" };
-
-        return (
-          <Link
-            key={event.id}
-            to={`/eventDetails/${event.id}`} //Uses event id from the database
-            style={{
-              position: "absolute",
-              top: pos.top,
-              left: pos.left,
-              cursor: "pointer",
-              textDecoration: 'none', //remove blue underline
-              transform: `translate(-50%, -100%)`, //Make sure centre of the image aligns with pins location 
-              width: ICON_DIAMETER,
-              height: ICON_DIAMETER,
-              borderRadius: '50%',
-              backgroundColor: 'white', //colour of circle event icons 
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)', //Event icons look less 'flat'
-              display: 'flex', //Flexbox to centre text inside circle 
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ color: 'black', fontSize: FONT_SIZE, textAlign: 'center' }}>
-              {event.title} {/*Displays title from prisma*/}
-            </span>
+        <div className='profile-page'>
+          <Link to="/profile">
+            <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
           </Link>
-        );
-      })}
+        </div>
+      </div>
+
+      <MapContainer
+        center={[51.5, -2.6]} //Centre of bristol
+        zoom={13}
+        zoomControl={false} //Users can still zoom in and out using trackpad
+        style={{ height: "100vh", width: "100vw" }} //Takes up whole page
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
+          attribution='&copy; OpenStreetMap contributors'
+        />
+
+        <MapClickHandler />
+
+      {dbEvents.map((event) => (
+        <Marker 
+          key={event.id} 
+          position={[event.latitude, event.longitude]} 
+          icon={createEventIcon(event.title)}
+          eventHandlers={{
+            click: () => navigate(`/eventDetails/${event.id}`)
+          }}
+        >
+        </Marker>
+      ))}
+    </MapContainer>
     </div>
   );
 };

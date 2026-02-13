@@ -1,21 +1,71 @@
 .map-container {
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: relative;
+    overflow: hidden;
     width: 100vw;
     height: 100dvh;
-    background-image: url('/public/bristolMap.png');
-    background-size: cover;       /* fills screen */
-    background-position: centre;  /* centers the map */
-    background-repeat: no-repeat;
-    
-  }
-
-  body, html {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* prevents scrolling completely */
   }
+
+  .leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+    z-index: 1; /* Map below everything else */
+  }
+
+  /* Display buttons above map */
+  .ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Stops overlay blocking clicks */
+    z-index: 1000; /* Stays above map */
+  }
+
+/* Allow clicks for buttons */
+.ui-overlay a, 
+.ui-overlay button, 
+.home-btn,
+.profile-page,
+.create-event {
+  pointer-events: auto;
+}
+
+.event-circle-marker {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.event-circle-marker:hover {
+  transform: scale(1.05);
+  background-color: #f0f0f0;
+}
+
+.event-circle-marker span {
+  font-size: 13px;
+  font-weight: 800;
+  color: black;
+  line-height: 1.2;
+  /* ... if it's too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .create-event {
   position: fixed;
