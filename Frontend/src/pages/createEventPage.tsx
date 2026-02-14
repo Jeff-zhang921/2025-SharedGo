@@ -47,9 +47,16 @@ const CreateEventPage = () => {
   const [loading, setLoading] = useState(false);
 
   // handle changes on input
-  const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+  const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>) => {
     const {name, value} = event.target;
+    if (name === "capacity" || name === "latitude" || name === "longitude") {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value === "" ? "" : Number(value),
+      }));
+    } else {
     setForm((previous) => ({...previous, [name]:value}));
+    }
   };
 
   const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
@@ -66,13 +73,11 @@ const CreateEventPage = () => {
         credentials: "include",
         body: JSON.stringify({
           ...form,
-          hostId: 1, // place-holder of Host Id
-          hostEmail: "host@sharego.dev", // place-holder for Host email
-          capacity: form.capacity === "" ? null:Number(form.capacity),
-          latitude: 1,
-          longitude: 2,
+          capacity: form.capacity === "" ? null:form.capacity,
+          latitude: form.latitude === "" ? null : form.latitude,
+          longitude: form.longitude === "" ? null : form.longitude,
           description: form.description || null,
-          category: form.category || undefined,
+          category: form.category || null,
           imageUrl: form.imageUrl || null,
           externalUrl: form.externalUrl || null,
         }),
@@ -118,7 +123,20 @@ const CreateEventPage = () => {
 
         <label>
           <span>CATEGORY</span>
-          <input name="category" placeholder="None" onChange={onChange}/>
+          <select name="category" value={form.category} onChange={onChange}>
+            <option value="">Select Category</option>
+            <option value="Physical_Activities">Physical Activities</option>
+            <option value="Festivals">Festivals</option>
+            <option value="Educational">Educational</option>
+            <option value="Networking">Networking</option>
+            <option value="Arts_Culture">Arts & Culture</option>
+            <option value="Food_Drink">Food & Drink</option>
+            <option value="Music_Concerts">Music & Concerts</option>
+            <option value="Tech_Gaming">Tech & Gaming</option>
+            <option value="Wellness_Meditation">Wellness & Meditation</option>
+            <option value="Volunteer_Charity">Volunteer & Charity</option>
+            <option value="Other">Other</option>
+          </select>
         </label>
 
         <label>
@@ -127,12 +145,22 @@ const CreateEventPage = () => {
         </label>
 
         <label>
+          <span>LATITUDE</span>
+          <input name="latitude" type="number" step="any" placeholder="e.g. 51.4561" value={form.latitude} onChange={onChange} required/>
+        </label>
+
+        <label>
+          <span>LONGITUDE</span>
+          <input name="longitude" type="number" step="any" placeholder="e.g. 2.6031" value={form.longitude} onChange={onChange} required/>
+        </label>
+
+        <label>
           <span>Description</span>
           <textarea name="description" placeholder="No description provided" onChange={onChange}/>
         </label>
       </section>
       
-      <button className="publish-btn" type="submit"> Publish</button>
+      <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
     </form>
   );
 };

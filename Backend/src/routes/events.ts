@@ -32,12 +32,23 @@ export const Categories = Object.values(Category);
 router.post("/create", requireSession, async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
-//if anything is undefine in josn input, it will throw 
+  //if anything is undefine in json input, it will throw 
+
+  const user = req.session?.user;
+
+  // Ensure user is authenticated
+  if (!user) {
+    res.status(401).json({message: "Unauthorised"});
+    return;
+  }
+
+  const hostId = user.id;
+  const hostEmail = user.email;
 
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
-  const hostEmailRaw = req.body?.hostEmail;
+  //const hostEmailRaw = req.body?.hostEmail;
   const descriptionRaw = req.body?.description;
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
@@ -51,7 +62,7 @@ router.post("/create", requireSession, async (req, res) => {
   const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
   const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
   const location = typeof locationRaw === "string" ? locationRaw.trim() : "";
-  const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
+  //const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
   const description = typeof descriptionRaw === "string" && descriptionRaw.trim() !== ""
     ? descriptionRaw.trim()
     : null;
@@ -94,10 +105,10 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
-  if (!hostEmail) {
+  /*if (!hostEmail) {
     res.status(400).json({ message: "Host email is required to publish an event." });
     return;
-  }
+  }*/
 
   if (latitude === null || longitude === null) {
     res.status(400).json({ message: "Latitude and longitude are required." });
@@ -120,11 +131,11 @@ router.post("/create", requireSession, async (req, res) => {
 
  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
-  const host = await prisma.user.upsert({
+  /*const host = await prisma.user.upsert({
     where: { email: hostEmail },
     update: {},
     create: { email: hostEmail },
-  });
+  });*/
 
 
 // Create the event row in the database and also include related data in the result.
@@ -141,7 +152,7 @@ router.post("/create", requireSession, async (req, res) => {
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
-      hostId: host.id,
+      hostId,
     },
 
     include: {
