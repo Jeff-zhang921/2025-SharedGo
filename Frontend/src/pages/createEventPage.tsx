@@ -8,13 +8,13 @@ type EventForm = {
   description?: string;
   startsAt: string;
   location: string;
-  hostEmail?: string;
+  hostEmail: string;
+  capacity?: number | "";
+  category: string;
+  latitude: number;
+  longitude: number;
   imageUrl?: string;
   externalUrl?: string;
-  capacity?: number | "";
-  category?: string;
-  latitude?: number | "";
-  longitude?: number | "";
   attendees?: Array<{ //Attendees section as backend also included this (maybe implement into page later)
     id?: number;
     name?: string | null;
@@ -37,8 +37,8 @@ const CreateEventPage = () => {
     externalUrl: "",
     capacity: "",
     category: "",
-    latitude: "",
-    longitude: "",
+    latitude: 0,
+    longitude: 0,
     //Attendees section as backend also included this (maybe implement into page later)
     attendees: [],
     attendeeCount: 0,
@@ -74,10 +74,10 @@ const CreateEventPage = () => {
         body: JSON.stringify({
           ...form,
           capacity: form.capacity === "" ? null:form.capacity,
-          latitude: form.latitude === "" ? null : form.latitude,
-          longitude: form.longitude === "" ? null : form.longitude,
+          latitude: form.latitude,
+          longitude: form.longitude,
           description: form.description || null,
-          category: form.category || null,
+          category: form.category,
           imageUrl: form.imageUrl || null,
           externalUrl: form.externalUrl || null,
         }),
