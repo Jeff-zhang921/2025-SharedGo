@@ -100,26 +100,27 @@ const CreateEventPage = () => {
   };
 
   return (
-    <form className="event-form" onSubmit={onSubmit}>
-      <header className="form-header">
-        <h1>Create Event</h1>
-      </header>
+    <div className="create-event-container">
+      <form className="event-form" onSubmit={onSubmit}>
+        <header className="form-header">
+          <h1>Create Event</h1>
+        </header>
 
-      <section className="form-section">
-        <label>
-          <span>TITLE</span>
-          <input name="title" placeholder="Title" onChange={onChange} required/>
-        </label>
+        <section className="form-section">
+          <label>
+            <span>TITLE</span>
+            <input name="title" placeholder="Title" onChange={onChange} required/>
+          </label>
 
-        <label>
-          <span>DATE</span>
-          <input name="startsAt" type="datetime-local" onChange={onChange} required/>
-        </label>
-      
-        <label>
-          <span>CAPACITY</span>
-          <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
-        </label>
+          <label>
+            <span>DATE</span>
+            <input name="startsAt" type="datetime-local" onChange={onChange} required/>
+          </label>
+        
+          <label>
+            <span>CAPACITY</span>
+            <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
+          </label>
 
         <label>
           <span>CATEGORY</span>
@@ -139,10 +140,10 @@ const CreateEventPage = () => {
           </select>
         </label>
 
-        <label>
-          <span>LOCATION</span>
-          <input name="location" placeholder="Add location" onChange={onChange} required/>
-        </label>
+          <label>
+            <span>LOCATION</span>
+            <input name="location" placeholder="Add location" onChange={onChange} required/>
+          </label>
 
         <label>
           <span>LATITUDE</span>
@@ -162,6 +163,7 @@ const CreateEventPage = () => {
       
       <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
     </form>
+    </div>
   );
 };
 
