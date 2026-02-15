@@ -84,7 +84,9 @@
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
-![chat system](https://www.figma.com/board/vaHsRx0KFEjaxIuOOEOMLQ/Chat-Workflow--REST---Socket.IO-?node-id=0-1)
+
+## Chat logic workflow
+![chat system]()
 
 ## Flow Steps
 * #### Indivisual user
