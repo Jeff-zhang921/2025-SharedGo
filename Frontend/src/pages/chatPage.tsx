@@ -13,6 +13,15 @@ type ChatMessage={
 }
 const Backend_URL="http://localhost:3000";
 
+//TIMELINE:
+//0ms	React reads useState(remember in memory).	Blank screen.
+//10ms	React hits the Bottom Return.	"Not connected" (The empty shell).
+//20ms	React looks back at useEffect.	[]
+//30ms	connectSocket() runs.	"Not connected".
+//100ms	Socket connects! setStatus("connected") is called.	"connected" (The screen updates).
+//when you call setMessage,setStatus... it will rerender, rerun useEffect but if manager found it run before, and nothing change in [] so it won't run it
+
+
 const ChatPage = () => {
   const location=useLocation()
   //bring extra info the previous page tried to send.
@@ -61,15 +70,63 @@ const loadMessages=async(id:number)=>{
   
 //connect to socket
 const connectSocket=()=>{
+  //check if already connect
  if (socketRef.current)return
  const socket=io(Backend_URL,{withCredentials:true})
+
  socket.on("connect",()=>{
   setStatus("connected")
   if(threadId){
+    //tells the server put the user in the thread romm
     socket.emit("thread:join", { threadId });
   }
  })
-}
+
+  socket.on("connect_error", () => {
+      setStatus("Socket connection error.");
+    });
+
+  socket.on("chat:error", (msg: string) => {
+      setStatus(msg || "Chat error.");
+    });
+//socket.on is the listener
+  socket.on("message:new", (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+  }
+
+
+
+    useEffect(()=>{
+      loadMe();
+     connectSocket();
+     //when the user clicks a link to go to a different page
+     return ()=>{
+   if (socketRef.current){
+    socketRef.current.disconnect()
+    socketRef.current=null
+   }
+  }
+//the rules say []. This means 'Only run the code inside if the stuff in these brackets has changed since the last time I was here.'"
+//The Reality: "Since there is nothing in the brackets, nothing could have changed. I'm not even going to open this door. Skip it!"
+    },[]);
+
+    useEffect(()=>{
+    if(!threadId||!socketRef.current) return
+    socketRef.current.emit("thread:join",{threadId})
+    loadMessages(threadId)
+  },[threadId ])
+
+ useEffect(()=>{
+  //If the box is still empty (because the screen hasn't finished drawing), stop here
+  if(!messageListRef.current)return 
+  messageListRef.current.scrollTo({
+    top:messageListRef.current.scrollHeight,
+    behavior:"smooth"
+  })
+ },[message])
+
+
 
   return (
     <div>
@@ -77,5 +134,6 @@ const connectSocket=()=>{
     </div>
   );
 };
+
 
 export default ChatPage;
