@@ -1,5 +1,5 @@
 //this is the backend logic
-import { Router } from "express"; 
+import { Router, Request, Response } from "express"; 
 import { PrismaClient, Category } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
