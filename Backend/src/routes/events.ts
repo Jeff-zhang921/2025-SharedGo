@@ -7,10 +7,16 @@ const router = Router();
 const prisma = new PrismaClient(); 
 
 //parse coodinate make sure that coodinate is number
-const parseCoordinate = (raw: unknown): number | null => {
+const parseCoordinate = (raw: unknown, type: 'lat' | 'lon'): number | null => {
   if (raw === undefined || raw === null || raw === "") return null;
   const parsed = typeof raw === "number" ? raw : Number(raw);
-  return Number.isFinite(parsed) ? parsed : null;
+  if( !Number.isFinite(parsed)) return null;
+
+  //added boundary check to make sure the coordinate is valid
+  if (type === 'lat' &&(parsed < -90 || parsed > 90)) return null;
+  if (type === 'lon' &&(parsed < -180 || parsed > 180)) return null;
+  
+  return parsed;
 };
 
 // Haversine formula to calculate distance between two lat/lon points
@@ -67,8 +73,6 @@ router.post("/create", requireSession, async (req, res) => {
   const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
     ? (categoryRaw as Category)
     : Category.Other;
-  const latitude = parseCoordinate(latitudeRaw);
-  const longitude = parseCoordinate(longitudeRaw);
 
   
  // Basic required-field validation. If invalid, return 400 and stop.
@@ -99,8 +103,15 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
-  if (latitude === null || longitude === null) {
+  if (latitudeRaw === undefined || longitudeRaw === undefined) {
     res.status(400).json({ message: "Latitude and longitude are required." });
+    return;
+  }
+  const latitude = parseCoordinate(latitudeRaw, 'lat');
+  const longitude = parseCoordinate(longitudeRaw, 'lon');
+
+  if (latitude === null || longitude === null) {
+    res.status(400).json({ message: "Invalid latitude or longitude values." });
     return;
   }
 
@@ -187,10 +198,10 @@ router.post("/create", requireSession, async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const queryLatitude = parseCoordinate(
-      typeof req.query.latitude === "string" ? req.query.latitude : undefined,
+      typeof req.query.latitude === "string" ? req.query.latitude : undefined, 'lat'
     );
     const queryLongitude = parseCoordinate(
-      typeof req.query.longitude === "string" ? req.query.longitude : undefined,
+      typeof req.query.longitude === "string" ? req.query.longitude : undefined, 'lon'
     );
     //bool
     const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
@@ -701,8 +712,8 @@ router.patch("/:id", requireSession, async (req, res) => {
       res.status(400).json({ message: "Latitude and longitude must be provided together." });
       return;
     }
-    const parsedLatitude = parseCoordinate(latitudeRaw);
-    const parsedLongitude = parseCoordinate(longitudeRaw);
+    const parsedLatitude = parseCoordinate(latitudeRaw, 'lat');
+    const parsedLongitude = parseCoordinate(longitudeRaw, 'lon');
     if (parsedLatitude === null || parsedLongitude === null) {
       res.status(400).json({ message: "Latitude and longitude must be valid numbers." });
       return;
