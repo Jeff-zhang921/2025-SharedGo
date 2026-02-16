@@ -32,7 +32,7 @@ export const Categories = Object.values(Category);
 router.post("/create", requireSession, async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
-//if anything is undefine in josn input, it will throw 
+  //if anything is undefine in json input, it will throw 
 
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
@@ -113,12 +113,12 @@ router.post("/create", requireSession, async (req, res) => {
       res.status(400).json({ message: "Capacity must be a positive number." });
       return;
     }
-//math.floor round down number
+  //math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
 
 
- // Ensure the host user exists by email.
+  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
     where: { email: hostEmail },
