@@ -10,6 +10,8 @@
 <a href="https://aws.amazon.com"><img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white"/>
 <img src="https://img.shields.io/badge/Leaflet-010101?style=for-the-badge&logo=leaflet&logoColor=white"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+
 
 
 ## Contents
@@ -119,15 +121,18 @@ SharedGO/
 ```
 
 ## TechStack
-### MVP Architecture
+<!-- ### MVP Architecture
 
-![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
+![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
 
 ### Architecture diagram
-![Architecture](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/Architecture2.0.jpg)
+![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.jpg)
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
+
+## Chat logic workflow
+![chat system]()
 
 ## Flow Steps
 * #### Indivisual user

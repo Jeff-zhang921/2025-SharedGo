@@ -45,6 +45,10 @@ router.post("/threads",async (req:Request,res:Response)=>{
 })
 
 
+
+
+
+
 router.get("/threads",async (req:Request,res:Response)=>{
     const userId=req.session.user?.id
     
@@ -57,7 +61,20 @@ router.get("/threads",async (req:Request,res:Response)=>{
             OR:[
                 {hostId:userId},
                 {guestId:userId}]
-        }
+        },
+        include:{
+    host:{select:{id:true,name:true,email:true}},
+    guest:{select:{id:true,name:true,email:true}},
+    //get one msg for display
+    Messages:{
+                take:1,
+                orderBy:{createdAt:"desc"},
+                select:{id:true,body:true,createdAt:true,senderId:true}
+            }
+        },
+        orderBy:[{lastMessageAt:"desc"},
+        {updatedAt:"desc"}
+        ]
     })
     res.json(threads)
 }

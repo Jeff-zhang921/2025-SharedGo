@@ -1,3 +1,14 @@
+//he order of the live chat is 
+//user a login with restful api, it set the session
+//user b do the same thing
+//user a create or get a chat thread by restful api with hostid:a guestid:b
+//usdr a and b endup with the same threadId
+//user emit thread:join in socket with thread id
+//That means both sockets are now in the same Socket.IO room: thread:<id>.
+//user a send a msg with msg:send in socket
+//msg will save to db and brodcast to every socket in the room
+//frontend will listen to the msg and update the ui with the msg
+
 import type { Server as HttpServer } from "http";
 import { Server } from "socket.io";
 import { sessionMiddleware } from "../session";
@@ -9,7 +20,8 @@ export function initSocket(server: HttpServer) {
 //If a visitor arrives via HTTP: The "Big Server" sends them to the Express office.
 //If a visitor arrives via WebSocket: The "Big Server" sends them to the Socket.io offce.
 //They share the same IP address, the same Port, and—most importantly—the same Security (CORS) and Identity (Cookies/Sessions).
-
+//io is the single Socket.IO server instance in your backend(everyone share only one)
+//socket is one client connection. user a, b, c has different socket 
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
@@ -24,7 +36,7 @@ export function initSocket(server: HttpServer) {
     //{}is i do not expect you to send back any response to user or browser.
     (sessionMiddleware as any)(socket.request, {}, next);
   });
-
+//io.use always take in socket and a next function
   io.use((socket, next) => {
     const session = (socket.request as any).session;
     const user = session?.user;
