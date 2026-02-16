@@ -10,7 +10,11 @@ interface User {
   name: string | null;
   email: string
 }
-
+/*  capacity?: number | "";
+  category?: string;
+  latitude?: number | "";
+  longitude?: number | "";
+};*/
 //Fields for the expected event data from the backend
 interface EventData {
   id: number;
@@ -18,6 +22,9 @@ interface EventData {
   description: string | null; //Null as doesn't have to be filled in
   startsAt: string;
   capacity: number | null;
+  category: string;
+  latitude: number;
+  longitude: number;
   location: string;
   imageUrl: string | null;
   externalUrl: string | null;
@@ -93,14 +100,15 @@ const EventDetailsPage = () => {
       <div className="navigation-buttons">
         {/*back button links to map page, using react-router-dom*/}
         <Button link="/map" imgSrc="/src/assets/back.svg" text="back" size={60} className="btn-nav"/>
-        {/*home button links to home page, using react-router-dom*/}
-        <Button link="/" imgSrc="/src/assets/home.svg" text="home" size={60} className="btn-nav"/>
-      </div>
 
-      {/*Page Title*/}
-      <section className="event-details">
+        {/*Page Title*/}
         <h1 className="event-title">Event details</h1>
 
+        {/*home button links to home page, using react-router-dom*/}
+        <Button link="/home" imgSrc="/src/assets/home.svg" text="home" size={60} className="btn-nav"/>
+      </div>
+
+      <section className="event-details">
         {/*all event detail listed as shown in the design*/}
         <div className="event-info">
           <div className="event-info-row">
@@ -116,31 +124,48 @@ const EventDetailsPage = () => {
             <h3>CAPACITY:</h3>
             <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
           </div>
+
+           <div className="event-info-row">
+            <h3>CATEGORY</h3>
+            <p>{event.category ?? "Other"}</p>
+          </div>
+
           <div className="event-info-row">
             <h3>LOCATION:</h3>
             <p>{event.location}</p>
           </div>
+
           <div className="event-info-row">
             <h3>DESCRIPTION:</h3>
-            <div className="event-description">
+            
+          </div>
+          <div className="event-description">
               <p>{event.description || "No description provided"}</p>
-            </div>
           </div>
         </div>
 
+        
+        <div className='btn-host'>
+          {/*Links to /host:id eg. localhost:5173/host:1 which is a page that does not currently exist!*/}
+          <Link to={`/host:${event.host.id}`}>
+            <img src="/src/assets/user-icon.png" alt="Host Details" className="profile-img" />
+          </Link>
+          <p className="host-details">Host Details</p>
+          
           <div className="host-info">
-          <h3>HOSTED BY:</h3>
-          <div className="host-details">
-            <div className="host-text">
-              <p><strong>{event.host.name}</strong></p>
-              <p>{event.host.email}</p>
+            <h3>HOSTED BY:</h3>
+            <div className="host-details">
+              <div className="host-text">
+                <p><strong>{event.host.name}</strong></p>
+                <p>{event.host.email}</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="action-buttons">
-          {/*Join button links to chat page, as described in the design*/}
-          <Link to="/chat" className="btn-join">Join Event</Link>
-          <Link to="/host" className="btn-host">Host Details</Link>
+        
+          <div className="action-buttons">
+            {/*Join button links to chat page, as described in the design*/}
+            <Link to="/chat" className="btn-join">Join Event</Link>
+          </div>
         </div>
       </section>
 
