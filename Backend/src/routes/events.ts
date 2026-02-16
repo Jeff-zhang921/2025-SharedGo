@@ -34,7 +34,7 @@ router.post("/create", requireSession, async (req, res) => {
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
   //if anything is undefine in json input, it will throw 
 
-  const user = req.session?.user;
+  /*const user = req.session?.user;
 
   // Ensure user is authenticated
   if (!user) {
@@ -43,10 +43,11 @@ router.post("/create", requireSession, async (req, res) => {
   }
 
   const hostId = user.id;
-  const hostEmail = user.email;
+  const hostEmail = user.email;*/
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
+  const hostEmailRaw = req.body?.hostEmail;
   const descriptionRaw = req.body?.description;
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
@@ -60,6 +61,7 @@ router.post("/create", requireSession, async (req, res) => {
   const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
   const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
   const location = typeof locationRaw === "string" ? locationRaw.trim() : "";
+  const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
   const description = typeof descriptionRaw === "string" && descriptionRaw.trim() !== ""
     ? descriptionRaw.trim()
     : null;
@@ -112,13 +114,6 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
-  // Ensure the host user exists by email.
-  // upsert: if a user with that email exists -> return it; else create it.
-  const host = await prisma.user.upsert({
-    where: { email: hostEmail },
-    update: {},
-    create: { email: hostEmail },
-  });
 
  // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
@@ -132,6 +127,15 @@ router.post("/create", requireSession, async (req, res) => {
 //math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
+
+
+  // Ensure the host user exists by email.
+  // upsert: if a user with that email exists -> return it; else create it.
+  const host = await prisma.user.upsert({
+    where: { email: hostEmail },
+    update: {},
+    create: { email: hostEmail },
+  });
 
 
 // Create the event row in the database and also include related data in the result.
