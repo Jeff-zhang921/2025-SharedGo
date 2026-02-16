@@ -48,7 +48,6 @@ router.post("/create", requireSession, async (req, res) => {
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
-  //const hostEmailRaw = req.body?.hostEmail;
   const descriptionRaw = req.body?.description;
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
@@ -62,7 +61,6 @@ router.post("/create", requireSession, async (req, res) => {
   const title = typeof titleRaw === "string" ? titleRaw.trim() : "";
   const startsAtInput = typeof startsAtRaw === "string" ? startsAtRaw : "";
   const location = typeof locationRaw === "string" ? locationRaw.trim() : "";
-  //const hostEmail = typeof hostEmailRaw === "string" ? hostEmailRaw.trim() : "";
   const description = typeof descriptionRaw === "string" && descriptionRaw.trim() !== ""
     ? descriptionRaw.trim()
     : null;
@@ -105,11 +103,6 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
-  /*if (!hostEmail) {
-    res.status(400).json({ message: "Host email is required to publish an event." });
-    return;
-  }*/
-
   if (latitude === null || longitude === null) {
     res.status(400).json({ message: "Latitude and longitude are required." });
     return;
@@ -127,15 +120,6 @@ router.post("/create", requireSession, async (req, res) => {
 //math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
-
-
- // Ensure the host user exists by email.
-  // upsert: if a user with that email exists -> return it; else create it.
-  /*const host = await prisma.user.upsert({
-    where: { email: hostEmail },
-    update: {},
-    create: { email: hostEmail },
-  });*/
 
 
 // Create the event row in the database and also include related data in the result.
