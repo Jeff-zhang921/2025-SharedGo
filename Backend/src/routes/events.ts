@@ -34,16 +34,6 @@ router.post("/create", requireSession, async (req, res) => {
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
   //if anything is undefine in json input, it will throw 
 
-  /*const user = req.session?.user;
-
-  // Ensure user is authenticated
-  if (!user) {
-    res.status(401).json({message: "Unauthorised"});
-    return;
-  }
-
-  const hostId = user.id;
-  const hostEmail = user.email;*/
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
@@ -114,7 +104,6 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
-
  // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
   if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
@@ -124,7 +113,7 @@ router.post("/create", requireSession, async (req, res) => {
       res.status(400).json({ message: "Capacity must be a positive number." });
       return;
     }
-//math.floor round down number
+  //math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
 
