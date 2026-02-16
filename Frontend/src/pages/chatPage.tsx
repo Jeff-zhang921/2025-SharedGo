@@ -33,10 +33,13 @@ const ChatPage = () => {
   const[hostId,setHostId]=useState("")
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
+
+  //<> is the generic: this box is empty right now (null), but eventually, it is going to hold an object with an id, an email, and a name. Please get the memory ready for that
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
   const autoThreadRef=useRef(false)
 //useEffect: After you finish drawing the screen, run this specific piece of code.
 
+const [messageBody,setMessageBody]=useState("")
 const loadMe=async()=>{
   try{
     const res=await fetch(`${Backend_URL}/auth/me`,{
@@ -176,10 +179,37 @@ useEffect(()=>{
     autoThreadRef.current=true
     setHostId(String(state.hostId))
     createThreadForHostId(state.hostId)
-
   }
 },[location.state])
 
+const handleSendMessage=()=>{
+  //socketRef is the container for socket
+  if(!socketRef.current){
+    setStatus("socket Not conencted")
+    return
+  }
+  if (!threadId){
+    setStatus("create or join a thread first")
+    return
+  }
+  const trimmed=messageBody.trim()
+  if (!trimmed){
+    setStatus("mesage cannot be empty")
+    return
+  }
+  socketRef.current.emit("message:send",{
+    threadId,body:trimmed
+  })
+  //The message is gone; now make the paper blank again
+  setMessageBody("")
+}
+//useMemo is the remember for react
+//useMemo is for the UI: It remembers a value so that React can use it to draw the screen faster. It is used for "derived data" (data created from other data).
+const headerTitle=useMemo(()=>{
+  if(threadId)return `thread#${threadId}`
+  return "chat"
+
+}[threadId])
 
 
   return (
