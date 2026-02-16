@@ -34,6 +34,7 @@ const ChatPage = () => {
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
+  const autoThreadRef=useRef(false)
 //useEffect: After you finish drawing the screen, run this specific piece of code.
 
 const loadMe=async()=>{
@@ -125,6 +126,59 @@ const connectSocket=()=>{
     behavior:"smooth"
   })
  },[message])
+
+
+ const createThreadForHostId=async(rawHostId:number)=>{
+  const parsed=Number(rawHostId)
+  if (!Number.isInteger(parsed)||parsed<=0){
+    setStatus("HostNumber must valid")
+    return
+  }
+  //when you call setstatus, or set... it immediately broadcast
+  try{
+    const res=await fetch(`${Backend_URL}/chat/threads`,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      credentials:"include",
+      body:JSON.stringify({hostId:parsed}),
+    })
+    const data=await res.json()
+    if(!res.ok){
+      setStatus(data.message||"fail to create thread")
+      return
+    }
+    //When you call setThreadId(data.threadId), React updates its internal memory.
+    setThreadId(data.threadId)
+    setStatus("Thread Ready")
+  }catch{
+    setStatus("Failed to create thread")
+  }
+ }
+ const handleCreateThread=async()=>{
+   const parsed=Number(hostId)
+   await createThreadForHostId(parsed)
+ }
+
+
+//i need hostId threadId from last page
+//location is the suitcase that you bring other stuff into thispage
+//the info is store in Ref so next time render it can stil remember
+useEffect(()=>{
+  const state=location.state as{hostId?:number;threadId:number}|null
+  if(!state||autoThreadRef.current)return
+  if(state.threadId){
+    autoThreadRef.current=true
+    setThreadId(state.threadId)
+    setStatus("thread ready")
+    return
+  }
+  if(state.hostId){
+    autoThreadRef.current=true
+    setHostId(String(state.hostId))
+    createThreadForHostId(state.hostId)
+
+  }
+},[location.state])
 
 
 
