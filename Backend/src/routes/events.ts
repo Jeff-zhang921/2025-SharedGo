@@ -1,5 +1,5 @@
 //this is the backend logic
-import { Router, Request, Response } from "express"; 
+import { Router } from "express"; 
 import { PrismaClient, Category } from "@prisma/client";
 import { requireSession } from "../middleware/requireSession";
 
@@ -44,7 +44,6 @@ router.post("/create", requireSession, async (req, res) => {
 
   const hostId = user.id;
   const hostEmail = user.email;
-
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
   const locationRaw = req.body?.location;
@@ -103,10 +102,23 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
+  if (!hostEmail) {
+    res.status(400).json({ message: "Host email is required to publish an event." });
+    return;
+  }
+
   if (latitude === null || longitude === null) {
     res.status(400).json({ message: "Latitude and longitude are required." });
     return;
   }
+
+  // Ensure the host user exists by email.
+  // upsert: if a user with that email exists -> return it; else create it.
+  const host = await prisma.user.upsert({
+    where: { email: hostEmail },
+    update: {},
+    create: { email: hostEmail },
+  });
 
  // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
@@ -136,7 +148,7 @@ router.post("/create", requireSession, async (req, res) => {
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
-      hostId,
+      hostId: host.id,
     },
 
     include: {
