@@ -40,6 +40,7 @@ interface EventData {
 const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
   const navigate = useNavigate()
+  const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
     // Fetch events from backend
@@ -68,8 +69,7 @@ const MapPage = () => {
   const MapClickHandler = () => {
     useMapEvents({
       click: (e) => {
-        const { lat, lng } = e.latlng;
-        console.log(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
+        setTempMarker({ lat: e.latlng.lat, lng: e.latlng.lng });
         //Functionality to save coordinates from clicking the map
       },
     });
@@ -117,11 +117,26 @@ const MapPage = () => {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
-        />
+        />w
 
         <MapClickHandler />
 
-      {dbEvents.map((event) => (
+        {tempMarker && (
+          <Popup position={[tempMarker.lat, tempMarker.lng]}>
+            <div style={{ textAlign: 'center' }}>
+              <strong>Create Event?</strong>
+              <br />
+              <button 
+                onClick={() => navigate('/createEvent', { state: { lat: tempMarker.lat, lng: tempMarker.lng } })}
+                style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}
+              >
+                Add Event Here
+              </button>
+            </div>
+          </Popup>
+        )}
+
+        {dbEvents.map((event) => (
         <Marker 
           key={event.id} 
           position={[event.latitude, event.longitude]} 
