@@ -248,5 +248,29 @@ const avatarLabel=useMemo(()=>{
           })}
         </div>
 
-
+        <div >
+          <button type="button" >
+          </button>
+          <input
+            type="text"
+            placeholder="Type your message"
+            value={messageBody}
+            onChange={(e) => setMessageBody(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
+          <button type="button" >
+          </button>
+          <button type="button" >
+            Send
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+};
 export default ChatPage;
