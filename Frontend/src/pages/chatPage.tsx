@@ -209,15 +209,44 @@ const headerTitle=useMemo(()=>{
   if(threadId)return `thread#${threadId}`
   return "chat"
 
-}[threadId])
+},[threadId])
+
+//this probably not gonna use this
+const avatarLabel=useMemo(()=>{
+  if(me?.email) return me.email.slice(0,1).toUpperCase()
+    return "C"
+},[me])
+
+
 
 
   return (
-    <div>
-      <h1>Welcome to the Chat Page!</h1>
-    </div>
-  );
-};
+    <div >
+      <main >
+        <div  ref={messageListRef}>
+          {threadId && (
+            <div>{new Date().toLocaleString()}</div>
+          )}
+          {message.length === 0 && (
+            <div >Start a conversation</div>
+          )}
+          {message.map((msg, index) => {
+            const isMe = msg.senderId === me?.id;
+
+
+            return (
+              <div
+              >
+                <div>
+                  <p>{msg.body}</p>
+                  <span >
+                    {new Date(msg.createdAt).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
 
 export default ChatPage;
