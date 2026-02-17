@@ -42,6 +42,9 @@ const ChatPage = () => {
 //useEffect: After you finish drawing the screen, run this specific piece of code.
 const [meLoaded, setMeLoaded] = useState(false);
 const [messageBody,setMessageBody]=useState("")
+
+
+
 const loadMe=async()=>{
   try{
     const res=await fetch(`${Backend_URL}/auth/me`,{
@@ -83,13 +86,22 @@ const loadMessages=async(id:number)=>{
       setStatus("Failed to load messages.");
     }
   }
+
+
+
+
   
-//connect to socket
+//connect to socket function
 const connectSocket=()=>{
   //check if already connect
  if (socketRef.current)return
+ //normal http open and close in each request
+ //io Stays open as long as you're on the page.
+ //The Verification (Sending)
  const socket=io(Backend_URL,{withCredentials:true})
 socketRef.current=socket
+//connect is a reserved keyword in socket unlike thread:id
+//when they connect it will execute the following code
  socket.on("connect",()=>{
   setStatus("Connected")
   if(threadId){
@@ -115,6 +127,7 @@ socketRef.current=socket
 
 //the rules say []. This means 'Only run the code inside if the stuff in these brackets has changed since the last time I was here.'"
 //The Reality: "Since there is nothing in the brackets, nothing could have changed. I'm not even going to open this door. Skip it!"
+//this useeffect is to connect to the socket
   useEffect(()=>{
    ( async()=>{
       const user=await loadMe()
@@ -128,12 +141,16 @@ socketRef.current=socket
   }
   },[])
 
+
+  //this useEffect is to join the chat and load
     useEffect(()=>{
     if(!threadId||!socketRef.current) return
     socketRef.current.emit("thread:join",{threadId})
     loadMessages(threadId)
   },[threadId ])
 
+
+//this is use to handle the visual scrolling and 
  useEffect(()=>{
   //If the box is still empty (because the screen hasn't finished drawing), stop here
   if(!messageListRef.current)return 
@@ -170,10 +187,10 @@ socketRef.current=socket
     setStatus("Failed to create thread")
   }
  }
- const handleCreateThread=async()=>{
-   const parsed=Number(hostId)
-   await createThreadForHostId(parsed)
- }
+//  const handleCreateThread=async()=>{
+//    const parsed=Number(hostId)
+//    await createThreadForHostId(parsed)
+//  }
 
 
 //i need hostId threadId from last page
@@ -239,13 +256,14 @@ const avatarLabel=useMemo(()=>{
     <div className='chat-shell'>
       <main className='chat-panel'>
         {/* finds the messageListRef object, and sets: messageListRef.current = [The actual HTML div element] */}
-
+        
         <div  className='chat-body' ref={messageListRef}>
 
           {/* Somewhere near the top of the chat panel */}
-<div className={`status-pill ${socketRef.current?.connected ? "online" : ""}`}>
-  {status}
-</div>
+
+           <div className={`status-pill ${socketRef.current?.connected ? "online" : ""}`}>
+               {status}
+                </div>
 
           {/* this is the checkgate, check whetjer it is 0 or null... for threadid  if check pass, render the next thing*/}
           {threadId && (
@@ -255,6 +273,7 @@ const avatarLabel=useMemo(()=>{
           {message.length === 0 && (
             <div className='chat-empty'>Start a conversation</div>
           )}
+          
           {message.map((msg, index) => {
             const isMe = msg.senderId === me?.id;
             //If True: It gives the div the class chat-row me.
@@ -265,8 +284,8 @@ const avatarLabel=useMemo(()=>{
               className={`chat-row ${isMe?"me":"them"}`}
               //{ color: "red", fontSize: "16px" }
               //{ --i: 0 } <i style="color: red;">
-              //Take the string inside these brackets and use it as the name for the key
-               style={{ ["--i" as any]: index }}
+              //using --i so each chat message is in different i
+               style={{ ["--i" as any]:index }}
               >
                  <div className={`chat-bubble ${isMe ? "bubble-me" : "bubble-them"}`}>
                   <p>{msg.body}</p>
@@ -283,8 +302,8 @@ const avatarLabel=useMemo(()=>{
 
 
         <div className='chat-input'>
-          <button type="button" className="input-icon" >
-          </button>
+          {/* <button type="button" className="input-icon" >
+          </button> */}
           <input
             type="text"
             placeholder="Type your message"
