@@ -2,7 +2,8 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import{useLocation}from"react-router-dom";
 import{io,type Socket}from "socket.io-client"
 //chatPage/css has not been commited.
-//import"./chatPage.css"
+import"./chatPage.css"
+
 
 
 type ChatMessage={
@@ -39,7 +40,7 @@ const ChatPage = () => {
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
   const autoThreadRef=useRef(false)
 //useEffect: After you finish drawing the screen, run this specific piece of code.
-
+const [meLoaded, setMeLoaded] = useState(false);
 const [messageBody,setMessageBody]=useState("")
 const loadMe=async()=>{
   try{
@@ -48,14 +49,35 @@ const loadMe=async()=>{
     })
     if(!res.ok){
       setMe(null)
-      return
+      return null
     }
     const data=await res.json();
     setMe(data.user||null)
+    return data.user||null
+
   }catch{
     setMe(null)
-  }
+    return null
+  }finally{
+  setMeLoaded(true)  
+  }  
 }
+//Async/Await: The code pauses at the await line. It waits for the server to send back the user data. Only once it has the data in its "hands" does it move to the next line to connect the socket.
+
+  useEffect(()=>{
+   ( async()=>{
+      const user=await loadMe()
+      if (user)connectSocket()
+    })()
+  return()=>{
+     if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+     }
+  }
+  },[])
+
+
 const loadMessages=async(id:number)=>{
   try{
     const res = await fetch(`${Backend_URL}/chat/threads/${id}/messages`, {
@@ -78,9 +100,9 @@ const connectSocket=()=>{
   //check if already connect
  if (socketRef.current)return
  const socket=io(Backend_URL,{withCredentials:true})
-
+socketRef.current=socket
  socket.on("connect",()=>{
-  setStatus("connected")
+  setStatus("Connected")
   if(threadId){
     //tells the server put the user in the thread romm
     socket.emit("thread:join", { threadId });
@@ -185,7 +207,7 @@ useEffect(()=>{
 
 const handleSendMessage=()=>{
   //socketRef is the container for socket
-  if(!socketRef.current){
+  if(!socketRef.current||!socketRef.current.connected){
     setStatus("socket Not conencted")
     return
   }
@@ -221,26 +243,44 @@ const avatarLabel=useMemo(()=>{
 
 
 
+
+
   return (
-    <div >
-      <main >
-        <div  ref={messageListRef}>
+    <div className='chat-shell'>
+      <main className='chat-panel'>
+        {/* finds the messageListRef object, and sets: messageListRef.current = [The actual HTML div element] */}
+
+        <div  className='chat-body' ref={messageListRef}>
+
+          {/* Somewhere near the top of the chat panel */}
+<div className={`status-pill ${socketRef.current?.connected ? "online" : ""}`}>
+  {status}
+</div>
+
+          {/* this is the checkgate, check whetjer it is 0 or null... for threadid  if check pass, render the next thing*/}
           {threadId && (
-            <div>{new Date().toLocaleString()}</div>
+            <div className='chat-date'>{new Date().toLocaleString()}</div>
           )}
+
           {message.length === 0 && (
-            <div >Start a conversation</div>
+            <div className='chat-empty'>Start a conversation</div>
           )}
           {message.map((msg, index) => {
             const isMe = msg.senderId === me?.id;
-
-
+            //If True: It gives the div the class chat-row me.
+            //If False: It gives the div the class chat-row them.
             return (
               <div
+              key={msg.id}
+              className={`chat-row ${isMe?"me":"them"}`}
+              //{ color: "red", fontSize: "16px" }
+              //{ --i: 0 } <i style="color: red;">
+              //Take the string inside these brackets and use it as the name for the key
+               style={{ ["--i" as any]: index }}
               >
-                <div>
+                 <div className={`chat-bubble ${isMe ? "bubble-me" : "bubble-them"}`}>
                   <p>{msg.body}</p>
-                  <span >
+                  <span className="chat-timestamp">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
@@ -249,24 +289,33 @@ const avatarLabel=useMemo(()=>{
           })}
         </div>
 
-        <div >
-          <button type="button" >
+
+
+
+        <div className='chat-input'>
+          <button type="button" className="input-icon" >
           </button>
           <input
             type="text"
             placeholder="Type your message"
             value={messageBody}
+          // e.target.value: This is the exact text currently sitting inside the input box.
+          //e is the key(键位) that user press
+          //it is use when enter text to the input board
             onChange={(e) => setMessageBody(e.target.value)}
+         //it is use when press enter or functional key in keyboard
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                //prevent the default of what it will do 
                 e.preventDefault();
+                //do the stuff that i assign to
                 handleSendMessage();
               }
             }}
           />
-          <button type="button" >
-          </button>
-          <button type="button" >
+           {/* <button type="button" className="input-icon">
+          </button> */}
+          <button type="button" className="send-button" onClick={handleSendMessage}>
             Send
           </button>
         </div>
@@ -274,4 +323,5 @@ const avatarLabel=useMemo(()=>{
     </div>
   );
 };
+
 export default ChatPage;
