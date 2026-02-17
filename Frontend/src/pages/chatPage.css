@@ -1,0 +1,38 @@
+/* this is the outer box that hold everything */
+/* padding is the space between the "text" and the "Frame."
+border defines the edge of the box. 
+margin: This is the space outside the frame.
+What it does: It pushes other boxes away. */
+
+/*same size as the browser window */
+.chat-shell {
+    /* this are the variables */
+  --bg: #e8d1d1;
+  --panel-2: #f7f3f3;
+  --line: #e4e4e4;
+  --text: #111111;
+  --muted: #858080;
+  --accent: #000000;
+  --bubble-me: #933fd8;
+  --bubble-them: #f8f4f4;
+
+  /* ensure chati s at least as tall as screen */
+  min-height: 100vh;
+  /* Locks the height to exactly the screen size. */
+  height: 100vh;
+  width: 100vw;
+  /* Tells the shell to use a "Grid" layout (good for dividing space). */
+  display: grid;
+
+  grid-template-columns: 1fr;
+  /* background: var(--bg): Applies that light gray color (#f7f7f7) to the whole background. */
+  background: var(--bg);
+  /* Sets the default text color to almost black */
+  color: var(--text);
+  /* use font */
+  font-family: "Manrope", sans-serif;
+  /* : Stops the whole page from scrolling */
+  overflow: hidden;
+  /* box sizing says if add the padding the border won't add, it will make content smaller to fit */
+  box-sizing: border-box;
+}
