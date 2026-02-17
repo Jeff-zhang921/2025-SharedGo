@@ -112,3 +112,36 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   cursor: pointer;
 }
 
+
+@media (min-width: 1200px) {
+  .chat-shell {
+    padding: 0 24px;
+  }
+
+  .chat-body {
+    padding: 28px 36px;
+  }
+
+  .chat-input {
+    padding: 18px 28px;
+  }
+
+  .chat-body,
+  .chat-input {
+    max-width: 980px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .chat-panel {
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .chat-input {
+    grid-template-columns: 1fr auto;
+  }
+}
