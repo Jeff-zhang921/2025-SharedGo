@@ -29,7 +29,7 @@ const CreateLoginPage = () => {
     return (
        <div className="authPage">
         <div className="authCard">
-            <h1 className="AppTitle">SharedGo</h1>
+        <img src="/src/assets/Logo.png" alt="SharedGo Logo" className="AppTitle" />
                 <div className="headerGroup">
                  <h2 className="createAccount">Create an account</h2>
                  <p className="helperText">Enter your email to sign up for this app</p>

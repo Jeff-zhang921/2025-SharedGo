@@ -9,6 +9,7 @@
     top: 0;
     left: 0;
     background-color: white;
+    transform: translateY(-100px); /*Move everything up*/
 }
 
 .authCard {
@@ -19,6 +20,11 @@
     max-width: 360px;
     padding: 20px;
     text-align: center;
+}
+
+.AppTitle {
+    width: 500px;
+    height: auto;   /*Stops stretched image*/
 }
 
 .headerGroup {
