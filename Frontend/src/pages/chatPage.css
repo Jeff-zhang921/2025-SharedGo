@@ -36,3 +36,36 @@ What it does: It pushes other boxes away. */
   /* box sizing says if add the padding the border won't add, it will make content smaller to fit */
   box-sizing: border-box;
 }
+
+/* Apply this thing to every single element inside chat-shell */
+.chat-shell * {
+  box-sizing: border-box;
+}
+
+
+/* the status logic */
+.status-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: #eeeeee;
+  color: var(--muted);
+}
+/* <div class="status-pill online">.
+If the element only has .status-pill, it stays gray. As soon as your JavaScript "injects" the word online into the class list, this black-and-white theme kicks in. */
+
+.status-pill.online {
+  background: #111111;
+  color: #ffffff;
+}
+
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-2);
+  height: 100vh;
+  overflow: hidden;
+}
