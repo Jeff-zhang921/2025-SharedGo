@@ -69,3 +69,46 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   height: 100vh;
   overflow: hidden;
 }
+
+/* chat body is the 聊天界面（big chat box） */
+.chat-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  /* Create the scrollbar */
+  display: flex;
+  /* stack them top to bottom */
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chat-input {
+  display: grid;
+  grid-template-columns:  1fr auto;
+  gap: 8px;
+  /* space inside the bar */
+  padding: 22px 20px;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+  position: relative;
+  bottom: 24px;
+}
+/* where you type */
+.chat-input input {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--text);
+}
+
+.send-button {
+  background: var(--accent);
+  border: none;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 0 22px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
