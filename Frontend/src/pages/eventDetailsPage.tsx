@@ -163,8 +163,8 @@ const EventDetailsPage = () => {
           </div>
         
           <div className="action-buttons">
-            {/*Join button links to chat page, as described in the design*/}
-            <Link to="/chat" className="btn-join">Join Event</Link>
+            {/* pass hostId so chat page can create/find the thread immediately */}
+            <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Join Event</Link>
           </div>
         </div>
       </section>

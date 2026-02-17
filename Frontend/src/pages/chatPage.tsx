@@ -64,18 +64,7 @@ const loadMe=async()=>{
 }
 //Async/Await: The code pauses at the await line. It waits for the server to send back the user data. Only once it has the data in its "hands" does it move to the next line to connect the socket.
 
-  useEffect(()=>{
-   ( async()=>{
-      const user=await loadMe()
-      if (user)connectSocket()
-    })()
-  return()=>{
-     if (socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
-     }
-  }
-  },[])
+
 
 
 const loadMessages=async(id:number)=>{
@@ -124,19 +113,20 @@ socketRef.current=socket
 
 
 
-    useEffect(()=>{
-      loadMe();
-     connectSocket();
-     //when the user clicks a link to go to a different page
-     return ()=>{
-   if (socketRef.current){
-    socketRef.current.disconnect()
-    socketRef.current=null
-   }
-  }
 //the rules say []. This means 'Only run the code inside if the stuff in these brackets has changed since the last time I was here.'"
 //The Reality: "Since there is nothing in the brackets, nothing could have changed. I'm not even going to open this door. Skip it!"
-    },[]);
+  useEffect(()=>{
+   ( async()=>{
+      const user=await loadMe()
+      if (user)connectSocket()
+    })()
+  return()=>{
+     if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+     }
+  }
+  },[])
 
     useEffect(()=>{
     if(!threadId||!socketRef.current) return
@@ -190,7 +180,7 @@ socketRef.current=socket
 //location is the suitcase that you bring other stuff into thispage
 //the info is store in Ref so next time render it can stil remember
 useEffect(()=>{
-  const state=location.state as{hostId?:number;threadId:number}|null
+  const state=location.state as{hostId?:number;threadId?:number}|null
   if(!state||autoThreadRef.current)return
   if(state.threadId){
     autoThreadRef.current=true
