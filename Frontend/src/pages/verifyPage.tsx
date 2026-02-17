@@ -62,7 +62,7 @@ const CreateVerifyPage = () => {
     return (
        <div className="authPage"> 
         <div className='authCard'> {/*Same name for consistency*/}
-            <h1 className="AppTitle">SharedGo</h1>
+        <img src="/src/assets/Logo.png" alt="SharedGo Logo" className="AppTitle" />
                 <div className="headerGroup">
                     <h2 className="createAccount">Enter verification code</h2>
                     <p className="helperText">A 6-digit code was sent to <b>{email}</b></p>
