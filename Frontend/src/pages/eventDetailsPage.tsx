@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, unstable_SerializesTo } from "react-router-dom"
-//import { Link } from "react-router";
+import { Link, unstable_SerializesTo, useNavigate } from "react-router-dom"
 import Button from "./../components/Button"
 import './eventDetailsPage.css';
 import { useParams } from 'react-router-dom';
@@ -10,11 +9,7 @@ interface User {
   name: string | null;
   email: string
 }
-/*  capacity?: number | "";
-  category?: string;
-  latitude?: number | "";
-  longitude?: number | "";
-};*/
+
 //Fields for the expected event data from the backend
 interface EventData {
   id: number;
@@ -41,6 +36,7 @@ interface EventData {
 }
 
 const EventDetailsPage = () => {
+  const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>(); //Use the eventId parameter from the URL
 
   const [event, setEvent]  = useState<EventData | null>(null) //Store actual event data from backend, setting initial value to null
@@ -57,7 +53,21 @@ const EventDetailsPage = () => {
     //Backend seems to be on port 3000 atm
     const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
-  
+
+    // will need this code once the backend is changed to provide current user id
+    // will need to add a get("/session") in the backend
+    /*const fetchCurrentUser = async () => {
+      try {
+        const res = await fetch(`${backendBaseURL}/session`, {credentials: "include"});
+        if (!res.ok) return;
+        const data = await res.json();
+        setCurrentUser(data.user);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchCurrentUser();*/
+
     const fetchEvent = async () => {
       try {
         const response = await fetch(backendUrl);
@@ -81,19 +91,47 @@ const EventDetailsPage = () => {
     };
 
     fetchEvent();
-    }, [eventId]); //Rerun the fetching when the eventId changes (different page requires different data)
-  
-    if (isLoading) { //Message displayed while loading the event details
-      return <div style={{ padding: '20px' }}><p>Loading event details: **{eventId}**...</p></div>; //Padding so msg not squashed in top left
-    }
+  }, [eventId]); //Rerun the fetching when the eventId changes (different page requires different data)
 
-    if (error) {
-      return <div style={{ padding: '20px', color: 'red' }}><h1>Error</h1><p>{error}</p></div>;
-    }
+  if (isLoading) { //Message displayed while loading the event details
+    return <div style={{ padding: '20px' }}><p>Loading event details: **{eventId}**...</p></div>; //Padding so msg not squashed in top left
+  }
 
-    if (!event) {
-      return <div style={{ padding: '20px' }}><h1>Event Not Found</h1><p>The requested event does not exist</p></div>;
+  if (error) {
+    return <div style={{ padding: '20px', color: 'red' }}><h1>Error</h1><p>{error}</p></div>;
+  }
+
+  if (!event) {
+    return <div style={{ padding: '20px' }}><h1>Event Not Found</h1><p>The requested event does not exist</p></div>;
+  }
+
+  const handleDelete = async () => {
+    const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
+    const backendUrl = `${backendBaseURL}/events/${eventId}`;
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(backendUrl, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to delete event.");
+        return;
+      }
+
+      alert("Event deleted successfully.");
+      navigate("/map"); //redirect to map page after deleting an event
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Something went wrong.");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
   return (
     <div className="event-details-container">
@@ -165,11 +203,14 @@ const EventDetailsPage = () => {
           <div className="action-buttons">
             {/* pass hostId so chat page can create/find the thread immediately */}
             <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Join Event</Link>
+            {/* IDEALLY: if hostId matches event host,, then show delete event button 
+            HOWEVER: I have not worked out how to do that (I believe backend changes are necessary to get the current user id*/}
+            {/*{currentUser?.id === event?.host?.id && (*insert line below in here*)*/}
+              <button onClick={handleDelete} disabled={isLoading} className="btn-join"> {isLoading ? "Deleting...":"Delete Event"}</button>
+            
           </div>
         </div>
       </section>
-
-      
     </div>
   )
 };
