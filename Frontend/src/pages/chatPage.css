@@ -112,6 +112,17 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   cursor: pointer;
 }
 
+.bubble-me {
+  background: var(--bubble-me);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble-them {
+  background: var(--bubble-them);
+  color: #ffffff;
+  border-bottom-left-radius: 4px;
+}
 
 @media (min-width: 1200px) {
   .chat-shell {

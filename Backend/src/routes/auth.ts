@@ -30,6 +30,7 @@ const mailer =
   SMTP_USER && SMTP_PASS
     ? nodemailer.createTransport({
         service: "gmail",
+        
         auth: {
           user: SMTP_USER,
           pass: SMTP_PASS,
