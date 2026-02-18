@@ -93,7 +93,12 @@ const CreateEventPage = () => {
       const createdEvent = JSON.parse(text);
 
       // Redirect to event details page
-      navigate(`/map`)
+      navigate(`/map`, {
+        state: { 
+          centerTo: [form.latitude, form.longitude], 
+          zoomTo: 15 
+        }
+      });
       //navigate(`/eventDetails/${createdEvent.event.id}`);
     } catch (err: any) {
       console.error(err);

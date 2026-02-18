@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
-import { Link, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -41,6 +41,7 @@ const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
   const navigate = useNavigate()
   const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     // Fetch events from backend
@@ -117,8 +118,7 @@ const MapPage = () => {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
-        />w
-
+        />
         <MapClickHandler />
 
         {tempMarker && (
