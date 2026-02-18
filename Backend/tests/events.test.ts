@@ -196,36 +196,36 @@ describe("Event API", () => {
   });
 
   // // Joining a full event should return 409 (conflict)
-  // it("should not allow joining a full event", async () => {
-  //   // Mock full event (capacity 1, already has 1 participant)
-  //   mockPrisma.event.findUnique.mockResolvedValue({
-  //     id: eventId,
-  //     title: "Test Event",
-  //     capacity: 1,
-  //     participants: [
-  //       {
-  //         user: {
-  //           email: "existing@example.com",
-  //         },
-  //       },
-  //     ],
+  it("should not allow joining a full event", async () => {
+    // Mock full event (capacity 1, already has 1 participant)
+    mockPrisma.event.findUnique.mockResolvedValue({
+      id: eventId,
+      title: "Test Event",
+      capacity: 1,
+      participants: [
+        {
+          user: {
+            email: "existing@example.com",
+          },
+        },
+      ],
   
-  //     host: {
-  //       id: 1,
-  //       email: "host@example.com",
-  //       name: null,
-  //     },
-  //   });
+      host: {
+        id: 1,
+        email: "host@example.com",
+        name: null,
+      },
+    });
 
-  //   const res = await request(app)
-  //     .post(`/events/${eventId}/join`)
-  //     .send({
-  //       email: "newuser@example.com",
-  //     });
+    const res = await request(app)
+      .post(`/events/${eventId}/join`)
+      .send({
+        email: "newuser@example.com",
+      });
 
-  //   expect(res.status).toBe(409);
-  //   expect(res.body).toHaveProperty("message", "Event is already full.");
-  // });
+    expect(res.status).toBe(409);
+    expect(res.body).toHaveProperty("message", "Event is already full.");
+  });
 
   // Duplicate join attempt 
   it("should return already joined message for duplicate participation", async () => {
@@ -322,4 +322,54 @@ describe("Event API", () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("message", "Event id must be a number.");
   });
+
+  // Invalid coordinate range should return 400
+  it("should return 400 for invalid coordinates", async () => {
+    const res = await request(app)
+      .post("/events/create")
+      .send({
+        title: "Test Event",
+        description: "This is a test event",
+        startsAt: "2024-12-31T22:00:00.000Z",
+        capacity: 50,
+        category: "Other",
+        location: "Test Location",
+        latitude: 100, // invalid latitude
+        longitude: 200, // invalid longitude
+        hostEmail: "host@example.com",
+      });
+      
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("message", "Invalid latitude or longitude values.");
+  });
+
+  it("should not allow reviews for events that haven't started", async () => {
+    const futureData = new Date();
+    futureData.setDate(futureData.getDate() + 1); // set to 1 day in the future
+
+    mockPrisma.event.findUnique.mockResolvedValue({
+      id: 123,
+      startsAt: futureData, // event starts in the future
+      hostId: 1,
+      participants: [
+        {
+          user: {
+            email: "user@example.com",
+          },
+        },
+      ],
+    });
+
+    const res = await request(app)
+      .post(`/events/123/reviews`)
+      .send({
+        email: "user@example.com",
+        rating: 5,
+        comment: "Great event!",
+      });
+      
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("message", "Reviews can be left only after the event starts.");
+  });
+
 });
