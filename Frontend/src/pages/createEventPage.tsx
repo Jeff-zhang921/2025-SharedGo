@@ -164,6 +164,16 @@ const CreateEventPage = () => {
         </label>
 
         <label>
+          <span>Image</span>
+          <input type="text" placeholder="https://example.com/image.png" value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})}/>
+        </label>
+
+        <label>
+          <span>Website</span>
+          <input type="text" placeholder="https://example.com" value={form.externalUrl} onChange={(e) => setForm({...form, externalUrl: e.target.value})}/>
+        </label>
+
+        <label>
           <span>Description</span>
           <textarea name="description" placeholder="No description provided" onChange={onChange}/>
         </label>

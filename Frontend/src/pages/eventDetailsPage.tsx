@@ -184,6 +184,16 @@ const EventDetailsPage = () => {
 
         
         <div className='btn-host'>
+          <div className="event-image-wrapper">
+          {event?.imageUrl && (
+            <img src={event.imageUrl} alt={event.title} className="event-image"/>
+          )}
+          {event?.externalUrl && (
+          <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
+            Visit Event Website</a>
+          )}
+          </div>
+
           {/*Links to /host:id eg. localhost:5173/host:1 which is a page that does not currently exist!*/}
           <Link to={`/host:${event.host.id}`}>
             <img src="/src/assets/user-icon.png" alt="Host Details" className="profile-img" />

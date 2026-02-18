@@ -1,9 +1,5 @@
 html, body {
     overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
 }
 
 .event-details-container {
@@ -110,6 +106,19 @@ html, body {
     background-color: #333;
 }
 
+.event-image-wrapper {
+    width: 100%;
+    margin-bottom: 100px;
+}
+
+.event-image {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+
 /* Adjust for portrait/mobile view (responsive design) */
 @media (max-width: 600px) {
     .event-details {
@@ -118,11 +127,16 @@ html, body {
     }
 
     .event-details-container {
-        padding: 0px; /* Remove padding on mobile */
+        min-height: auto;
+        padding: 10px;
     }
 
     .btn-host {
         width: 400px;
-        margin: 0 auto; 
+        margin:0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
     }
 }
