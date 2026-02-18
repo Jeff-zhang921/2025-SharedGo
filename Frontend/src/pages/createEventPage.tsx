@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import './createEventPage.css';
 //import Button from "./../components/Button"
 
@@ -27,6 +27,8 @@ type EventForm = {
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialCoords = location.state as { lat: number; lng: number } | null; //getting lat/long from navigation state
   const [form, setForm] = useState<EventForm>({
     title: "",
     description: "",
@@ -37,8 +39,8 @@ const CreateEventPage = () => {
     externalUrl: "",
     capacity: "",
     category: "",
-    latitude: 0,
-    longitude: 0,
+    latitude: initialCoords?.lat || 0, //Use coordinates from map or default to zero
+    longitude: initialCoords?.lng || 0,
     //Attendees section as backend also included this (maybe implement into page later)
     attendees: [],
     attendeeCount: 0,
@@ -91,7 +93,13 @@ const CreateEventPage = () => {
       const createdEvent = JSON.parse(text);
 
       // Redirect to event details page
-      navigate(`/eventDetails/${createdEvent.event.id}`);
+      navigate(`/map`, {
+        state: { 
+          centerTo: [form.latitude, form.longitude], 
+          zoomTo: 15 
+        }
+      });
+      //navigate(`/eventDetails/${createdEvent.event.id}`);
     } catch (err: any) {
       console.error(err);
     } finally {
