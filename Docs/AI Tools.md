@@ -34,6 +34,14 @@ All uses of AI have been thoroughly checked by the programmers to avoid any erro
 
 - General advice: "What is the best Map API I could use for this project"
 
+**Soko**
+- Design brainstorming: "What are the must have features", "suggest layout for ... page"
+
+- Unit testing (Jest): "Explain this Jest error message" 
+
+- CI/CD: "Explain why my Github action deployment failed, suggest fix for YAML configuration", "suggest fix for multi-stage build errors"
+
+
 **Quality Assurance:**
 - Manual validation: Every word proposed by AI underwent a mandatory manual review by a programmer
 
