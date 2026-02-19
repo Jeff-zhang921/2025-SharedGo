@@ -94,7 +94,9 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await fetch("/profile/me/overview");
+        const response = await fetch("http://localhost:3000/profile/me/overview", {
+          credentials: "include",
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
