@@ -1,5 +1,5 @@
 # Build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 # prisma needs openssl to gerenate client on Alphine
 RUN apk add --no-cache openssl
 WORKDIR /app
@@ -24,7 +24,7 @@ RUN npx prisma generate
 RUN npm run build
 
 #Production 
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 RUN apk add --no-cache openssl
 WORKDIR /app
 

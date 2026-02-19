@@ -5,9 +5,11 @@ on:
 
 env:
   AWS_REGION: eu-north-1
-  ECR_REPOSITORY: sharedgo
+  BACKEND_ECR_REPOSITORY: sharedgo
+  FRONTEND_ECR_REPOSITORY: sharedgo_frontend
   ECS_CLUSTER: sharedgo_cluster
-  ECS_SERVICE: sharedgo_service
+  BACKEND_ECS_SERVICE: sharedgo_service
+  FRONTEND_ECS_SERVICE: sharedgo_frontend_service
   IMAGE_TAG: ${{ github.sha }}
 
 permissions:
@@ -33,34 +35,65 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Build, tag, and push Backend image to Amazon ECR
+        id: build-backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          ECR_REPOSITORY: ${{ env.BACKEND_ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build the Docker image
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG Backend/
+          docker build -t $BACKEND_ECR_REPOSITORY:$IMAGE_TAG Backend/
           # Tag the image to ECR
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG
+          docker tag $BACKEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG
           # Push the image to ECR
-          docker push $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
       
-      - name: Fill in new image ID in the ECS task definition
-        id: task-def
+      - name: Build, tag, and push Frontend image to Amazon ECR
+        id: build-frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.FRONTEND_ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build the Docker image
+          docker build -t $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG Frontend/
+          # Tag the image to ECR
+          docker tag $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG
+          # Push the image to ECR
+          docker push $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Render backendtask definition
+        id: backend-task
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with: 
           task-definition: Backend/task-definition.json
           container-name: backend_container
-          image: ${{ steps.build-image.outputs.image }}
-        
-      - name: Deploy Amazon ECS task definition
+          image: ${{ steps.build-backend.outputs.image }}
+      
+      - name: Render frontend task definition
+        id: frontend-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with: 
+          task-definition: Frontend/task-definition.json
+          container-name: frontend_container
+          image: ${{ steps.build-frontend.outputs.frontend-image }}
+
+      - name: Deploy Backend
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with: 
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
+          task-definition: ${{ steps.backend-task.outputs.task-definition }}
+          service: ${{ env.BACKEND_ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+      
+      - name: Deploy Frontend
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with: 
+          task-definition: ${{ steps.frontend-task.outputs.task-definition }}
+          service: ${{ env.FRONTEND_ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
