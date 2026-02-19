@@ -79,7 +79,7 @@ jobs:
         with: 
           task-definition: Frontend/task-definition.json
           container-name: frontend_container
-          image: ${{ steps.build-frontend.outputs.frontend-image }}
+          image: ${{ steps.build-frontend.outputs.image }}
 
       - name: Deploy Backend
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
