@@ -27,6 +27,9 @@ model User {
   registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
   authoredReviews Review[]           @relation("UserReviews")
   hostReviews     Review[]           @relation("HostReviews")
+  hostThread  ChatThread[] @relation("HostThreads")
+  guestThread ChatThread[] @relation("GuestThreads")
+  message     ChatMessage[] 
   }
 
 
@@ -104,4 +107,26 @@ model LoginCode {
   createdAt DateTime @default(now())
 
   @@index([email, expiresAt])
+}
+
+model ChatThread{
+  id Int @id @default(autoincrement())
+  hostId Int
+  guestId Int
+  lastMessageAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  host User @relation("HostThreads",fields: [hostId],references: [id])
+  guest User@relation("GuestThreads",fields: [guestId],references: [id])
+  Messages ChatMessage[]
+  @@unique([hostId,guestId])
+}
+model ChatMessage{
+id Int @id @default(autoincrement())//primary key
+threadId Int
+senderId Int
+body String
+createdAt DateTime @default(now())
+thread ChatThread @relation(fields:[threadId],references:[id])
+sender User @relation(fields:[senderId],references:[id])
 }

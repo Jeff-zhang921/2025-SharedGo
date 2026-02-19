@@ -10,18 +10,15 @@ function HomePage() {
         <h2>A real-time activity map</h2>
       </div>
 
-      <div className='login-link'>
-        <Link to="/login">Login</Link>
+
+      <div className='profile-page'>
+        <Link to="/profile">
+          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
+        </Link>
       </div>
 
       <div className='nav-links'>
-      <Link to="/map">MapPage </Link>
-      <Link to="/eventDetails">EventDetailsPage </Link>
-      <Link to="/personal">PersonalPage </Link>
-      <Link to="/createEvent">CreateEventPage </Link>
-      <Link to="/chat">ChatPage </Link>
-      <Link to="/host">HostPage </Link>
-      <Link to="/profile">ProfilePage </Link>
+      <Link to="/map" className="enter-button">Go! </Link>
       </div>
     </div>
   );

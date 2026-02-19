@@ -1,4 +1,6 @@
 # 2025-SharedGo
+<img src="Docs/logo.png" alt="SharedGo logo " width="400"></img>
+
 <a href="https://react.dev"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/></a>
 <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/></a>
 <a href="https://nodejs.org/en"><img src="https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/></a>
@@ -6,12 +8,19 @@
 <a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/PostgreSQL-316195?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
 <a href="https://www.prisma.io"><img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white"/></a>
 <a href="https://aws.amazon.com"><img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white"/>
+<img src="https://img.shields.io/badge/Leaflet-010101?style=for-the-badge&logo=leaflet&logoColor=white"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+
+
+
 ## Contents
 * [Project Description](#project-Description)
 * [Stakeholders](#stakeholders)
 * [User Stories](#user-stories)
 * [Project structure](#project-structure)
 * [Tech Stack](#teckstack)
+* [CI/CD diagram](#ci/cd-diagram)
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
 
@@ -69,10 +78,61 @@
 
 >For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
-## TechStack
-### MVP Architecture
+```text
+SharedGO/
+├── .github/
+│   ├── ISSUE_TEMPLATE/           # Custom issue reporting forms
+│   ├── PULL_REQUEST_TEMPLATE/    # PR template
+│   └── workflows/                # CI/CD automation files 
+├── Backend/                      # Node.js/Express server logic
+│   ├── prisma/                   # Database schema and migrations
+│   ├── src/
+│   │   ├── generated/            # Auto-generated types/files
+│   │   ├── middleware/           # Auth and request validation
+│   │   ├── routes/               # API endpoints
+│   │   ├── socket/               # Real-time communication (Socket.io)
+│   │   ├── types/                # express session
+│   │   ├── index.ts              # Server entry point
+│   │   ├── seed.ts               # Database seeding script
+│   │   └── session.ts            # Session management
+│   ├── tests/                    # Backend unit tests
+│   ├── Dockerfile                # Containerization config
+│   ├── API_README.md             # Documentation for API endpoints
+│   └── DEVELOPER_README.md       # Setup guide for backend devs
+├── Frontend/                     # React/Vite web application
+│   ├── public/                   # Static assets
+│   ├── src/
+│   │   ├── assets/               # Icons
+│   │   ├── components/           # Reusable UI components
+│   │   ├── pages/                # View/Screen components
+│   │   ├── App.tsx               # Main application component
+│   │   └── main.tsx              # React entry point
+│   ├── vite.config.ts            # Vite build configuration
+│   └── README.md                 # Frontend-specific documentation
+└── Docs/                         # Project management & design
+│   ├── Architecture/             # System diagrams and logic flow
+│   ├── database/                 # DB diagrams
+│   ├── design/                   # Figma designs
+│   ├── Minutes/                  # Client and team meeting notes
+│   ├── Presentations/            # Slide materials
+│   ├── AI Tools.md               # Log of AI usage in development
+│   └── testing_day_survey.pdf    # User testing feedback & results
+├── README.md                     # Project documentation
+```
 
-![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
+## TechStack
+<!-- ### MVP Architecture
+
+![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
+
+### Architecture diagram
+![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.png)
+
+## CI/CD diagram
+![CI/CD Diagram](Docs/Architecture/ci,cd.png)
+
+## Chat logic workflow
+![chat system](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Workflow/Chat%20Workflow.png)
 
 ## Flow Steps
 * #### Indivisual user

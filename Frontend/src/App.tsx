@@ -16,7 +16,7 @@ function App() {
   return (
     <Routes>
       {/* set the path for the home page */}
-      <Route path="/" element={<HomePage />} />
+      <Route path="/home" element={<HomePage />} />
       {/* set the path for the map page */}
       <Route path="/map" element={<MapPage />} />
       {/* set the path for the personal page */}
@@ -32,7 +32,7 @@ function App() {
        {/* set the path for the profile page */}
       <Route path="/profile" element={<HostProfile />} />
       {/* set the path for the login page */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage />} />
       {/* set the path for the verify page */}
       <Route path="/verify" element={<VerifyPage />} />
     </Routes>

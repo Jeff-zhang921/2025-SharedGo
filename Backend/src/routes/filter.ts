@@ -1,27 +1,40 @@
-import { Router,Request,Response,} from "express";
-import { PrismaClient,Category } from "@prisma/client"
+import { Router,Request,Response} from "express";
+import { PrismaClient,Category } from "@prisma/client";
 
 export const Categories = Object.values(Category);
 const router=Router()
 const prisma = new PrismaClient()
+function pharseDateTimeparam(raw:unknown):Date|null{
+    if (typeof raw !== "string") return null;
+    //nan is math error
+    const parsed = Date.parse(raw);
+    if (isNaN(parsed)) return null;
+    return new Date(parsed);
+}
+
+function startOfUtcDay(date: Date): Date {
+    const copy = new Date(date);
+    //set hour to zero
+    copy.setUTCHours(0, 0, 0, 0);
+    return copy;
+}
 
 
 function calcevent(event:any,userLat:number|null,userLong:number|null){
      let distance: number | null = null;
-     let attendeeCount=event.participants.length
+     const attendeeCount=event.participants.length
     if (event.latitude!==null && event.longitude!==null&& userLat!==null && userLong!==null){
     distance=distanceKM(userLat,userLong,event.latitude,event.longitude)
    }
     return{
         event,
         distance:distance,
-        attendeeCount:attendeeCount
+        attendeeCount:attendeeCount,
     }
 }
 function pharseCoords(raw:unknown):number|null{
-   if (typeof raw !=="string"){
-    return null
-   }
+ if (raw === undefined || raw === null || raw === "") return null;
+
    const coords= Number(raw)
    if (!Number.isFinite(coords)){
     return null
@@ -30,7 +43,7 @@ function pharseCoords(raw:unknown):number|null{
    }
 }
 
-function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number|null{
+function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number{
 // if (lat1===null || long1===null || lat2===null || long2===null){
 //     return null
 // }
@@ -54,6 +67,7 @@ if (hasValidCoords){
         longitude:longitude as number,
         updatedAt:new Date().toISOString()
     }
+}
     const sessionlocation=req.session.location
     const userLatitude=hasValidCoords?
     latitude:
@@ -78,9 +92,6 @@ if (hasValidCoords){
         }
     }
     res.json(filtered)
-}else{
-    res.status(400).json({message:"Valid lat and long are required"})
-}
 })
 
 
@@ -90,11 +101,16 @@ router.get("/search",async (req:Request,res:Response)=>{
     //type of blablabla is equal to string?
 const name=typeof req.query.name==="string"?req.query.name.trim():""
  const distance=typeof req.query.distance==="string"?req.query.distance.trim():""
- const category=typeof req.query.category==="string" ?req.query.category.trim():""
+ const rawcategory=typeof req.query.category==="string" ?req.query.category.trim():""
  const latitude=pharseCoords(req.query.latitude)
  const longitude=pharseCoords(req.query.longitude)
 const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
+const rawdate=typeof req.query.rawdate==="string"?req.query.rawdate.trim().toLowerCase():""
+const rawenddate=typeof req.query.enddate==="string"?req.query.enddate.trim().toLowerCase():""  
+const category=Categories.includes(rawcategory as Category)?rawcategory as Category:""
 
+const filterdate=pharseDateTimeparam(rawdate)
+const enddate=pharseDateTimeparam(rawenddate)
 
 
     const hasValidCoords=latitude!==null && longitude!==null
@@ -120,11 +136,13 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
         }
     ,include:{host:true,participants:true}
     })
-    let distanceNum: number =Number(distance)
-    let attendeeCountMinNum:number=Number(attendeeCountMin)
+    const distanceNum: number =Number(distance)
+    const attendeeCountMinNum:number=Number(attendeeCountMin)
+    const hasValidDistance=Number.isFinite(distanceNum)
+    const hasValidAttendeeCountMin=Number.isFinite(attendeeCountMinNum)
 
     let mapped= events.map(event=>calcevent(event,userLatitude,userLongitude))
-    if (distance!==""&&distance!==null){
+    if (distance!==""&&distance!==null && hasValidDistance){
            mapped=mapped.filter((event)=>event.distance!==null && event.distance<=distanceNum)
 }
 
@@ -132,15 +150,37 @@ const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.at
            mapped=mapped.filter((events)=>events.event.title.toLowerCase().includes(name.toLowerCase()))
 }
 
- if (attendeeCountMin!==""&&attendeeCountMin!==null){
+ if (attendeeCountMin!==""&&attendeeCountMin!==null && hasValidAttendeeCountMin){
          mapped=mapped.filter((events)=>events.attendeeCount>=attendeeCountMinNum)
 }
 
-if (category!==""&&category!==null){
+ if (category!==""&&category!==null){
        mapped=mapped.filter((events)=>events.event.category===category)
-}
+ }
+ if (rawdate!==""&&filterdate!==null){
+    //getTime returns the number of milliseconds since January 1, 1970, 00:00:00 UTC. By comparing these values, we can determine if the event starts on the same day as the filter date.
+     const startMs = startOfUtcDay(filterdate).getTime()
+     mapped=mapped.filter((events)=>events.event.startsAt.getTime()===startMs)
+ }
+ if (rawenddate!==""&&enddate!==null){
+     const endExclusiveMs = startOfUtcDay(enddate).getTime() + (24*60*60*1000)
+     mapped=mapped.filter((events)=>events.event.startsAt.getTime()<endExclusiveMs)
+ }
     return res.json(mapped)
 })
 
+router.get("/name",async (req:Request,res:Response)=>{
+    const name=typeof req.query.name==="string"?req.query.name.trim():""
+    if (name===""){
+        res.status(400).json({message:"Name query parameter is required"})
+        return
+    }
+    const host=await prisma.user.findMany({
+        where:{name:{contains:name,mode:"insensitive"}
+        }
+    })
+    const hostname=host.map((user)=>user.name)
+    res.json(hostname)
+})
 
 export default router
