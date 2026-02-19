@@ -1,60 +1,168 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// Interface for host profile data (static mock data structure)
-interface HostData {
+// Define the interface for returning data from the API
+interface User {
   id: number;
-  name: string;
   email: string;
-  totalEvents: number;
-  totalAttendees: number;
-  avgRating: number;
-  avgAttendance: number;
-  reviewCount: number;
+  name: string;
 }
 
-// Interface for event card data (each card represents an upcoming/past event)
+interface Stats {
+  upcomingCount: number;
+  pastCount: number;
+}
+
+interface Event {
+  id: number;
+  title: string;
+  startsAt: string;
+  capacity: number;
+  seatsRemaining: number;
+  category: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  imageUrl: string | null;
+  externalUrl: string | null;
+  attendeeCount: number;
+  host: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  isHost: boolean;
+  isAttendee: boolean;
+  joinedAt: string | null;
+}
+
+interface ProfileOverviewResponse {
+  user: User;
+  stats: Stats;
+  upcomingEvents: Event[];
+  pastEvents: Event[];
+}
+
+// The original card/comment interface (the comment section temporarily retains static data, which can be expanded in the future)
 interface CardItem {
+  id: number;
   title: string;
   date: string;
-  image?: string; // Optional event image URL
+  image?: string;
 }
 
-// Interface for review data (user reviews for host events)
 interface ReviewItem {
   id: number;
   userName: string;
   msg: string;
 }
 
-// Main Host Profile Component (static display only, no backend fetch)
-export default function HostProfile() {
-  // Static mock data (replaces backend API response)
-  const hostData: HostData = {
-    id: 1,
-    name: "Name",
-    email: "email@domain.com",
-    totalEvents: 125,
-    totalAttendees: 500,
-    avgRating: 4.1,
-    avgAttendance: 85,
-    reviewCount: 140,
-  };
+// Date formatting tool function: Converts ISO time to a friendly prompt (such as "Starts in 3 days")
+const formatEventDate = (isoDateString: string): string => {
+  try {
+    const eventDate = new Date(isoDateString);
+    const now = new Date();
+    const diffTime = eventDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  // Static mock event cards (upcoming events)
-  const eventCards: CardItem[] = [
-    { title: "TITLE", date: "Starts in 3 days", image: "/watermelon.png" },
-    { title: "TITLE", date: "Starts in 3 days", image: "/watermelon.png" },
-  ];
+    if (diffDays < 0) return `Ended ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} ago`;
+    if (diffDays === 0) return 'Starts today';
+    if (diffDays === 1) return 'Starts tomorrow';
+    return `Starts in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+  } catch (err) {
+    return 'Date unavailable';
+  }
+};
 
-  // Static mock review data
+// Main ProfilePage component
+export default function ProfilePage() {
+  // API data status
+  const [profileData, setProfileData] = useState<ProfileOverviewResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Tab navigation status
+  const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
+  const [selectedTag, setSelectedTag] = useState<number>(0);
+
+  // Static comment data (which can be retrieved from the API later)
   const reviewList: ReviewItem[] = [
     { id: 1, userName: "User1", msg: "Great event experience!" },
     { id: 2, userName: "User2", msg: "Highly recommended to attend!" },
   ];
 
-  // State for tab navigation (Upcoming/Past events/Reviews)
-  const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
-  const [selectedTag, setSelectedTag] = useState<number>(0); // Default: Upcoming tab
+  // Asynchronous acquisition of personal profile data
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/profile/me/overview", {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProfileData(data);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load profile data");
+        console.error("Profile fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  // Adapt API data to card format
+  const upcomingEventCards: CardItem[] = profileData?.upcomingEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    date: formatEventDate(event.startsAt),
+    image: event.imageUrl || "/watermelon.png"
+  })) || [];
+
+  const pastEventCards: CardItem[] = profileData?.pastEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    date: formatEventDate(event.startsAt),
+    image: event.imageUrl || "/watermelon.png"
+  })) || [];
+
+  // Loading/Error State Rendering
+  if (loading) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: '#f9fafb' 
+      }}>
+        <p>Loading profile data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: '#f9fafb',
+        padding: '1.25rem'
+      }}>
+        <p style={{ color: '#ef4444' }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  // Default user data (fallback)
+  const fallbackUser = { id: 0, name: "Unknown User", email: "no-email@example.com" };
+  const user = profileData?.user || fallbackUser;
+  const stats = profileData?.stats || { upcomingCount: 0, pastCount: 0 };
 
   return (
     <div style={{ 
@@ -62,7 +170,8 @@ export default function HostProfile() {
       backgroundColor: '#f9fafb', 
       fontFamily: 'sans-serif',
       overflowY: 'auto',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      paddingBottom: '60px' //Leave space for the bottom navigation
     }}>
       {/* Header Navigation Bar */}
       <div style={{
@@ -73,14 +182,13 @@ export default function HostProfile() {
         alignItems: 'center',
         borderBottom: '1px solid #e5e7eb'
       }}>
-        {/* Back Arrow Icon */}
         <div style={{ cursor: 'pointer' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M5 12l7 7M5 12l7-7" />
           </svg>
         </div>
         <div style={{ fontWeight: '600', fontSize: '1rem' }}>My profile</div>
-        <div></div> {/* Placeholder for empty right section */}
+        <div></div>
       </div>
 
       {/* Host Profile Information Section */}
@@ -90,10 +198,9 @@ export default function HostProfile() {
         display: 'flex',
         alignItems: 'center'
       }}>
-        {/* Host Avatar */}
         <div style={{ marginRight: '1.5rem' }}>
           <img
-            src="/user-avatar.png" // Replace with actual avatar path
+            src="/user-avatar.png"
             alt="Host Profile"
             style={{ 
               width: '80px', 
@@ -105,7 +212,6 @@ export default function HostProfile() {
           />
         </div>
         
-        {/* Host Name & Email */}
         <div style={{ flex: 1 }}>
           <h1 style={{ 
             margin: 0, 
@@ -113,16 +219,15 @@ export default function HostProfile() {
             fontWeight: '600', 
             color: '#111827' 
           }}>
-            {hostData.name}
+            {user.name}
           </h1>
           <p style={{ 
             margin: '0.25rem 0 0.5rem 0', 
             fontSize: '0.875rem', 
             color: '#6b7280' 
           }}>
-            {hostData.email}
+            {user.email}
           </p>
-          {/* Edit Profile Button */}
           <button style={{
             padding: '0.25rem 0.75rem',
             fontSize: '0.75rem',
@@ -169,64 +274,64 @@ export default function HostProfile() {
         gap: '1rem',
         flexWrap: 'wrap'
       }}>
-        {/* Total Events Stat */}
+        {/* Upcoming Events Stat */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>{hostData.totalEvents}</div>
+          }}>{stats.upcomingCount}</div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6b7280',
             marginTop: '0.25rem'
-          }}>events</div>
+          }}>upcoming events</div>
         </div>
         
-        {/* Total Attendees Stat */}
+        {/* Past Events Stat */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>{hostData.totalAttendees}</div>
+          }}>{stats.pastCount}</div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6b7280',
             marginTop: '0.25rem'
-          }}>attendees</div>
+          }}>past events</div>
         </div>
         
-        {/* Average Rating Stat */}
+        {/* Retain the original average rating placeholder (which can be extended from the API later) */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>{hostData.avgRating}</div>
+          }}>4.1</div>
           <div style={{
             fontSize: '0.75rem',
             color: '#6b7280',
             marginTop: '0.25rem'
-          }}>({hostData.reviewCount} reviews)</div>
+          }}>(140 reviews)</div>
         </div>
         
-        {/* Average Attendance Stat */}
+        {/* Maintain the original average attendance rate placeholders (which can be expanded from the API later) */}
         <div style={{ flex: 1, minWidth: '80px' }}>
           <div style={{
             fontSize: '1.75rem',
             fontWeight: '700',
             color: '#111827'
-          }}>{hostData.avgAttendance}</div>
+          }}>85</div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6b7280',
             marginTop: '0.25rem'
-          }}>avg</div>
+          }}>avg attendance</div>
         </div>
       </div>
 
-      {/* Tab Navigation (Upcoming/Past events/Reviews) */}
+      {/* Tab Navigation */}
       <div style={{
         padding: '1rem 1.25rem 0',
         display: 'flex',
@@ -254,7 +359,7 @@ export default function HostProfile() {
         ))}
       </div>
 
-      {/* Upcoming Events Section (Default Active Tab) */}
+      {/* Upcoming Events Section */}
       {selectedTag === 0 && (
         <div style={{
           padding: '1rem 1.25rem',
@@ -263,57 +368,57 @@ export default function HostProfile() {
           borderRadius: '0.5rem',
           margin: '0.5rem 1.25rem'
         }}>
-          {eventCards.map((card, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '1rem 0',
-              borderBottom: index < eventCards.length - 1 ? '1px solid #e5e7eb' : 'none'
-            }}>
-              {/* Event Thumbnail Image */}
-              <div style={{ marginRight: '1rem' }}>
-                <img
-                  src={card.image || '/default-event.png'} // Replace with actual event image path
-                  alt={card.title}
-                  style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '0.5rem',
-                    objectFit: 'cover'
-                  }}
-                />
+          {upcomingEventCards.length === 0 ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem 0' }}>No upcoming events found</p>
+          ) : (
+            upcomingEventCards.map((card) => (
+              <div key={card.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem 0',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                <div style={{ marginRight: '1rem' }}>
+                  <img
+                    src={card.image || '/default-event.png'}
+                    alt={card.title}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '0.5rem',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#111827'
+                  }}>{card.title}</h3>
+                  <p style={{
+                    margin: '0.25rem 0 0.5rem 0',
+                    fontSize: '0.875rem',
+                    color: '#6b7280'
+                  }}>{card.date}</p>
+                  <button style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    backgroundColor: '#f3f4f6',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    color: '#374151'
+                  }}>
+                    Edit event
+                  </button>
+                </div>
               </div>
-              
-              {/* Event Details (Title/Date/Edit Button) */}
-              <div style={{ flex: 1 }}>
-                <h3 style={{
-                  margin: 0,
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  color: '#111827'
-                }}>{card.title}</h3>
-                <p style={{
-                  margin: '0.25rem 0 0.5rem 0',
-                  fontSize: '0.875rem',
-                  color: '#6b7280'
-                }}>{card.date}</p>
-                {/* Edit Event Button */}
-                <button style={{
-                  padding: '0.25rem 0.75rem',
-                  fontSize: '0.75rem',
-                  backgroundColor: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.375rem',
-                  cursor: 'pointer',
-                  color: '#374151'
-                }}>
-                  Edit event
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
 
-          {/* Create New Event Button */}
           <button style={{
             width: '100%',
             padding: '0.75rem',
@@ -330,21 +435,69 @@ export default function HostProfile() {
         </div>
       )}
 
-      {/* Past Events Section (Empty State) */}
+      {/* Past Events Section */}
       {selectedTag === 1 && (
         <div style={{
-          padding: '2rem 1.25rem',
+          padding: '1rem 1.25rem',
           backgroundColor: 'white',
           marginTop: '0.5rem',
           borderRadius: '0.5rem',
-          margin: '0.5rem 1.25rem',
-          textAlign: 'center'
+          margin: '0.5rem 1.25rem'
         }}>
-          <p style={{ color: '#6b7280' }}>No past events found</p>
+          {pastEventCards.length === 0 ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem 0' }}>No past events found</p>
+          ) : (
+            pastEventCards.map((card) => (
+              <div key={card.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem 0',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                <div style={{ marginRight: '1rem' }}>
+                  <img
+                    src={card.image || '/default-event.png'}
+                    alt={card.title}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '0.5rem',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#111827'
+                  }}>{card.title}</h3>
+                  <p style={{
+                    margin: '0.25rem 0 0.5rem 0',
+                    fontSize: '0.875rem',
+                    color: '#6b7280'
+                  }}>{card.date}</p>
+                  <button style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    backgroundColor: '#f3f4f6',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    color: '#374151'
+                  }}>
+                    View details
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* Reviews Section */}
+      {/* Reviews Section (Retain the original static data and it can be expanded with the API in the future.) */}
       {selectedTag === 2 && (
         <div style={{
           padding: '1rem 1.25rem',
@@ -359,7 +512,6 @@ export default function HostProfile() {
               borderBottom: '1px solid #e5e7eb'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-                {/* Reviewer Avatar */}
                 <div style={{
                   width: '40px',
                   height: '40px',
@@ -373,7 +525,6 @@ export default function HostProfile() {
                   <span style={{ color: '#6b7280' }}>{review.userName.charAt(0)}</span>
                 </div>
                 
-                {/* Reviewer Name */}
                 <h4 style={{
                   margin: 0,
                   fontSize: '0.875rem',
@@ -381,7 +532,6 @@ export default function HostProfile() {
                 }}>{review.userName}</h4>
               </div>
               
-              {/* Review Message */}
               <p style={{
                 margin: 0,
                 fontSize: '0.875rem',
@@ -405,7 +555,6 @@ export default function HostProfile() {
         justifyContent: 'space-around',
         borderTop: '1px solid #e5e7eb'
       }}>
-        {/* Home Icon */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -418,7 +567,6 @@ export default function HostProfile() {
           </svg>
         </div>
         
-        {/* Calendar Icon */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -433,7 +581,6 @@ export default function HostProfile() {
           </svg>
         </div>
         
-        {/* Notifications Icon */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -446,7 +593,6 @@ export default function HostProfile() {
           </svg>
         </div>
         
-        {/* Profile Icon */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
