@@ -60,7 +60,7 @@
  * #### The Client
     - Description
 
-      As our point of contact, the client ensures that the projects expands in the intended direction, as per the application's purpose and envisioned end-goal. This includes regular meetings, checking not only progress, but also understanding. This means that the result can be successfully reached, with everyone involved, learning and comprehending along the way.
+      As our point of contact, the client ensures that the projects expand in the intended direction, as per the application's purpose and envisioned end-goal. This includes regular meetings, checking not only progress, but also understanding. This means that the result can be successfully reached, with everyone involved, learning and comprehending along the way.
 
 
 ## User Stories
@@ -72,11 +72,11 @@
 
 ## Project structure
 > [!NOTE]
-> For a more thorough explanation of project structure Detail, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
+> For a more thorough explanation of project structure details, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
 
-> For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+> For a more thorough explanation of the Backend structure, see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
 
->For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
+>For a more thorough explanation of AWS, PostgreSQL setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
 ```text
 SharedGO/
@@ -135,29 +135,29 @@ SharedGO/
 ![chat system](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Workflow/Chat%20Workflow.png)
 
 ## Flow Steps
-* #### Indivisual user
+* #### Individual user
      1. Register and log in
      2. Grant location access to see nearby events
      3. Browse events by filter (interest and time)
      4. Tap an event pin to see details
      5. Click "join"
-     6. Recieve confirmation
+     6. Receive confirmation
      7. Added to the schedule and access group chat
      
         
 * #### Host
-     1. Log in with verified host account
+     1. Log in with a verified host account
      2. Click "create event"
      3. Fill in event details (title, time, location, capacity)
      4. Click "publish"
-     5. Event appers on the map, chat is created
+     5. Event appears on the map, chat is created
 
 * #### Friend group & Societies
      1. Click "create private event"
      2. Fills in event details (title, time, location, capacity)
      3. Chooses friends from contacts/app list to invite
      4. Click "create & send invites"
-     5. Event is created but only visible to invited users
+     5. The event is created but only visible to invited users
      6. Invited users receive notification
      7. Accepted users added to group chat
         
