@@ -20,6 +20,7 @@ const MAX_ATTEMPTS = 5;
 //node js read enviornment from process.env
 const SMTP_USER =process.env.SMTP_USER || "";
 const SMTP_PASS = process.env.SMTP_PASS || "";
+//SMTP_FROM: This determines what the recipient sees in the "From" field.
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "SharedGo <no-reply@sharedgo.local>";
 
 // Secret for hashing login codes
@@ -28,9 +29,9 @@ const LOGIN_CODE_SECRET = process.env.LOGIN_CODE_SECRET || "";
 //create mailer if SMTP_USER and SMTP_PASS are provided
 const mailer =
   SMTP_USER && SMTP_PASS
+  //using modemailer
     ? nodemailer.createTransport({
         service: "gmail",
-        
         auth: {
           user: SMTP_USER,
           pass: SMTP_PASS,
@@ -61,7 +62,7 @@ if (!mailer) {
   throw new Error("Email login is not configured.");
 }
 
-const subject = "Your SharedGo verification code";
+const subject = "NO REPLY-Your SharedGo verification code";
 
 
 const text = `Hello ${name},
@@ -94,6 +95,7 @@ const html = `
     <p style="font-size: 12px; color: #666; margin-top: 16px;">
       If you didn’t request this code, you can ignore this email.
     </p>
+
   </div>
 `;
 
@@ -147,8 +149,8 @@ router.post("/email/start", async (req, res) => {
     orderBy: { createdAt: "desc" },
   });
 
-  //if a code is still valid, block resending
-  if (activeCode?.expiresAt && activeCode.expiresAt.getTime() + 1000 > now.getTime()) {
+  // if a code is still valid, block resending
+  if (activeCode?.expiresAt && activeCode.expiresAt.getTime() > now.getTime()) {
     res.status(429).json({ message: "A verification code is already active. Please wait for it to expire." });
     return;
   }
