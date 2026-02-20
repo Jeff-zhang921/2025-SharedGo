@@ -148,7 +148,7 @@ router.post("/email/start", async (req, res) => {
   });
 
   //if a code is still valid, block resending
-  if (activeCode) {
+  if (activeCode?.expiresAt && activeCode.expiresAt.getTime() + 1000 > now.getTime()) {
     res.status(429).json({ message: "A verification code is already active. Please wait for it to expire." });
     return;
   }
