@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import{useLocation}from"react-router-dom";
 import{io,type Socket}from "socket.io-client"
 //chatPage/css has not been commited.
@@ -29,10 +29,11 @@ const ChatPage = () => {
   //bring extra info the previous page tried to send.
   const socketRef=useRef<Socket|null>(null);
   //useRef is like a box that holds a value, but changing what’s inside does not tell React to redraw the screen.
+  //when refresh the page, stuff inside will not vanish. to call the stuff inside call var.current
   const messageListRef=useRef<HTMLDivElement|null>(null)
+  const threadIdRef = useRef<number | null>(null);
   //change a useState value, React rerender the UI to show the new information."
   const [status,setStatus]=useState("Not connected")
-  const[hostId,setHostId]=useState("")
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
 
@@ -40,7 +41,6 @@ const ChatPage = () => {
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
   const autoThreadRef=useRef(false)
 //useEffect: After you finish drawing the screen, run this specific piece of code.
-const [meLoaded, setMeLoaded] = useState(false);
 const [messageBody,setMessageBody]=useState("")
 
 
@@ -61,9 +61,7 @@ const loadMe=async()=>{
   }catch{
     setMe(null)
     return null
-  }finally{
-  setMeLoaded(true)  
-  }  
+  }
 }
 //Async/Await: The code pauses at the await line. It waits for the server to send back the user data. Only once it has the data in its "hands" does it move to the next line to connect the socket.
 
@@ -104,9 +102,11 @@ socketRef.current=socket
 //when they connect it will execute the following code
  socket.on("connect",()=>{
   setStatus("Connected")
-  if(threadId){
-    //tells the server put the user in the thread romm
-    socket.emit("thread:join", { threadId });
+  const activeThreadId = threadIdRef.current;
+  if(activeThreadId){
+    //tells the server put the user in the thread room
+    socket.emit("thread:join", { threadId: activeThreadId });
+    loadMessages(activeThreadId);
   }
  })
 
@@ -128,6 +128,10 @@ socketRef.current=socket
 //the rules say []. This means 'Only run the code inside if the stuff in these brackets has changed since the last time I was here.'"
 //The Reality: "Since there is nothing in the brackets, nothing could have changed. I'm not even going to open this door. Skip it!"
 //this useeffect is to connect to the socket
+  useEffect(() => {
+    threadIdRef.current = threadId;
+  }, [threadId]);
+
   useEffect(()=>{
    ( async()=>{
       const user=await loadMe()
@@ -144,10 +148,12 @@ socketRef.current=socket
 
   //this useEffect is to join the chat and load
     useEffect(()=>{
-    if(!threadId||!socketRef.current) return
-    socketRef.current.emit("thread:join",{threadId})
+    if(!threadId) return
     loadMessages(threadId)
-  },[threadId ])
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("thread:join",{threadId})
+    }
+  },[threadId ])  
 
 
 //this is use to handle the visual scrolling and 
@@ -207,7 +213,6 @@ useEffect(()=>{
   }
   if(state.hostId){
     autoThreadRef.current=true
-    setHostId(String(state.hostId))
     createThreadForHostId(state.hostId)
   }
 },[location.state])
@@ -233,25 +238,6 @@ const handleSendMessage=()=>{
   //The message is gone; now make the paper blank again
   setMessageBody("")
 }
-//useMemo is the remember for react
-//useMemo is for the UI: It remembers a value so that React can use it to draw the screen faster. It is used for "derived data" (data created from other data).
-const headerTitle=useMemo(()=>{
-  if(threadId)return `thread#${threadId}`
-  return "chat"
-
-},[threadId])
-
-//this probably not gonna use this
-const avatarLabel=useMemo(()=>{
-  if(me?.email) return me.email.slice(0,1).toUpperCase()
-    return "C"
-},[me])
-
-
-
-
-
-
   return (
     <div className='chat-shell'>
       <main className='chat-panel'>

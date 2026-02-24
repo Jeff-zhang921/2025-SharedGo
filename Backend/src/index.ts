@@ -1,14 +1,14 @@
-import "./types/express-session";
 import express, { Request, Response } from "express";
+import cors from "cors";
+import http from "http";
+import "./types/express-session";
 import eventsRouter from "./routes/events";
 import hostsRouter from "./routes/hosts";
-import cors from "cors";
 import authRouter from "./routes/auth";
 import homeRouter from "./routes/home";
 import profileRouter from "./routes/profile";
 import filterRouter from "./routes/filter";
 import { sessionMiddleware } from "./session";
-import http from "http";
 import { initSocket } from "./socket";
 import chatRouter from "./routes/chat";
 
@@ -43,6 +43,7 @@ app.get("/",(request:Request,response:Response)=>{
 if (require.main === module) {
   const server = http.createServer(app);
   initSocket(server);
+  // the server now contain both express and socket.io
   server.listen(PORT, () => {
     console.log(`running on port ${PORT} `);
   });

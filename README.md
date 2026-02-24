@@ -72,11 +72,12 @@
 
 ## Project structure
 > [!NOTE]
-> For a more thorough explanation of project structure Detail, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
 
-> For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+For a more thorough explanation of project structure Detail, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
 
->For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
+For a more thorough explanation of the Backend structure see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+
+For a more thorough explanation of AWS, Postgresql setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
 
 ```text
 SharedGO/
@@ -126,13 +127,13 @@ SharedGO/
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
 
 ### Architecture diagram
-![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.png)
+![Architecture](Docs/Architecture/Architecture2.0.png)
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
 
 ## Chat logic workflow
-![chat system](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Workflow/Chat%20Workflow.png)
+![chat system](Docs/Workflow/Chat%20Workflow.png)
 
 ## Flow Steps
 * #### Indivisual user

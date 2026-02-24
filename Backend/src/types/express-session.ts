@@ -1,4 +1,5 @@
 import "express-session";
+//make sure the data format send in to the session store is correct
 
 declare module "express-session" {
   interface SessionData {

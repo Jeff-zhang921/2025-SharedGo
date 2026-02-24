@@ -10,6 +10,7 @@ import HostPage from './pages/hostPage'
 import HostProfile from './pages/profilePage';
 import LoginPage from './pages/loginPage'
 import VerifyPage from './pages/verifyPage'
+import ConversationsPage from './pages/ConversationPage';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
       <Route path="/host/:hostId" element={<HostPage />} />
        {/* set the path for the profile page */}
       <Route path="/profile" element={<HostProfile />} />
+      <Route path="/conversations" element={<ConversationsPage />} />
       {/* set the path for the login page */}
       <Route path="/" element={<LoginPage />} />
       {/* set the path for the verify page */}
