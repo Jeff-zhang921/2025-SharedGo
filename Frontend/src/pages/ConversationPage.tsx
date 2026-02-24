@@ -141,6 +141,81 @@ const handleOpenThread = (threadId: number) => {
   };
 
 
+return(
+    <div className="conversations-page">
+      <div className="conversations-shell">
+        <header className="conversations-header">
+          <div>
+            <p className="eyebrow"></p>
+            <h1>{me?.email}</h1>
+          </div>
+        </header>
+        <div className="conversations-toolbar">
+          <div className="search-field">
+            <label className="conversation-search">Search</label>
+            <input
+              id="conversation-search"
+              type="text"
+              placeholder="Search by name or event"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="conversations-meta">
+          <h2>
+           Messages
+          </h2>
+        </div>
+        
+
+        {status && <div>{status}</div>}
+        {!status && conversations.length === 0 && (
+          <div>No conversations yet.</div>
+        )}
+        {!status && conversations.length > 0 && filteredConversations.length === 0 && (
+          <div>
+            No conversations match "{searchTerm.trim()}".
+          </div>
+        )}
+        {/* section: It tells the browser (and search engines) that "everything inside this box belongs to one specific theme." */}
+         <section className="conversations-list">
+          {filteredConversations.map((item) => (
+            // If you "cut" an article out of your website and put it on a different page, it should still make sense by itself.
+            <article
+              key={item.threadId}
+              className="conversation-card"
+              style={{ ["--accent" as any]: item.accent }}
+              onClick={() => handleOpenThread(item.threadId)}
+              role="button"
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  handleOpenThread(item.threadId);
+                }
+              }}
+            >
+              <div className="avatar">
+                {/*  span doesn't do anything*/}
+                <span>{getInitials(item.name[0])}</span>
+              </div>
+              <div className="conversation-body">
+                <div className="conversation-top">
+                  <h3>{item.name}</h3>
+                    <p className={"role"}>
+                    {item.role}
+                  </p>
+                  <span className="time">{item.time}</span>
+                </div>
+                <p className="preview">{item.preview}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+    </div>
+  </div>
+)
 
 
 }

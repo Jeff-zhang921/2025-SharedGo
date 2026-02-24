@@ -286,8 +286,6 @@ const handleSendMessage=()=>{
         </div>
 
 
-
-
         <div className='chat-input'>
           {/* <button type="button" className="input-icon" >
           </button> */}
