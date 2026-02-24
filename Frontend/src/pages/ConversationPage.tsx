@@ -37,7 +37,8 @@ type ConversationView = {
 };
 
 const BACKEND_URL = "http://localhost:3000";
-const ACCENTS = ["#1f7a8c", "#e63946", "#7f5539", "#2a9d8f", "#5a189a", "#2d6a4f"];
+//accent is used for the avater
+const ACCENTS = ["#1f98b0", "#c43642", "#cb7e4a", "#37c9b8", "#7743ac", "#42a679"];
 
 const getInitials=(name:string)=>{
   const parts=name.split(" ").filter(Boolean)
@@ -79,15 +80,15 @@ const ConversationPage=()=>{
         const meData=await meRes.json()
         if(isMounted) setme(meData.user??null)
 
-          const threadResponse=await fetch(`${BACKEND_URL}/chat/threads`,{
+          const threadRespond=await fetch(`${BACKEND_URL}/chat/threads`,{
             credentials:"include"
           })
-          if(!threadResponse.ok){
-            const data=await threadResponse.json().catch(()=>{})
+          if(!threadRespond.ok){
+            const data=await threadRespond.json().catch(()=>{"error occur when fetching threads!"})
             if(isMounted)setStatus(data.message||"Fail to load conversation")
               return
           }
-          const data=await threadResponse.json()
+          const data=await threadRespond.json()
           if(isMounted) {
             setThread(Array.isArray(data)?data:[])
             setStatus("")
@@ -104,6 +105,30 @@ const ConversationPage=()=>{
  },[])
 
 
+//Please remember the result of this calculation and don't redo the work unless it is absolutely necessary.
+const conversations=useMemo(()=>{
+if(!me)return []
+const mapped =thread.map((thread)=>{
+  const isHost=thread.hostId===me.id
+  const other=isHost?thread.guest:thread.host
+  //make sure they are different 
+  const accent=ACCENTS[other.id%ACCENTS.length]
+  return {
+    threadId:thread.id,
+    name:other.name||other.email,
+    role:isHost? "Host":"Guest",
+    preview: thread.lastMessage?.body || "No messages yet.",
+    time:formatTime(thread.lastMessage?.createdAt),
+    accent,
+  }
+}
+)
+return mapped
+},[thread,me])
+
+const handleOpenThread = (threadId: number) => {
+    navigate("/chat", { state: { threadId } });
+  };
 
 }
 
