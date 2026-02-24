@@ -106,3 +106,26 @@ width: 1px;
   justify-content: space-between;
   gap: 0.5rem;
 }
+
+
+.time {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.role {
+  display: inline-block;
+  margin-right: auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+    background: rgba(17, 17, 17, 0.08);
+  color: #1c1d20;
+}
+
+.preview {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
