@@ -35,3 +35,41 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+.conversations-toolbar {
+  /* display: flex; */
+  margin-top:-100px;
+  align-items: center;
+}
+
+.search-field {
+  width: min( 100%);
+  display: grid;
+  gap: 0.4rem;
+}
+
+.search-field label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.search-field input {
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  background: var(--panel);
+}
+
+.conversations-meta {
+  
+  margin-top: -150px;
+width: 1px;
+  font-size: 0.8rem;
+}
+
+.conversations-list {
+  margin-top:-250px;
+  display: grid;
+  
+}
