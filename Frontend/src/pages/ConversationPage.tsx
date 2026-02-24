@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ConversationPage.css";
 
@@ -18,22 +18,20 @@ type ThreadResponse = {
   updatedAt: string;
   host: UserSummary;
   guest: UserSummary;
-  lastMessage: {
+  // current backend shape from /chat/threads
+  Messages?: {
+    id: number;
+    body: string;
+    createdAt: string;
+    senderId: number;
+  }[];
+  // optional legacy/alternate shape
+  lastMessage?: {
     id: number;
     body: string;
     createdAt: string;
     senderId: number;
   } | null;
-};
-
-
-type ConversationView = {
-  threadId: number;
-  name: string;
-  role: "Host" | "Guest";
-  preview: string;
-  time: string;
-  accent: string;
 };
 
 const BACKEND_URL = "http://localhost:3000";
@@ -59,6 +57,7 @@ const ConversationPage=()=>{
   const [me,setme]=useState<UserSummary|null>(null)
   const[thread,setThread]=useState<ThreadResponse[]>([])
   const [status,setStatus]=useState("loading...")
+  const [searchTerm, setSearchTerm] = useState("");
   //async function is use to let function inside and outside async func to run when async is running, no need to wait
   //await only contain inside async func
   //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected
@@ -106,19 +105,22 @@ const ConversationPage=()=>{
 
 
 //Please remember the result of this calculation and don't redo the work unless it is absolutely necessary.
+//list out all the user thread
 const conversations=useMemo(()=>{
 if(!me)return []
 const mapped =thread.map((thread)=>{
   const isHost=thread.hostId===me.id
   const other=isHost?thread.guest:thread.host
+  //fall back chain 
+  const latestMessage = thread.lastMessage ?? thread.Messages?.[0] ?? null;
   //make sure they are different 
   const accent=ACCENTS[other.id%ACCENTS.length]
   return {
     threadId:thread.id,
     name:other.name||other.email,
     role:isHost? "Host":"Guest",
-    preview: thread.lastMessage?.body || "No messages yet.",
-    time:formatTime(thread.lastMessage?.createdAt),
+    preview: latestMessage?.body || "No messages yet.",
+    time:formatTime(latestMessage?.createdAt),
     accent,
   }
 }
@@ -126,9 +128,20 @@ const mapped =thread.map((thread)=>{
 return mapped
 },[thread,me])
 
+const filteredConversations = useMemo(() => {
+  const query = searchTerm.trim().toLowerCase();
+  if (!query) return conversations;
+  return conversations.filter((item) =>
+    item.name.includes(query)
+  );
+}, [conversations, searchTerm]);
+
 const handleOpenThread = (threadId: number) => {
     navigate("/chat", { state: { threadId } });
   };
+
+
+
 
 }
 

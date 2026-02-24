@@ -30,6 +30,8 @@ const ChatPage = () => {
   const socketRef=useRef<Socket|null>(null);
   //useRef is like a box that holds a value, but changing what’s inside does not tell React to redraw the screen.
   //when refresh the page, stuff inside will not vanish. to call the stuff inside call var.current
+  //when call <div className="chat-body" ref={messageListRef}>, it wll do 
+  //messageListRef.current = <the actual div DOM node>: the stuff that inside the div will auto scroll or do some action
   const messageListRef=useRef<HTMLDivElement|null>(null)
   const threadIdRef = useRef<number | null>(null);
   //change a useState value, React rerender the UI to show the new information."
@@ -160,9 +162,9 @@ socketRef.current=socket
  useEffect(()=>{
   //If the box is still empty (because the screen hasn't finished drawing), stop here
   if(!messageListRef.current)return 
+
   messageListRef.current.scrollTo({
     top:messageListRef.current.scrollHeight,
-    behavior:"smooth"
   })
  },[message])
 
@@ -257,7 +259,7 @@ const handleSendMessage=()=>{
           )}
 
           {message.length === 0 && (
-            <div className='chat-empty'>Start a conversation</div>
+            <div>Start a conversation</div>
           )}
           
           {message.map((msg, index) => {
@@ -271,7 +273,6 @@ const handleSendMessage=()=>{
               //{ color: "red", fontSize: "16px" }
               //{ --i: 0 } <i style="color: red;">
               //using --i so each chat message is in different i
-               style={{ ["--i" as any]:index }}
               >
                  <div className={`chat-bubble ${isMe ? "bubble-me" : "bubble-them"}`}>
                   <p>{msg.body}</p>
@@ -292,7 +293,7 @@ const handleSendMessage=()=>{
           </button> */}
           <input
             type="text"
-            placeholder="Type your message"
+            placeholder="Messages..."
             value={messageBody}
           // e.target.value: This is the exact text currently sitting inside the input box.
           //e is the key(键位) that user press

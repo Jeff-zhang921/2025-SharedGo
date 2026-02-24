@@ -7,14 +7,14 @@ What it does: It pushes other boxes away. */
 /*same size as the browser window */
 .chat-shell {
     /* this are the variables */
-  --bg: #e8d1d1;
+  --bg: #f4f3f3;
   --panel-2: #f7f3f3;
   --line: #e4e4e4;
   --text: #111111;
   --muted: #858080;
   --accent: #000000;
   --bubble-me: #933fd8;
-  --bubble-them: #f8f4f4;
+  --bubble-them: #b8b5b59f;
 
   /* ensure chati s at least as tall as screen */
   min-height: 100vh;
@@ -24,22 +24,14 @@ What it does: It pushes other boxes away. */
   /* Tells the shell to use a "Grid" layout (good for dividing space). */
   display: grid;
 
-  grid-template-columns: 1fr;
   /* background: var(--bg): Applies that light gray color (#f7f7f7) to the whole background. */
   background: var(--bg);
-  /* Sets the default text color to almost black */
-  color: var(--text);
-  /* use font */
-  font-family: "Manrope", sans-serif;
+  
+  font-family: "Manrope";
   /* : Stops the whole page from scrolling */
   overflow: hidden;
-  /* box sizing says if add the padding the border won't add, it will make content smaller to fit */
-  box-sizing: border-box;
-}
-
-/* Apply this thing to every single element inside chat-shell */
-.chat-shell * {
-  box-sizing: border-box;
+      /* box sizing says if add the padding the border won't add, it will make content smaller to fit */
+box-sizing: border-box;
 }
 
 
@@ -47,9 +39,8 @@ What it does: It pushes other boxes away. */
 .status-pill {
   padding: 6px 10px;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
   background: #eeeeee;
   color: var(--muted);
 }
@@ -79,13 +70,14 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   display: flex;
   /* stack them top to bottom */
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
 }
 
 .chat-input {
   display: grid;
   grid-template-columns:  1fr auto;
   gap: 8px;
+  border-radius:12px;
   /* space inside the bar */
   padding: 22px 20px;
   border-top: 1px solid var(--line);
@@ -109,7 +101,6 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   border-radius: 10px;
   padding: 0 22px;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .bubble-me {
@@ -123,6 +114,38 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   color: #ffffff;
   border-bottom-left-radius: 4px;
 }
+
+.chat-date {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.chat-row {
+  display: flex;
+  gap: 12px;
+}
+
+.chat-row.me {
+  justify-content: flex-end;
+}
+
+.chat-bubble {
+  max-width: 99%;
+  padding: 5px 10px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap:4px;
+  line-height: 1.5;
+}
+
+
+.chat-timestamp {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 
 @media (min-width: 1200px) {
   .chat-shell {
@@ -145,14 +168,3 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   }
 }
 
-@media (max-width: 900px) {
-  .chat-panel {
-    min-height: 100vh;
-  }
-}
-
-@media (max-width: 600px) {
-  .chat-input {
-    grid-template-columns: 1fr auto;
-  }
-}
