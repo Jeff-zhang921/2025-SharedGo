@@ -1,5 +1,5 @@
-import {useEffect,useRef,useState} from 'react';
-import{useLocation}from"react-router-dom";
+import {useEffect,useMemo,useRef,useState} from 'react';
+import{useLocation,useNavigate}from"react-router-dom";
 import{io,type Socket}from "socket.io-client"
 //chatPage/css has not been commited.
 import"./chatPage.css"
@@ -26,6 +26,8 @@ const Backend_URL="http://localhost:3000";
 
 const ChatPage = () => {
   const location=useLocation()
+  const other = (location.state as { other?: string } | null)?.other ?? "";
+  const navigate=useNavigate()
   //bring extra info the previous page tried to send.
   const socketRef=useRef<Socket|null>(null);
   //useRef is like a box that holds a value, but changing what’s inside does not tell React to redraw the screen.
@@ -240,11 +242,24 @@ const handleSendMessage=()=>{
   //The message is gone; now make the paper blank again
   setMessageBody("")
 }
+
   return (
     <div className='chat-shell'>
       <main className='chat-panel'>
         {/* finds the messageListRef object, and sets: messageListRef.current = [The actual HTML div element] */}
-        
+        <div className='chat-bar'>
+          <button 
+          type='button'
+          className='back-button'
+          onClick={()=>navigate(-1)}
+          >
+           ⤺
+          </button>
+          <span className='avatar'>
+           {other ? other[0].toUpperCase() : "?"}
+          </span>
+          <span>{other}</span>
+        </div>
         <div  className='chat-body' ref={messageListRef}>
 
           {/* Somewhere near the top of the chat panel */}

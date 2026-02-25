@@ -63,6 +63,7 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
 
 /* chat body is the 聊天界面（big chat box） */
 .chat-body {
+  /* flex:1 make sure chat body fit the exact size that is screen- (header+input) */
   flex: 1;
   padding: 24px;
   overflow-y: auto;
@@ -71,6 +72,34 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   /* stack them top to bottom */
   flex-direction: column;
   gap: 4px;
+}
+.chat-bar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: var(--bg);
+}
+
+.chat-bar .back-button {
+   font-size: 22px;
+   font-weight: 900;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  align-items: center;
+  padding: 0;
+  background: var(--bg);
+}
+
+.chat-bar .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  display: grid;
+  text-transform: uppercase;
 }
 
 .chat-input {

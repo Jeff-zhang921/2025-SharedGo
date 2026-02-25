@@ -118,6 +118,7 @@ const mapped =thread.map((thread)=>{
   return {
     threadId:thread.id,
     name:other.name||other.email,
+    email:other.email,
     role:isHost? "Host":"Guest",
     preview: latestMessage?.body || "No messages yet.",
     time:formatTime(latestMessage?.createdAt),
@@ -136,8 +137,8 @@ const filteredConversations = useMemo(() => {
   );
 }, [conversations, searchTerm]);
 
-const handleOpenThread = (threadId: number) => {
-    navigate("/chat", { state: { threadId } });
+const handleOpenThread = (threadId: number,other:string) => {
+    navigate("/chat", { state: { threadId, other} });
   };
 
 
@@ -187,11 +188,11 @@ return(
               key={item.threadId}
               className="conversation-card"
               style={{ ["--accent" as any]: item.accent }}
-              onClick={() => handleOpenThread(item.threadId)}
+              onClick={() => handleOpenThread(item.threadId,item.email)}
               role="button"
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
-                  handleOpenThread(item.threadId);
+                  handleOpenThread(item.threadId, item.email);
                 }
               }}
             >
