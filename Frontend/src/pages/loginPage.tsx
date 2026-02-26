@@ -10,6 +10,13 @@ const CreateLoginPage = () => {
 
     const handleGetCode = async () => {
         try {
+                if(email.includes("@bristol.ac.uk")){
+       const message = 
+  "SharedGo follows the University of Bristol’s Information Security Policy (ISP-07),University emails are prohibited for external services. Please use a personal email."
+;
+setStatus(message);
+                    return
+                }
             const response = await fetch("http://localhost:3000/auth/email/start", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
