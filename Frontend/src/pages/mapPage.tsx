@@ -81,10 +81,11 @@ const MapPage = () => {
   // Circle Icons
   const createEventIcon = (title: string) => {
     const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 1.3); //Exponential scaling to make icons grow larger or smaller dependant on zoom
+    const fontSize = size * 0.13;
     return new L.DivIcon({
       className: 'custom-div-icon',
       html: `<div class="event-circle-marker" style="width: ${size}px; height: ${size}px;">
-               <span style="font-size: ${size / 5}px;">${title}</span>
+               <span style="font-size: ${fontSize}px;">${title}</span>
              </div>`,
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2], //Centre circle exactly on top of coordinates
