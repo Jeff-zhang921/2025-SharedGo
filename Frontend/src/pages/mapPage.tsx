@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -41,8 +41,22 @@ const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
   const navigate = useNavigate()
   const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
+  const [map, setMap] = useState<L.Map | null>(null); //State to hold the map instance
   const location = useLocation();
+  const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
+  const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
+
+  useEffect(() => {
+    //Only run if map is ready and we have coordinates
+    if (map && navState?.centerTo && !hasMovedRef.current) {
+      map.setView(navState.centerTo, navState.zoomTo || 16, { animate: true });
+      //Lock it so it doesn't runs again
+      hasMovedRef.current = true;
+      //Wipe the state (bug fixing)
+      window.history.replaceState({}, document.title);
+    }
+  }, [map, navState]); //Only re-run if the map object itself changes
 
   useEffect(() => {
     // Fetch events from backend
@@ -125,6 +139,7 @@ const MapPage = () => {
         center={[51.5, -2.6]} //Centre of bristol
         zoom={13}
         zoomControl={false} //Users can still zoom in and out using trackpad
+        ref={setMap}
         style={{ height: "100vh", width: "100vw" }} //Takes up whole page
       >
         <TileLayer
