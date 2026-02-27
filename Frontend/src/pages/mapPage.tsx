@@ -58,12 +58,22 @@ const MapPage = () => {
     fetchEvents();
   }, []);
 
-  //Helper function to track the zoom level
-  const ZoomTracker = () => {
+  const MapEventsHandler = () => {
     const map = useMapEvents({
-      zoomend: () => {
-        setZoomLevel(map.getZoom()); //Update state when zoom ends
+      click: (e) => {
+        setTempMarker({ lat: e.latlng.lat, lng: e.latlng.lng }); //Functionality to save coordinates from clicking the map
       },
+      //Handle zoom updates
+      zoomend: () => {
+        setZoomLevel(map.getZoom());
+      },
+      //Get rid of popup whenever map moves or zooms (bug fix)
+      zoomstart: () => {
+        setTempMarker(null);
+      },
+      movestart: () => {
+        setTempMarker(null);
+      }
     });
     return null;
   };
@@ -80,16 +90,6 @@ const MapPage = () => {
       iconAnchor: [size / 2, size / 2], //Centre circle exactly on top of coordinates
     });
   };
-
-  const MapClickHandler = () => {
-    useMapEvents({
-      click: (e) => {
-        setTempMarker({ lat: e.latlng.lat, lng: e.latlng.lng });
-        //Functionality to save coordinates from clicking the map
-      },
-    });
-    return null;
-  }
 
   return (
     <div className="map-container">
@@ -130,8 +130,7 @@ const MapPage = () => {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
         />
-        <ZoomTracker />
-        <MapClickHandler />
+        <MapEventsHandler />
 
         {tempMarker && (
           <Popup position={[tempMarker.lat, tempMarker.lng]}>
