@@ -70,7 +70,7 @@ const MapPage = () => {
 
   // Circle Icons
   const createEventIcon = (title: string) => {
-    const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 2); //Exponential scaling to make icons grow larger or smaller dependant on zoom
+    const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 1.3); //Exponential scaling to make icons grow larger or smaller dependant on zoom
     return new L.DivIcon({
       className: 'custom-div-icon',
       html: `<div class="event-circle-marker" style="width: ${size}px; height: ${size}px;">
@@ -90,9 +90,6 @@ const MapPage = () => {
     });
     return null;
   }
-
-  const ICON_DIAMETER = 100; // Diameter of the circle in pixels
-  const FONT_SIZE = '16px';
 
   return (
     <div className="map-container">

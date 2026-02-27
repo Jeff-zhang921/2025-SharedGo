@@ -34,8 +34,6 @@
 }
 
 .event-circle-marker {
-  width: 100px;
-  height: 100px;
   cursor: pointer;
   text-decoration: none;
   border-radius: 50%;
