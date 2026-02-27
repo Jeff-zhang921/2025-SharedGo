@@ -42,6 +42,7 @@ const MapPage = () => {
   const navigate = useNavigate()
   const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
   const location = useLocation();
+  const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
 
   useEffect(() => {
     // Fetch events from backend
@@ -57,13 +58,26 @@ const MapPage = () => {
     fetchEvents();
   }, []);
 
+  //Helper function to track the zoom level
+  const ZoomTracker = () => {
+    const map = useMapEvents({
+      zoomend: () => {
+        setZoomLevel(map.getZoom()); //Update state when zoom ends
+      },
+    });
+    return null;
+  };
+
   // Circle Icons
   const createEventIcon = (title: string) => {
+    const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 2); //Exponential scaling to make icons grow larger or smaller dependant on zoom
     return new L.DivIcon({
       className: 'custom-div-icon',
-      html: `<div class="event-circle-marker"><span>${title}</span></div>`, //Inserts title of event into marker
-      iconSize: [100, 100],
-      iconAnchor: [50, 50], //Centre circle exactly on top of coordinates
+      html: `<div class="event-circle-marker" style="width: ${size}px; height: ${size}px;">
+               <span style="font-size: ${size / 5}px;">${title}</span>
+             </div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2], //Centre circle exactly on top of coordinates
     });
   };
 
@@ -119,6 +133,7 @@ const MapPage = () => {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
         />
+        <ZoomTracker />
         <MapClickHandler />
 
         {tempMarker && (
