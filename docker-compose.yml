@@ -1,0 +1,24 @@
+services:
+  backend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - 3000:3000
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+    env_file:
+      - ./Backend/.env
+    command: sh -c "npm install && npm run dev"
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - 5173:5173
+    volumes:
+    # Mounts the frontend contents to the app folder
+      - ./Frontend:/app
+      # Ensures that npm install uses the dependencies inside of the container, not the local machine
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    

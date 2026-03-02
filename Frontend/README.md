@@ -20,6 +20,7 @@ Make sure you install these:
 
 - npm ci
 - npm install react-router-dom
+- npm install leaflet react-leaflet @types/leaflet
 
 ### Run frontend development server
 

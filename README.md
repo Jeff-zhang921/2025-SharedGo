@@ -1,4 +1,6 @@
 # 2025-SharedGo
+<img src="Docs/logo.png" alt="SharedGo logo " width="400"></img>
+
 <a href="https://react.dev"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/></a>
 <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/></a>
 <a href="https://nodejs.org/en"><img src="https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/></a>
@@ -6,11 +8,19 @@
 <a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/PostgreSQL-316195?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
 <a href="https://www.prisma.io"><img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white"/></a>
 <a href="https://aws.amazon.com"><img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white"/>
+<img src="https://img.shields.io/badge/Leaflet-010101?style=for-the-badge&logo=leaflet&logoColor=white"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+
+
+
 ## Contents
 * [Project Description](#project-Description)
 * [Stakeholders](#stakeholders)
 * [User Stories](#user-stories)
+* [Project structure](#project-structure)
 * [Tech Stack](#teckstack)
+* [CI/CD diagram](#ci/cd-diagram)
 * [Flow Steps](#flow-steps)
 * [Team members](#team-members)
 
@@ -50,7 +60,7 @@
  * #### The Client
     - Description
 
-      As our point of contact, the client ensures that the projects expands in the intended direction, as per the application's purpose and envisioned end-goal. This includes regular meetings, checking not only progress, but also understanding. This means that the result can be successfully reached, with everyone involved, learning and comprehending along the way.
+      As our point of contact, the client ensures that the projects expand in the intended direction, as per the application's purpose and envisioned end-goal. This includes regular meetings, checking not only progress, but also understanding. This means that the result can be successfully reached, with everyone involved, learning and comprehending along the way.
 
 
 ## User Stories
@@ -60,35 +70,94 @@
 
 * As a society, I want to be able to advertise all my events quickly and conveniently. I would like my society and its socials to be displayed to all users via the application and I want users to be able to join my society easily.
 
-## TechStack
-### MVP Architecture
+## Project structure
+> [!NOTE]
+> For a more thorough explanation of project structure details, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
 
-![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg)
+> For a more thorough explanation of the Backend structure, see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
+
+>For a more thorough explanation of AWS, PostgreSQL setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
+
+```text
+SharedGO/
+├── .github/
+│   ├── ISSUE_TEMPLATE/           # Custom issue reporting forms
+│   ├── PULL_REQUEST_TEMPLATE/    # PR template
+│   └── workflows/                # CI/CD automation files 
+├── Backend/                      # Node.js/Express server logic
+│   ├── prisma/                   # Database schema and migrations
+│   ├── src/
+│   │   ├── generated/            # Auto-generated types/files
+│   │   ├── middleware/           # Auth and request validation
+│   │   ├── routes/               # API endpoints
+│   │   ├── socket/               # Real-time communication (Socket.io)
+│   │   ├── types/                # express session
+│   │   ├── index.ts              # Server entry point
+│   │   ├── seed.ts               # Database seeding script
+│   │   └── session.ts            # Session management
+│   ├── tests/                    # Backend unit tests
+│   ├── Dockerfile                # Containerization config
+│   ├── API_README.md             # Documentation for API endpoints
+│   └── DEVELOPER_README.md       # Setup guide for backend devs
+├── Frontend/                     # React/Vite web application
+│   ├── public/                   # Static assets
+│   ├── src/
+│   │   ├── assets/               # Icons
+│   │   ├── components/           # Reusable UI components
+│   │   ├── pages/                # View/Screen components
+│   │   ├── App.tsx               # Main application component
+│   │   └── main.tsx              # React entry point
+│   ├── vite.config.ts            # Vite build configuration
+│   └── README.md                 # Frontend-specific documentation
+└── Docs/                         # Project management & design
+│   ├── Architecture/             # System diagrams and logic flow
+│   ├── database/                 # DB diagrams
+│   ├── design/                   # Figma designs
+│   ├── Minutes/                  # Client and team meeting notes
+│   ├── Presentations/            # Slide materials
+│   ├── AI Tools.md               # Log of AI usage in development
+│   └── testing_day_survey.pdf    # User testing feedback & results
+├── README.md                     # Project documentation
+```
+
+## TechStack
+<!-- ### MVP Architecture
+
+![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
+
+### Architecture diagram
+![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.png)
+
+## CI/CD diagram
+![CI/CD Diagram](Docs/Architecture/ci,cd.png)
+
+## Chat logic workflow
+![chat system](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Workflow/Chat%20Workflow.png)
 
 ## Flow Steps
-* #### Indivisual user
+* #### Individual user
      1. Register and log in
      2. Grant location access to see nearby events
      3. Browse events by filter (interest and time)
      4. Tap an event pin to see details
      5. Click "join"
-     6. Recieve confirmation
+     6. Receive confirmation
      7. Added to the schedule and access group chat
      
         
 * #### Host
-     1. Log in with verified host account
+     1. Log in with a verified host account
      2. Click "create event"
      3. Fill in event details (title, time, location, capacity)
      4. Click "publish"
-     5. Event appers on the map, chat is created
+     5. Event appears on the map, chat is created
 
 * #### Friend group & Societies
      1. Click "create private event"
      2. Fills in event details (title, time, location, capacity)
      3. Chooses friends from contacts/app list to invite
      4. Click "create & send invites"
-     5. Event is created but only visible to invited users
+     5. The event is created but only visible to invited users
      6. Invited users receive notification
      7. Accepted users added to group chat
         

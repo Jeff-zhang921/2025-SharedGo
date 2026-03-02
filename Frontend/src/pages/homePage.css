@@ -15,6 +15,22 @@
     padding: 2rem 0;
   }
 
+
+.profile-page {
+  position: absolute; 
+  top: 20px;
+  right: 20px;
+  z-index: 10; 
+}
+
+.profile-img {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  object-fit: cover; /*image isn't squashed*/
+  border-radius: 8px;
+}
+
   .nav-links {
     display: flex;
     flex-direction: row; /* Links horizontally next to each other */
@@ -31,6 +47,10 @@
   h1, h2 {
     color: black;
   }
+
+  .top-section {
+    margin-top: -50px;
+  }
   
   .top-section h1 {
     margin-bottom: 0.3rem; /* Bring h1 closer to h2 */
@@ -39,3 +59,25 @@
   .top-section h2 {
     margin-top: -0.2rem;
   }
+
+
+.enter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: black;
+    color: white;
+    padding: 18px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 50px; /*Rounded shape*/
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.enter-button:hover {
+    transform: translateY(-3px); /*Lifts up slightly*/
+    background-color: #222;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}

@@ -1,16 +1,44 @@
 //this is the backend logic
-import { Router } from "express"; 
-import { PrismaClient } from "@prisma/client";
+import { Router, Request, Response } from "express"; 
+import { PrismaClient, Category } from "@prisma/client";
+import { requireSession } from "../middleware/requireSession";
 
 const router = Router(); 
 const prisma = new PrismaClient(); 
 
+//parse coodinate make sure that coodinate is number
+const parseCoordinate = (raw: unknown, type: 'lat' | 'lon'): number | null => {
+  if (raw === undefined || raw === null || raw === "") return null;
+  const parsed = typeof raw === "number" ? raw : Number(raw);
+  if( !Number.isFinite(parsed)) return null;
+
+  //added boundary check to make sure the coordinate is valid
+  if (type === 'lat' &&(parsed < -90 || parsed > 90)) return null;
+  if (type === 'lon' &&(parsed < -180 || parsed > 180)) return null;
+  
+  return parsed;
+};
+
+// Haversine formula to calculate distance between two lat/lon points
+function distanceInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
+export const Categories = Object.values(Category);
 //publish event logic
 //you can post on /events/create
-router.post("/create", async (req, res) => {
+router.post("/create", requireSession, async (req, res) => {
   // Read and sanitize inputs from the request body.
   //checks the field is a string; if so, trims it; otherwise gives a safe fallback.
-//if anything is undefine in josn input, it will throw 
+  //if anything is undefine in json input, it will throw 
 
   const titleRaw = req.body?.title;
   const startsAtRaw = req.body?.startsAt;
@@ -20,6 +48,9 @@ router.post("/create", async (req, res) => {
   const imageUrlRaw = req.body?.imageUrl;
   const externalUrlRaw = req.body?.externalUrl;
   const capacityRaw = req.body?.capacity; // could be number or string; validate below
+  const categoryRaw = req.body?.category;
+  const latitudeRaw = req.body?.latitude;
+  const longitudeRaw = req.body?.longitude;
 
 //? means if titleRaw is a string, trim it; otherwise use an empty string "" 
 
@@ -37,9 +68,11 @@ router.post("/create", async (req, res) => {
     ? externalUrlRaw.trim()
     : null;
 
-
-
-
+    //treat categoryRaw as if it were already a valid Category type so that the .includes() function accepts it
+    //and test whether or not it is inside the category list
+  const category = typeof categoryRaw === "string" && Categories.includes(categoryRaw as Category)
+    ? (categoryRaw as Category)
+    : Category.Other;
 
   
  // Basic required-field validation. If invalid, return 400 and stop.
@@ -70,6 +103,18 @@ router.post("/create", async (req, res) => {
     return;
   }
 
+  if (latitudeRaw === undefined || longitudeRaw === undefined) {
+    res.status(400).json({ message: "Latitude and longitude are required." });
+    return;
+  }
+  const latitude = parseCoordinate(latitudeRaw, 'lat');
+  const longitude = parseCoordinate(longitudeRaw, 'lon');
+
+  if (latitude === null || longitude === null) {
+    res.status(400).json({ message: "Invalid latitude or longitude values." });
+    return;
+  }
+
  // Capacity is optional. If provided, parse to a finite non-negative integer.
   let capacity: number | null = null;
   if (capacityRaw !== undefined && capacityRaw !== null && capacityRaw !== "") {
@@ -79,12 +124,12 @@ router.post("/create", async (req, res) => {
       res.status(400).json({ message: "Capacity must be a positive number." });
       return;
     }
-//math.floor round down number
+  //math.floor round down number
     capacity = Math.floor(parsedCapacity);
   }
 
 
- // Ensure the host user exists by email.
+  // Ensure the host user exists by email.
   // upsert: if a user with that email exists -> return it; else create it.
   const host = await prisma.user.upsert({
     where: { email: hostEmail },
@@ -100,7 +145,10 @@ router.post("/create", async (req, res) => {
       description,
       startsAt,
       capacity,
+      category: category ?? undefined,
       location,
+      latitude,
+      longitude,
       imageUrl,
       externalUrl,
       // foreign key to the user we just upserted
@@ -125,7 +173,10 @@ router.post("/create", async (req, res) => {
       description: event.description,
       startsAt: event.startsAt,
       capacity: event.capacity,
+      category: event.category,
       location: event.location,
+      latitude: event.latitude,
+      longitude: event.longitude,
       imageUrl: event.imageUrl,
       externalUrl: event.externalUrl,
       host: {
@@ -137,6 +188,109 @@ router.post("/create", async (req, res) => {
     },
   });
 });
+
+
+
+
+//Logic to return list of ALL events
+//can get at just /events so it lists all the events rather than just 1 for each id
+//what it return is base on the user location, if location is provided, order by the nearest location event to far
+router.get("/", async (req, res) => {
+  try {
+    const queryLatitude = parseCoordinate(
+      typeof req.query.latitude === "string" ? req.query.latitude : undefined, 'lat'
+    );
+    const queryLongitude = parseCoordinate(
+      typeof req.query.longitude === "string" ? req.query.longitude : undefined, 'lon'
+    );
+    //bool
+    const hasQueryCoords = queryLatitude !== null && queryLongitude !== null;
+
+    if (hasQueryCoords) {
+      req.session.location = {
+        latitude: queryLatitude,
+        longitude: queryLongitude,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    const sessionLocation = req.session.location;
+
+    const userLatitude = hasQueryCoords
+      ? queryLatitude
+      : sessionLocation?.latitude ?? null;
+    const userLongitude = hasQueryCoords
+      ? queryLongitude
+      //"If the thing on the left is null or undefined, give me the thing on the right
+      : sessionLocation?.longitude ?? null;
+
+    const events = await prisma.event.findMany({
+      include: {
+        host: true,
+        participants: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const formattedEvents = events.map((event) => {
+      let distance: number | null = null;
+      if (
+        userLatitude !== null &&
+        userLongitude !== null &&
+        event.latitude !== null &&
+        event.longitude !== null
+      ) {
+        distance = distanceInKm(
+          userLatitude,
+          userLongitude,
+          event.latitude,
+          event.longitude,
+        );
+      }
+
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        startsAt: event.startsAt,
+        capacity: event.capacity,
+        category: event.category,
+        location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        imageUrl: event.imageUrl,
+        externalUrl: event.externalUrl,
+        host: {
+          id: event.host.id,
+          name: event.host.name,
+          email: event.host.email,
+        },
+        attendeeCount: event.participants.length,
+        distance: distance !== null ? Number(distance.toFixed(3)) : null,
+      };
+    });
+
+    let result = formattedEvents;
+
+    if (userLatitude !== null && userLongitude !== null) {
+      result = [...result].sort((a, b) => {
+        const distanceA = a.distance !== null ? a.distance : Infinity;
+        const distanceB = b.distance !== null ? b.distance : Infinity;
+        //in ascending order
+        return distanceA - distanceB;
+      });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching events", error);
+    res.status(500).json({ message: "Internal server error while fetching events." });
+  }
+});
+
+
 
 
 
@@ -181,7 +335,7 @@ router.get("/:id", async (req, res) => {
     const remaining = event.capacity - attendeeCount; // Subtract the number of attendees from the total capacity.
     seatsRemaining = remaining > 0 ? remaining : 0; // Never show a negative value even if we somehow go over.
   }
-   
+  
   //map copy participant array to attendees and only copy field of return in participate to attendees
   //which is
   const attendees = event.participants.map((participant: { user: { id: number; name: string | null; email: string }; joinedAt: Date }) => { // Build an array that only contains the data the UI needs.
@@ -233,7 +387,10 @@ router.get("/:id", async (req, res) => {
     startsAt: event.startsAt, 
     capacity: event.capacity, 
     seatsRemaining, 
+    category: event.category,
     location: event.location, 
+    latitude: event.latitude,
+    longitude: event.longitude,
     imageUrl: event.imageUrl, 
     externalUrl: event.externalUrl, 
     host: { 
@@ -252,7 +409,7 @@ router.get("/:id", async (req, res) => {
 // Handle the case where someone presses "Join" on the event screen.
 //it takes in eventid
 //you can post on /events/:id/join
-router.post("/:id/join", async (req, res) => { 
+router.post("/:id/join", requireSession, async (req, res) => { 
   // Read the event id from the URL.
   const idText = req.params.id;
   const eventId = Number(idText); // Turn the id string into a number.
@@ -335,7 +492,7 @@ router.post("/:id/join", async (req, res) => {
 
 
 // Allow attendees to leave or update a review for an event (and host).
-router.post("/:id/reviews", async (req, res) => {
+router.post("/:id/reviews", requireSession, async (req, res) => {
   const idText = req.params.id;
   const eventId = Number(idText);
 
@@ -453,6 +610,234 @@ router.post("/:id/reviews", async (req, res) => {
       },
     },
   });
+});
+
+
+
+// Host-only update event
+router.patch("/:id", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  //convert to number
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the host can update this event!" });
+    return;
+  }
+
+  const titleRaw = req.body?.title;
+  const startsAtRaw = req.body?.startsAt;
+  const locationRaw = req.body?.location;
+  const descriptionRaw = req.body?.description;
+  const imageUrlRaw = req.body?.imageUrl;
+  const externalUrlRaw = req.body?.externalUrl;
+  const capacityRaw = req.body?.capacity;
+  const categoryRaw = req.body?.category;
+  const latitudeRaw = req.body?.latitude;
+  const longitudeRaw = req.body?.longitude;
+//trim remove invisible whitespace (spaces, tabs, newlines) from the start and end of a string.
+  const title = typeof titleRaw === "string" ? titleRaw.trim() : undefined;
+  const startsAtInput = typeof startsAtRaw==="string"?startsAtRaw.trim():undefined
+  const location = typeof locationRaw === "string" ? locationRaw.trim() : undefined;
+  const description = typeof descriptionRaw === "string"
+    ? descriptionRaw.trim()
+    : undefined;
+  const imageUrl = typeof imageUrlRaw === "string"
+    ? imageUrlRaw.trim()
+    : undefined;
+  const externalUrl = typeof externalUrlRaw === "string"
+    ? externalUrlRaw.trim()
+    : undefined;
+
+  let startsAt: Date | undefined;
+  if (startsAtInput !== undefined) {
+    //convert to a object that have many method
+    startsAt = new Date(startsAtInput);
+    
+    //NAN: not a number
+    if (Number.isNaN(startsAt.getTime())) {
+      res.status(400).json({ message: "Start date/time is invalid." });
+      return;
+    }
+  }
+
+  let capacity: number | null | undefined;
+  if (capacityRaw !== undefined) {
+    if (capacityRaw === null || capacityRaw === "") {
+      capacity = null;
+    } else {
+      const parsedCapacity = Number(capacityRaw);
+      if (!Number.isFinite(parsedCapacity) || parsedCapacity < 0) {
+        res.status(400).json({ message: "Capacity must be a positive number." });
+        return;
+      }
+      capacity = Math.floor(parsedCapacity);
+    }
+  }
+
+  let category: Category | undefined;
+  if (typeof categoryRaw === "string") {
+    category=Categories.includes(categoryRaw as Category)
+      ? (categoryRaw as Category)
+      : Category.Other;
+  }
+
+  const latitudeProvided = latitudeRaw !== undefined;
+  const longitudeProvided = longitudeRaw !== undefined;
+  let latitude: number | undefined;
+  let longitude: number | undefined;
+
+  if (latitudeProvided || longitudeProvided) {
+    if (!latitudeProvided || !longitudeProvided) {
+      res.status(400).json({ message: "Latitude and longitude must be provided together." });
+      return;
+    }
+    const parsedLatitude = parseCoordinate(latitudeRaw, 'lat');
+    const parsedLongitude = parseCoordinate(longitudeRaw, 'lon');
+    if (parsedLatitude === null || parsedLongitude === null) {
+      res.status(400).json({ message: "Latitude and longitude must be valid numbers." });
+      return;
+    }
+    latitude = parsedLatitude;
+    longitude = parsedLongitude;
+  }
+
+  if (title !== undefined && title.length === 0) {
+    res.status(400).json({ message: "Title cannot be empty." });
+    return;
+  }
+
+  if (location !== undefined && location.length === 0) {
+    res.status(400).json({ message: "Location cannot be empty." });
+    return;
+  }
+
+//It sets the starting value to an Empty Object.
+  const updateData: {
+    title?: string;
+    startsAt?: Date;
+    location?: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    externalUrl?: string | null;
+    capacity?: number | null;
+    category?: Category;
+    latitude?: number;
+    longitude?: number;
+  } = {};
+
+
+  if (title !== undefined) updateData.title = title;
+  if (startsAt !== undefined) updateData.startsAt = startsAt;
+  if (location !== undefined) updateData.location = location;
+  if (description !== undefined) updateData.description = description || null;
+  if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
+  if (externalUrl !== undefined) updateData.externalUrl = externalUrl || null;
+  if (capacity !== undefined) updateData.capacity = capacity;
+  if (category !== undefined) updateData.category = category;
+  if (latitude !== undefined) updateData.latitude = latitude;
+  if (longitude !== undefined) updateData.longitude = longitude;
+
+  //if there is no field
+  if (Object.keys(updateData).length === 0) {
+    res.status(400).json({ message: "No valid fields provided." });
+    return;
+  }
+
+  //use update if event must created, can be found
+  const updatedEvent = await prisma.event.update({
+    where: { id: eventId },
+    data: updateData,
+    include: {
+      host: true,
+      participants: true,
+    },
+  });
+
+  res.json({
+    message: "Event updated successfully.",
+    event: {
+      id: updatedEvent.id,
+      title: updatedEvent.title,
+      description: updatedEvent.description,
+      startsAt: updatedEvent.startsAt,
+      capacity: updatedEvent.capacity,
+      category: updatedEvent.category,
+      location: updatedEvent.location,
+      latitude: updatedEvent.latitude,
+      longitude: updatedEvent.longitude,
+      imageUrl: updatedEvent.imageUrl,
+      externalUrl: updatedEvent.externalUrl,
+      host: {
+        id: updatedEvent.host.id,
+        name: updatedEvent.host.name,
+        email: updatedEvent.host.email,
+      },
+      attendeeCount: updatedEvent.participants.length,
+    },
+  });
+});
+
+
+// Host-only delete event
+router.delete("/:id", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const sessionUser = req.session.user;
+  if (!sessionUser) {
+    res.status(401).json({ message: "Unauthorized." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, hostId: true },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the host can delete this event." });
+    return;
+  }
+
+  await prisma.$transaction([
+    //delete many rows
+    prisma.review.deleteMany({ where: { eventId } }),
+    prisma.eventParticipant.deleteMany({ where: { eventId } }),
+    prisma.event.delete({ where: { id: eventId } }),
+  ]);
+
+  res.json({ message: "Event deleted successfully." });
 });
 
 export default router; // Export the router so index.ts can mount the /events routes.

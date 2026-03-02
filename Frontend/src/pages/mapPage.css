@@ -1,18 +1,110 @@
 .map-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100dvh;
-    background-image: url('/public/bristolMap.png');
-    background-size: cover;       /* fills screen */
-    background-position: centre;  /* centers the map */
-    background-repeat: no-repeat;
-    
-  }
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
 
-  body, html {
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* prevents scrolling completely */
-  }
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 1; /* Map below everything else */
+}
+
+/* Display buttons above map */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Stops overlay blocking clicks */
+  z-index: 1000; /* Stays above map */
+}
+
+/* Allow clicks for buttons */
+.ui-overlay a, 
+.ui-overlay button, 
+.home-btn,
+.profile-page,
+.create-event {
+  pointer-events: auto;
+}
+
+.event-circle-marker {
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12%;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.event-circle-marker:hover {
+  transform: scale(1.05);
+  background-color: #f0f0f0;
+}
+
+.event-circle-marker span {
+  font-weight: 800;
+  color: black;
+  line-height: 1.1;
+  width: 90%;
+  word-break: keep-all;
+  overflow-wrap: normal; /* Only break at spaces or hyphens */
+  hyphens: none;
+  /* ... if it's too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.create-event {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background-color: black;
+  color: white;
+  padding: 18px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 50px; /*Rounded shape*/
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.create-event:hover {
+  transform: translateY(-3px); /*Lifts up slightly*/
+  background-color: #222;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.profile-page {
+  position: absolute; 
+  top: 20px;
+  right: 20px;
+  z-index: 10; 
+}
+
+.profile-img {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  object-fit: cover; /*image isn't squashed*/
+  border-radius: 8px;
+}

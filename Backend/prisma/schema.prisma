@@ -27,7 +27,10 @@ model User {
   registrations  EventParticipant[]   // Relation listing participation records for events the user joined.
   authoredReviews Review[]           @relation("UserReviews")
   hostReviews     Review[]           @relation("HostReviews")
-}
+  hostThread  ChatThread[] @relation("HostThreads")
+  guestThread ChatThread[] @relation("GuestThreads")
+  message     ChatMessage[] 
+  }
 
 
 model Event { 
@@ -36,7 +39,10 @@ model Event {
   description  String? 
   startsAt     DateTime // Scheduled start date and time.
   capacity     Int? // Optional maximum number of attendees allowed.
+  category     Category   @default(Other)
   location     String // Text field noting where the event takes place.
+  latitude  Float
+  longitude Float
   imageUrl     String? // Optional image URL rendered in the UI.
   externalUrl  String? // Optional link to an external page with more details.
   hostId       Int // Foreign key pointing to the User who hosts the event.
@@ -47,8 +53,21 @@ model Event {
   updatedAt    DateTime           @updatedAt 
 } 
 
+enum Category {
+  Physical_Activities
+  Festivals
+  Educational
+  Networking
+  Arts_Culture
+  Food_Drink
+  Music_Concerts
+  Tech_Gaming
+  Wellness_Meditation
+  Volunteer_Charity
+  Other
+}
+
 model EventParticipant { // Join table linking users to events they attend.
-  id        Int      @id @default(autoincrement()) 
   eventId   Int // Foreign key referencing the event joined.
   userId    Int // Foreign key referencing the user who joined.
   joinedAt  DateTime @default(now())
@@ -76,4 +95,38 @@ model Review {
 // The combination of (eventId, authorId) must be unique.
   @@unique([eventId, authorId])
   @@index([hostId, createdAt])
+}
+
+model LoginCode {
+  id        Int      @id @default(autoincrement())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, expiresAt])
+}
+
+model ChatThread{
+  id Int @id @default(autoincrement())
+  hostId Int
+  guestId Int
+  lastMessageAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  host User @relation("HostThreads",fields: [hostId],references: [id])
+  guest User@relation("GuestThreads",fields: [guestId],references: [id])
+  Messages ChatMessage[]
+  @@unique([hostId,guestId])
+}
+model ChatMessage{
+id Int @id @default(autoincrement())//primary key
+threadId Int
+senderId Int
+body String
+createdAt DateTime @default(now())
+thread ChatThread @relation(fields:[threadId],references:[id])
+sender User @relation(fields:[senderId],references:[id])
 }

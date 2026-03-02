@@ -1,53 +1,57 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
+//Interface to match backend
+interface HostData {
+    id: number,
+    name: string,
+    email: string
+}
+
+//Moved interfaces outside of the export
+interface CardItem { //Cards = events
+    title: string;
+    date: string;
+}
+
+interface ReviewItem {
+    id: number;
+    userName: string;
+    msg: string;
+}
 export default function host() {
-    interface CardItem {
-        title: string;
-        date: string;
-    }
-
+    const { hostId } = useParams<{ hostId: string }>(); //Fetches id of host from browser e.g. url/host/4 hostId becomes 4
+    const [host, setHost] = useState<HostData | null>(null);
     const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);  // select status of tags
-
-    const [card, setCard] = useState<CardItem[]>([{ title: "Title", date: "Date" }, { title: "Title", date: "Date" }, { title: "Title", date: "Date" }])
-
-    interface ReviewItem {
-        id: number;
-        userName: string;
-        msg: string;
-    }
-
+    const [card, setCard] = useState<CardItem[]>([])
     // 在组件内部添加状态
-    const [reviews, setReviews] = useState<ReviewItem[]>([
-        {
-            id: 1,
-            userName: "User1",
-            msg: "reviews",
-        },
-        {
-            id: 2,
-            userName: "User2",
-            msg: "reviews",
-        },
-        {
-            id: 3,
-            userName: "User3",
-            msg: "reviews",
-        },
-        {
-            id: 4,
-            userName: "User4",
-            msg: "reviews",
-        },
-        {
-            id: 5,
-            userName: "User5",
-            msg: "reviews",
-        }
-    ]);
+    const [reviews, setReviews] = useState<ReviewItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    //const [selectedTab, setSelectedTab] = useState<number>(0);
 
-    const [selectedTab, setSelectedTab] = useState<number>(0);
+    useEffect(() => { //Logic to actually fetch host data from backend
+        const fetchHostData = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/hosts/${hostId}/overview`); //Backend route to get specific host
+                const data = await response.json();
+                console.log("Debugging, host Overview Data:", data); //checking connection is working
+                setHost(data.host);
+                setCard(data.upcomingEvents); //backend returns their hosted events
+                setReviews(data.reviews); //backend returns their reviews
+            } catch (err) {
+                console.error("Failed to fetch host:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (hostId) fetchHostData();
+    }, [hostId]);
+
+    if (isLoading) return <p>Loading Host Profile...</p>;
+    if (!host) return <p>Host not found.</p>;
     return (
         <>
             <div style={{ height: '100vh' }}>
@@ -77,6 +81,27 @@ export default function host() {
                         justifyContent: 'center'
                     }}></div>
                 </div>
+
+                {/* Profile Section (Connects to backend) */}
+                {host && (
+                    <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem 1.25rem', backgroundColor: 'white' }}>
+                        <div style={{ marginRight: '1.5rem' }}>
+                            <img //Placeholder host icon image
+                                src="/src/assets/user-icon.png" 
+                                alt="Host Profile"
+                                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: '500', color: 'black' }}> {/*Name of host*/}
+                                {host.name || "Anonymous Host"} {/*Name of host from backend*/}
+                            </h1>
+                            <p style={{ margin: 0, fontSize: '1.25rem', color: '#6b7280' }}> {/*Email address*/}
+                                {host.email} {/*Email from backend*/}
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {/* tags UI */}
                 <div style={{
@@ -138,26 +163,6 @@ export default function host() {
                             </div>
                         ))}
                     </div>
-                </div>
-
-                {/* Description UI */}
-                <div style={{
-                    height: '20rem',
-                    marginTop: '2.5rem',
-                    marginLeft: '0.75rem',
-                    marginRight: '0.75rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.75rem',
-                    paddingLeft: '0.75rem',
-                    paddingRight: '0.75rem'
-                }}>
-                    <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Description</div>
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} style={{
-                            borderBottom: '1px solid #e5e7eb',
-                            height: '2.5rem'
-                        }}></div>
-                    ))}
                 </div>
 
                 {/* Reviews UI */}
