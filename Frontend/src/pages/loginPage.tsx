@@ -5,10 +5,18 @@ import { useNavigate } from "react-router-dom";
 
 const CreateLoginPage = () => {
     const [email, setEmail] = useState(""); //To capture email
+    const [status, setStatus] = useState("")
     const navigate = useNavigate();
 
     const handleGetCode = async () => {
         try {
+                if(email.includes("@bristol.ac.uk")){
+       const message = 
+  "SharedGo follows the University of Bristol’s Information Security Policy (ISP-07),University emails are prohibited for external services. Please use a personal email."
+;
+setStatus(message);
+                    return
+                }
             const response = await fetch("http://localhost:3000/auth/email/start", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -20,7 +28,7 @@ const CreateLoginPage = () => {
                 navigate("/verify", { state: { email } });
             } else {
                 const data = await response.json();
-                alert(data.message || "Something went wrong");
+                setStatus(data.message || "Something went wrong");
             }
         } catch (err) {
             console.error("Connection error:", err);
@@ -42,6 +50,7 @@ const CreateLoginPage = () => {
              value={email}
              onChange={(e) => setEmail(e.target.value)}
            />
+           <div className='wrong-code'>{status}</div>
            <button className="blackButton" onClick={handleGetCode}>Get verification code</button>
          </div>
         </div>

@@ -60,7 +60,14 @@ const CreateVerifyPage = () => {
     };
 
     return (
+        <div>
+        <button type='button'
+       className='back-button' 
+       onClick={()=>{
+        navigate(-1)
+       }}> ← </button>
        <div className="authPage"> 
+       
         <div className='authCard'> {/*Same name for consistency*/}
         <img src="/src/assets/Logo.png" alt="SharedGo Logo" className="AppTitle" />
                 <div className="headerGroup">
@@ -81,9 +88,12 @@ const CreateVerifyPage = () => {
                 />
             ))}
             </div>
+            <div className='wrong-code'>{status}</div>
             <button className="blackButton submitBtn" onClick={handleSubmit}>Submit</button>
         </div> 
       </div>
+        </div>
+           
     );
   };
 
