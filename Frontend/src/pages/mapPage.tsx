@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import "./mapPage.css"
 import Button from '../components/Button';
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -41,7 +41,22 @@ const MapPage = () => {
   const [dbEvents, setDbEvents] = useState<EventData[]>([]); //Empty array of eventdata
   const navigate = useNavigate()
   const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
+  const [map, setMap] = useState<L.Map | null>(null); //State to hold the map instance
   const location = useLocation();
+  const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
+  const hasMovedRef = useRef(false); //Prevents map moving more than once
+  const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
+
+  useEffect(() => {
+    //Only run if map is ready and we have coordinates
+    if (map && navState?.centerTo && !hasMovedRef.current) {
+      map.setView(navState.centerTo, navState.zoomTo || 16, { animate: true });
+      //Lock it so it doesn't runs again
+      hasMovedRef.current = true;
+      //Wipe the state (bug fixing)
+      window.history.replaceState({}, document.title);
+    }
+  }, [map, navState]); //Only re-run if the map object itself changes
 
   useEffect(() => {
     // Fetch events from backend
@@ -57,28 +72,39 @@ const MapPage = () => {
     fetchEvents();
   }, []);
 
-  // Circle Icons
-  const createEventIcon = (title: string) => {
-    return new L.DivIcon({
-      className: 'custom-div-icon',
-      html: `<div class="event-circle-marker"><span>${title}</span></div>`, //Inserts title of event into marker
-      iconSize: [100, 100],
-      iconAnchor: [50, 50], //Centre circle exactly on top of coordinates
-    });
-  };
-
-  const MapClickHandler = () => {
-    useMapEvents({
+  const MapEventsHandler = () => {
+    const map = useMapEvents({
       click: (e) => {
-        setTempMarker({ lat: e.latlng.lat, lng: e.latlng.lng });
-        //Functionality to save coordinates from clicking the map
+        setTempMarker({ lat: e.latlng.lat, lng: e.latlng.lng }); //Functionality to save coordinates from clicking the map
       },
+      //Handle zoom updates
+      zoomend: () => {
+        setZoomLevel(map.getZoom());
+      },
+      //Get rid of popup whenever map moves or zooms (bug fix)
+      zoomstart: () => {
+        setTempMarker(null);
+      },
+      movestart: () => {
+        setTempMarker(null);
+      }
     });
     return null;
-  }
+  };
 
-  const ICON_DIAMETER = 100; // Diameter of the circle in pixels
-  const FONT_SIZE = '16px';
+  // Circle Icons
+  const createEventIcon = (title: string) => {
+    const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 1.3); //Exponential scaling to make icons grow larger or smaller dependant on zoom
+    const fontSize = size * 0.13;
+    return new L.DivIcon({
+      className: 'custom-div-icon',
+      html: `<div class="event-circle-marker" style="width: ${size}px; height: ${size}px;">
+               <span style="font-size: ${fontSize}px;">${title}</span>
+             </div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2], //Centre circle exactly on top of coordinates
+    });
+  };
 
   return (
     <div className="map-container">
@@ -113,13 +139,14 @@ const MapPage = () => {
         center={[51.5, -2.6]} //Centre of bristol
         zoom={13}
         zoomControl={false} //Users can still zoom in and out using trackpad
+        ref={setMap}
         style={{ height: "100vh", width: "100vw" }} //Takes up whole page
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
         />
-        <MapClickHandler />
+        <MapEventsHandler />
 
         {tempMarker && (
           <Popup position={[tempMarker.lat, tempMarker.lng]}>

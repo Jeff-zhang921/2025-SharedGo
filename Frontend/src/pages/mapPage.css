@@ -34,8 +34,6 @@
 }
 
 .event-circle-marker {
-  width: 100px;
-  height: 100px;
   cursor: pointer;
   text-decoration: none;
   border-radius: 50%;
@@ -45,7 +43,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 10px;
+  padding: 12%;
   box-sizing: border-box;
   transition: all 0.2s;
 }
@@ -56,15 +54,19 @@
 }
 
 .event-circle-marker span {
-  font-size: 13px;
   font-weight: 800;
   color: black;
-  line-height: 1.2;
+  line-height: 1.1;
+  width: 90%;
+  word-break: keep-all;
+  overflow-wrap: normal; /* Only break at spaces or hyphens */
+  hyphens: none;
   /* ... if it's too long */
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .create-event {
