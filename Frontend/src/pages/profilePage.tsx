@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Define the interface for returning data from the API
 interface User {
@@ -75,6 +76,7 @@ const formatEventDate = (isoDateString: string): string => {
 
 // Main ProfilePage component
 export default function ProfilePage() {
+  const navigate = useNavigate();
   // API data status
   const [profileData, setProfileData] = useState<ProfileOverviewResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -238,6 +240,20 @@ export default function ProfilePage() {
             color: '#374151'
           }}>
             Edit Profile
+          </button>
+          <button
+            onClick={() => navigate("/conversations")}
+            style={{
+              marginLeft: '0.5rem',
+              padding: '0.25rem 0.75rem',
+              fontSize: '0.75rem',
+              backgroundColor: '#111827',
+              border: '1px solid #111827',
+              borderRadius: '0.375rem',
+              color: '#ffffff'
+            }}
+          >
+            Conversations
           </button>
         </div>
       </div>

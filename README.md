@@ -126,13 +126,13 @@ SharedGO/
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
 
 ### Architecture diagram
-![Architecture](http://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Architecture/Architecture2.0.png)
+![Architecture](Docs/Architecture/Architecture2.0.png)
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci,cd.png)
 
 ## Chat logic workflow
-![chat system](https://github.com/spe-uob/2025-SharedGo/blob/dev/Docs/Workflow/Chat%20Workflow.png)
+![chat system](Docs/Workflow/Chat%20Workflow.png)
 
 ## Flow Steps
 * #### Individual user
