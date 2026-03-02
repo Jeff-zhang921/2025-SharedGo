@@ -41,6 +41,14 @@ All uses of AI have been thoroughly checked by the programmers to avoid any erro
 
 - CI/CD: "Explain why my Github action deployment failed, suggest fix for YAML configuration", "suggest fix for multi-stage build errors"
 
+**Minzhe**
+- Debugging: "Can you help me fix the error...? Please give me some advice."
+
+- Coding: "Give me some templates to complete the specific styles."
+
+- PR: "Help me rewrite the PR description according to the specified format."
+
+
 
 **Quality Assurance:**
 - Manual validation: Every word proposed by AI underwent a mandatory manual review by a programmer
