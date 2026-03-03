@@ -12,18 +12,27 @@ interface HostData {
 interface CardItem {
     title: string;
     date: string;
-    location?: string;  
-    filled?: number;     
-    total?: number;      
-    image?: string;      
+    location?: string;
+    filled?: number;
+    total?: number;
+    image?: string;
 }
 
 interface ReviewItem {
     id: number;
     userName: string;
     msg: string;
-    rating?: number;     
-    avatar?: string;     
+    rating?: number;
+    avatar?: string;
+}
+
+// ← NEW
+interface HostStats {
+    totalEvents: number;
+    totalAttendees: number;
+    avgRating: number;
+    reviewCount: number;
+    avgFillRate: number;
 }
 
 export default function host() {
