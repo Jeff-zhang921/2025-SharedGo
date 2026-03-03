@@ -194,8 +194,8 @@ const EventDetailsPage = () => {
           )}
           </div>
 
-          {/*Links to /host:id eg. localhost:5173/host:1 which is a page that does not currently exist!*/}
-          <Link to={`/host:${event.host.id}`}>
+          {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}
+          <Link to={`/host/${event.host.id}`}>
             <img src="/src/assets/user-icon.png" alt="Host Details" className="profile-img" />
           </Link>
           <p className="host-details">Host Details</p>
