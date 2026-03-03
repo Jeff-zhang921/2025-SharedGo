@@ -132,6 +132,10 @@ return mapped
 const filteredConversations = useMemo(() => {
   const query = searchTerm.trim().toLowerCase();
   if (!query) return conversations;
+ const Res =  fetch(`${BACKEND_URL}/auth/me`, {
+          credentials: "include",
+      });
+      conversations.
   return conversations.filter((item) =>
     item.name.includes(query)
   );
