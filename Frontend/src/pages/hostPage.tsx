@@ -34,7 +34,6 @@ interface HostStats {
     avgFillRate: number;
 }
 
-// ← NEW
 const MOCK_STATS: HostStats = {
     totalEvents: 125,
     totalAttendees: 500,
@@ -43,15 +42,36 @@ const MOCK_STATS: HostStats = {
     avgFillRate: 85,
 };
 
+// ← NEW
+const MOCK_UPCOMING_EVENTS: CardItem[] = Array.from({ length: 3 }, () => ({
+    title: "Title",
+    date: "Date",
+    location: "location",
+    filled: 25,
+    total: 100,
+    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
+}));
+
+// ← NEW
+const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
+    title: "Title",
+    date: "Date",
+    location: "location",
+    filled: 25,
+    total: 100,
+    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
+}));
+
 export default function host() {
     const { hostId } = useParams<{ hostId: string }>();
     const [host, setHost] = useState<HostData | null>(null);
     const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);
-    const [card, setCard] = useState<CardItem[]>([])
+    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS); // ← uses mock default
+    const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);                            // ← uses mock default
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [stats] = useState<HostStats>(MOCK_STATS); // ← NEW: wired to mock until backend ready
+    const [stats] = useState<HostStats>(MOCK_STATS);
 
     useEffect(() => {
         const fetchHostData = async () => {
@@ -60,16 +80,34 @@ export default function host() {
                 const data = await response.json();
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);
-                setCard(data.upcomingEvents);
+                if (data.upcomingEvents?.length) setUpcomingEvents(data.upcomingEvents); // real data wins
                 setReviews(data.reviews);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
+                // ← NEW: fallback mock host + reviews when backend unreachable
+                setHost({ id: 0, name: "Name", email: "email@domain.com" });
+                setReviews([
+                    { id: 1, userName: "Name", msg: "review", rating: 4 },
+                    { id: 2, userName: "Name", msg: "review", rating: 4 },
+                    { id: 3, userName: "Name", msg: "review", rating: 4 },
+                    { id: 4, userName: "Name", msg: "review", rating: 4 },
+                ]);
             } finally {
                 setIsLoading(false);
             }
         };
 
         if (hostId) fetchHostData();
+        else {
+            setHost({ id: 0, name: "Name", email: "email@domain.com" });
+            setReviews([
+                { id: 1, userName: "Name", msg: "review", rating: 4 },
+                { id: 2, userName: "Name", msg: "review", rating: 4 },
+                { id: 3, userName: "Name", msg: "review", rating: 4 },
+                { id: 4, userName: "Name", msg: "review", rating: 4 },
+            ]);
+            setIsLoading(false);
+        }
     }, [hostId]);
 
     if (isLoading) return <p>Loading Host Profile...</p>;
@@ -160,7 +198,7 @@ export default function host() {
                         paddingLeft: '0.75rem',
                         minWidth: 'max-content'
                     }}>
-                        {card.map((card, index) => (
+                        {upcomingEvents.map((card, index) => (
                             <div key={index} style={{
                                 width: '12.5rem',
                                 height: '5rem',
