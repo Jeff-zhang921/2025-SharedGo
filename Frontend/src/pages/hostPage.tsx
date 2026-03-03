@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 
+
 interface HostData {
     id: number,
     name: string,
@@ -71,7 +72,6 @@ const StarRating = ({ rating = 4 }: { rating?: number }) => (
     </div>
 );
 
-// ← NEW: single statistics tile (label / large value / optional sub-label)
 const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
     <div style={{
         flex: 1,
@@ -83,6 +83,32 @@ const StatCard = ({ label, value, sub }: { label: string; value: string | number
         <div style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: "500" }}>{label}</div>
         <div style={{ fontSize: "2rem", fontWeight: "700", color: "#111827", lineHeight: 1.2, marginTop: "0.25rem" }}>{value}</div>
         {sub && <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "0.25rem" }}>{sub}</div>}
+    </div>
+);
+
+// ← NEW: event card with thumbnail image, title, date, location and fill rate
+const EventCard = ({ card }: { card: CardItem }) => (
+    <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        padding: "0.75rem",
+        backgroundColor: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: "0.75rem",
+        marginBottom: "0.625rem",
+    }}>
+        <img
+            src={card.image || "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80"}
+            alt={card.title}
+            style={{ width: "72px", height: "72px", borderRadius: "0.5rem", objectFit: "cover", flexShrink: 0 }}
+        />
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div style={{ fontWeight: "700", fontSize: "1rem", color: "#111827" }}>{card.title}</div>
+            <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#374151" }}>{card.date}</div>
+            <div style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{card.location || "location"}</div>
+            <div style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{card.filled ?? 25}/{card.total ?? 100}</div>
+        </div>
     </div>
 );
 
@@ -184,8 +210,6 @@ export default function host() {
                     </div>
                 )}
 
-                {/* StatCard defined but not yet rendered in JSX – happens in commit 10 */}
-
                 <div style={{
                     width: '100%',
                     display: 'flex',
@@ -215,6 +239,7 @@ export default function host() {
                     ))}
                 </div>
 
+                {/* EventCard defined but not yet used in JSX – will replace old card blocks in commit 12 */}
                 <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
                     <div style={{
                         display: 'flex',
