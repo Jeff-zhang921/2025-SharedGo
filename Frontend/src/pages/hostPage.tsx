@@ -42,7 +42,6 @@ const MOCK_STATS: HostStats = {
     avgFillRate: 85,
 };
 
-// ← NEW
 const MOCK_UPCOMING_EVENTS: CardItem[] = Array.from({ length: 3 }, () => ({
     title: "Title",
     date: "Date",
@@ -52,7 +51,6 @@ const MOCK_UPCOMING_EVENTS: CardItem[] = Array.from({ length: 3 }, () => ({
     image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
 }));
 
-// ← NEW
 const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
     title: "Title",
     date: "Date",
@@ -62,13 +60,26 @@ const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
     image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
 }));
 
+// ← NEW: renders 5 stars, filled up to `rating`
+const StarRating = ({ rating = 4 }: { rating?: number }) => (
+    <div style={{ display: "flex", gap: "2px" }}>
+        {[1, 2, 3, 4, 5].map((s) => (
+            <svg key={s} width="14" height="14" viewBox="0 0 24 24"
+                fill={s <= rating ? "#FBBF24" : "none"}
+                stroke="#FBBF24" strokeWidth="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+        ))}
+    </div>
+);
+
 export default function host() {
     const { hostId } = useParams<{ hostId: string }>();
     const [host, setHost] = useState<HostData | null>(null);
     const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);
-    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS); // ← uses mock default
-    const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);                            // ← uses mock default
+    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
+    const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats] = useState<HostStats>(MOCK_STATS);
@@ -80,11 +91,10 @@ export default function host() {
                 const data = await response.json();
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);
-                if (data.upcomingEvents?.length) setUpcomingEvents(data.upcomingEvents); // real data wins
+                if (data.upcomingEvents?.length) setUpcomingEvents(data.upcomingEvents);
                 setReviews(data.reviews);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
-                // ← NEW: fallback mock host + reviews when backend unreachable
                 setHost({ id: 0, name: "Name", email: "email@domain.com" });
                 setReviews([
                     { id: 1, userName: "Name", msg: "review", rating: 4 },
@@ -251,6 +261,7 @@ export default function host() {
                             }}>
                                 <div style={{ fontWeight: 'bold' }}>{review.userName}</div>
                                 <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>{review.msg}</div>
+                                {/* StarRating is defined but not yet wired to JSX – happens in commit 8 */}
                             </div>
                         </div>
                     ))}
