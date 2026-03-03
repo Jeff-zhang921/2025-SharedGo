@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 
 
+
 interface HostData {
     id: number,
     name: string,
@@ -60,7 +61,6 @@ const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
     image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
 }));
 
-// ← NEW: renders 5 stars, filled up to `rating`
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
     <div style={{ display: "flex", gap: "2px" }}>
         {[1, 2, 3, 4, 5].map((s) => (
@@ -70,6 +70,21 @@ const StarRating = ({ rating = 4 }: { rating?: number }) => (
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
         ))}
+    </div>
+);
+
+// ← NEW: single statistics tile (label / large value / optional sub-label)
+const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
+    <div style={{
+        flex: 1,
+        padding: "1rem",
+        backgroundColor: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: "0.75rem",
+    }}>
+        <div style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: "500" }}>{label}</div>
+        <div style={{ fontSize: "2rem", fontWeight: "700", color: "#111827", lineHeight: 1.2, marginTop: "0.25rem" }}>{value}</div>
+        {sub && <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "0.25rem" }}>{sub}</div>}
     </div>
 );
 
@@ -171,6 +186,8 @@ export default function host() {
                     </div>
                 )}
 
+                {/* StatCard defined but not yet rendered in JSX – happens in commit 10 */}
+
                 <div style={{
                     width: '100%',
                     display: 'flex',
@@ -261,7 +278,6 @@ export default function host() {
                             }}>
                                 <div style={{ fontWeight: 'bold' }}>{review.userName}</div>
                                 <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>{review.msg}</div>
-                                {/* StarRating is defined but not yet wired to JSX – happens in commit 8 */}
                             </div>
                         </div>
                     ))}
