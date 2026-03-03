@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 
-
-
 interface HostData {
     id: number,
     name: string,
