@@ -142,13 +142,19 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => (
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const [host, setHost] = useState<HostData | null>(null);
-    const [tagsArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
-    const [selectedTag, setSelectedTag] = useState<number>(0);
+    const [selectedTab, setSelectedTab] = useState<number>(0);  // ← renamed from selectedTag
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
     const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats] = useState<HostStats>(MOCK_STATS);
+
+    // ← NEW: tab config derived from data, includes counts
+    const tabs = [
+        { label: "Upcoming events", count: upcomingEvents.length },
+        { label: "Past events",     count: pastEvents.length },
+        { label: "Review" },
+    ];
 
     useEffect(() => {
         const fetchHostData = async () => {
@@ -213,7 +219,7 @@ export default function Host() {
                 }} />
             </div>
 
-            {/* Profile + Stats in same white card */}
+            {/* Profile + Stats */}
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
                     <img
@@ -229,8 +235,6 @@ export default function Host() {
                         <p style={{ margin: 0, fontSize: "0.875rem", color: "#9ca3af", marginTop: "2px" }}>{host.email}</p>
                     </div>
                 </div>
-
-                {/* ← NEW: 4-column stats row */}
                 <div style={{ display: "flex", gap: "0.625rem" }}>
                     <StatCard label="Total" value={stats.totalEvents} sub="events" />
                     <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
@@ -239,55 +243,44 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* Tags (unchanged) */}
-            <div style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                marginTop: '0.5rem',
-                paddingLeft: '0.75rem',
-                paddingRight: '0.75rem'
-            }}>
-                {tagsArr.map((tag, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            width: '33%',
-                            height: '2.5rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '1.5rem',
-                            marginRight: '0.75rem',
-                            backgroundColor: selectedTag === index ? 'black' : '#e5e7eb',
-                            color: selectedTag === index ? 'white' : 'black',
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => setSelectedTag(index)}
-                    >
-                        <div style={{ fontWeight: 'bold' }}>{tag}</div>
-                    </div>
-                ))}
+            {/* ── Tab bar (redesigned) ── */}
+            <div style={{ backgroundColor: "white", padding: "0.875rem 1.25rem 0", marginTop: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {tabs.map((tab, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setSelectedTab(i)}
+                            style={{
+                                padding: "0.4rem 0.875rem",
+                                borderRadius: "999px",                                          // pill
+                                border: "1px solid #e5e7eb",
+                                backgroundColor: selectedTab === i ? "#111827" : "white",       // black when active
+                                color: selectedTab === i ? "white" : "#374151",
+                                fontWeight: "600",
+                                fontSize: "0.8125rem",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                                transition: "all 0.15s",
+                            }}
+                        >
+                            {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ""}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* Cards (unchanged) */}
-            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: '0.5rem',
-                    paddingLeft: '0.75rem',
-                    minWidth: 'max-content'
-                }}>
+            {/* Content (still old cards – replaced in commit 12) */}
+            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', marginTop: "1rem", padding: "0 1.25rem" }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {upcomingEvents.map((card, index) => (
                         <div key={index} style={{
-                            width: '12.5rem',
+                            width: '100%',
                             height: '5rem',
                             backgroundColor: 'white',
                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                             border: '1px solid #e5e7eb',
                             borderRadius: '0.5rem',
-                            marginRight: '0.75rem'
+                            marginBottom: '0.75rem'
                         }}>
                             <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
                             <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
@@ -296,18 +289,17 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* Reviews (unchanged) */}
+            {/* Reviews */}
             <div style={{
-                marginTop: '2.5rem',
+                marginTop: '1rem',
                 paddingBottom: '1.25rem',
-                marginLeft: '0.75rem',
-                marginRight: '0.75rem',
+                marginLeft: '1.25rem',
+                marginRight: '1.25rem',
                 border: '1px solid #e5e7eb',
                 borderRadius: '0.75rem',
                 paddingLeft: '0.75rem',
                 paddingRight: '0.75rem'
             }}>
-                <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Reviews</div>
                 {reviews.map((review) => (
                     <ReviewCard key={review.id} review={review} />
                 ))}
