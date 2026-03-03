@@ -111,7 +111,6 @@ const EventCard = ({ card }: { card: CardItem }) => (
     </div>
 );
 
-// ← NEW: review row with avatar, name, text, and star rating
 const ReviewCard = ({ review }: { review: ReviewItem }) => (
     <div style={{
         display: "flex",
@@ -133,17 +132,17 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => (
         <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#111827" }}>{review.userName}</div>
-                <StarRating rating={review.rating ?? 4} />   {/* ← StarRating wired in */}
+                <StarRating rating={review.rating ?? 4} />
             </div>
             <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "2px" }}>{review.msg}</div>
         </div>
     </div>
 );
 
-export default function host() {
+export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const [host, setHost] = useState<HostData | null>(null);
-    const [tagsArr, settagArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
+    const [tagsArr] = useState<string[]>(['Upcoming', 'Past events', 'Overview']);
     const [selectedTag, setSelectedTag] = useState<number>(0);
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
     const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
@@ -190,125 +189,125 @@ export default function host() {
     if (isLoading) return <p>Loading Host Profile...</p>;
     if (!host) return <p>Host not found.</p>;
     return (
-        <>
-            <div style={{ height: '100vh' }}>
+        <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+
+            {/* ── Header (redesigned) ── */}
+            <div style={{
+                backgroundColor: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0.875rem 1.25rem",               // ← tighter padding
+                borderBottom: "1px solid #f3f4f6",          // ← subtle separator
+            }}>
+                {/* ← back arrow replaces logo icon */}
+                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
                 <div style={{
-                    backgroundColor: 'white',
-                    width: '100%',
-                    paddingLeft: '1.25rem',
-                    paddingRight: '1.25rem',
-                    paddingTop: '1rem',
-                    paddingBottom: '1.25rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <div>
-                        <img style={{ height: '1.25rem', width: '1.25rem' }} src="../../public/flodIcon.svg" />
+                    width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827",
+                    display: "flex", alignItems: "center", justifyContent: "center"
+                }} />
+            </div>
+
+            {/* Profile */}
+            {host && (
+                <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem 1.25rem', backgroundColor: 'white' }}>
+                    <div style={{ marginRight: '1.5rem' }}>
+                        <img
+                            src="/src/assets/user-icon.png"
+                            alt="Host Profile"
+                            style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }}
+                        />
                     </div>
-                    <div style={{ fontWeight: 'bold' }}>HOST</div>
-                    <div style={{
-                        width: '2rem',
-                        height: '2rem',
-                        borderRadius: '50%',
-                        backgroundColor: 'black',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}></div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <h1 style={{ margin: 0, fontSize: '1.375rem', fontWeight: '700', color: '#111827' }}>
+                            {host.name || "Anonymous Host"}
+                        </h1>
+                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#9ca3af', marginTop: '2px' }}>
+                            {host.email}
+                        </p>
+                    </div>
                 </div>
+            )}
 
-                {host && (
-                    <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem 1.25rem', backgroundColor: 'white' }}>
-                        <div style={{ marginRight: '1.5rem' }}>
-                            <img
-                                src="/src/assets/user-icon.png"
-                                alt="Host Profile"
-                                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
-                            />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: '500', color: 'black' }}>
-                                {host.name || "Anonymous Host"}
-                            </h1>
-                            <p style={{ margin: 0, fontSize: '1.25rem', color: '#6b7280' }}>
-                                {host.email}
-                            </p>
-                        </div>
+            {/* Tags (unchanged for now) */}
+            <div style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                marginTop: '0.5rem',
+                paddingLeft: '0.75rem',
+                paddingRight: '0.75rem'
+            }}>
+                {tagsArr.map((tag, index) => (
+                    <div
+                        key={index}
+                        style={{
+                            width: '33%',
+                            height: '2.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '1.5rem',
+                            marginRight: '0.75rem',
+                            backgroundColor: selectedTag === index ? 'black' : '#e5e7eb',
+                            color: selectedTag === index ? 'white' : 'black',
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => setSelectedTag(index)}
+                    >
+                        <div style={{ fontWeight: 'bold' }}>{tag}</div>
                     </div>
-                )}
+                ))}
+            </div>
 
+            {/* Cards (unchanged) */}
+            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
                 <div style={{
-                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     marginTop: '0.5rem',
                     paddingLeft: '0.75rem',
-                    paddingRight: '0.75rem'
+                    minWidth: 'max-content'
                 }}>
-                    {tagsArr.map((tag, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                width: '33%',
-                                height: '2.5rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '1.5rem',
-                                marginRight: '0.75rem',
-                                backgroundColor: selectedTag === index ? 'black' : '#e5e7eb',
-                                color: selectedTag === index ? 'white' : 'black'
-                            }}
-                            onClick={() => setSelectedTag(index)}
-                        >
-                            <div style={{ fontWeight: 'bold' }}>{tag}</div>
+                    {upcomingEvents.map((card, index) => (
+                        <div key={index} style={{
+                            width: '12.5rem',
+                            height: '5rem',
+                            backgroundColor: 'white',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.5rem',
+                            marginRight: '0.75rem'
+                        }}>
+                            <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
+                            <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
                         </div>
                     ))}
                 </div>
-
-                <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginTop: '0.5rem',
-                        paddingLeft: '0.75rem',
-                        minWidth: 'max-content'
-                    }}>
-                        {upcomingEvents.map((card, index) => (
-                            <div key={index} style={{
-                                width: '12.5rem',
-                                height: '5rem',
-                                backgroundColor: 'white',
-                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '0.5rem',
-                                marginRight: '0.75rem'
-                            }}>
-                                <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
-                                <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Old reviews block replaced in commit 12; ReviewCard is ready but not wired yet */}
-                <div style={{
-                    marginTop: '2.5rem',
-                    paddingBottom: '1.25rem',
-                    marginLeft: '0.75rem',
-                    marginRight: '0.75rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.75rem',
-                    paddingLeft: '0.75rem',
-                    paddingRight: '0.75rem'
-                }}>
-                    <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Reviews</div>
-                    {reviews.map((review) => (
-                        <ReviewCard key={review.id} review={review} />   /* ← now uses ReviewCard */
-                    ))}
-                </div>
             </div>
-        </>
+
+            {/* Reviews (unchanged) */}
+            <div style={{
+                marginTop: '2.5rem',
+                paddingBottom: '1.25rem',
+                marginLeft: '0.75rem',
+                marginRight: '0.75rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.75rem',
+                paddingLeft: '0.75rem',
+                paddingRight: '0.75rem'
+            }}>
+                <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Reviews</div>
+                {reviews.map((review) => (
+                    <ReviewCard key={review.id} review={review} />
+                ))}
+            </div>
+        </div>
     )
 }
