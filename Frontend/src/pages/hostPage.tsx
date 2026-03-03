@@ -26,7 +26,6 @@ interface ReviewItem {
     avatar?: string;
 }
 
-// ← NEW
 interface HostStats {
     totalEvents: number;
     totalAttendees: number;
@@ -34,6 +33,15 @@ interface HostStats {
     reviewCount: number;
     avgFillRate: number;
 }
+
+// ← NEW
+const MOCK_STATS: HostStats = {
+    totalEvents: 125,
+    totalAttendees: 500,
+    avgRating: 4.1,
+    reviewCount: 140,
+    avgFillRate: 85,
+};
 
 export default function host() {
     const { hostId } = useParams<{ hostId: string }>();
@@ -43,6 +51,7 @@ export default function host() {
     const [card, setCard] = useState<CardItem[]>([])
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [stats] = useState<HostStats>(MOCK_STATS); // ← NEW: wired to mock until backend ready
 
     useEffect(() => {
         const fetchHostData = async () => {
