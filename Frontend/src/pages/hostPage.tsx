@@ -191,16 +191,15 @@ export default function Host() {
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
 
-            {/* ── Header (redesigned) ── */}
+            {/* Header */}
             <div style={{
                 backgroundColor: "white",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "0.875rem 1.25rem",               // ← tighter padding
-                borderBottom: "1px solid #f3f4f6",          // ← subtle separator
+                padding: "0.875rem 1.25rem",
+                borderBottom: "1px solid #f3f4f6",
             }}>
-                {/* ← back arrow replaces logo icon */}
                 <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
@@ -214,28 +213,33 @@ export default function Host() {
                 }} />
             </div>
 
-            {/* Profile */}
-            {host && (
-                <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem 1.25rem', backgroundColor: 'white' }}>
-                    <div style={{ marginRight: '1.5rem' }}>
-                        <img
-                            src="/src/assets/user-icon.png"
-                            alt="Host Profile"
-                            style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }}
-                        />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <h1 style={{ margin: 0, fontSize: '1.375rem', fontWeight: '700', color: '#111827' }}>
+            {/* Profile + Stats in same white card */}
+            <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+                    <img
+                        src="/src/assets/user-icon.png"
+                        alt="Host"
+                        onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"; }}
+                        style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}
+                    />
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: "1.375rem", fontWeight: "700", color: "#111827" }}>
                             {host.name || "Anonymous Host"}
                         </h1>
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#9ca3af', marginTop: '2px' }}>
-                            {host.email}
-                        </p>
+                        <p style={{ margin: 0, fontSize: "0.875rem", color: "#9ca3af", marginTop: "2px" }}>{host.email}</p>
                     </div>
                 </div>
-            )}
 
-            {/* Tags (unchanged for now) */}
+                {/* ← NEW: 4-column stats row */}
+                <div style={{ display: "flex", gap: "0.625rem" }}>
+                    <StatCard label="Total" value={stats.totalEvents} sub="events" />
+                    <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
+                    <StatCard label="Avg.rating" value={stats.avgRating} sub={`(${stats.reviewCount} reviews)`} />
+                    <StatCard label="Avg. fill rate" value={`${stats.avgFillRate}%`} />
+                </div>
+            </div>
+
+            {/* Tags (unchanged) */}
             <div style={{
                 width: '100%',
                 display: 'flex',
