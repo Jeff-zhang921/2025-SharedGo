@@ -86,7 +86,6 @@ const StatCard = ({ label, value, sub }: { label: string; value: string | number
     </div>
 );
 
-// ← NEW: event card with thumbnail image, title, date, location and fill rate
 const EventCard = ({ card }: { card: CardItem }) => (
     <div style={{
         display: "flex",
@@ -108,6 +107,35 @@ const EventCard = ({ card }: { card: CardItem }) => (
             <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#374151" }}>{card.date}</div>
             <div style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{card.location || "location"}</div>
             <div style={{ fontSize: "0.75rem", color: "#9ca3af" }}>{card.filled ?? 25}/{card.total ?? 100}</div>
+        </div>
+    </div>
+);
+
+// ← NEW: review row with avatar, name, text, and star rating
+const ReviewCard = ({ review }: { review: ReviewItem }) => (
+    <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        padding: "0.625rem 0",
+        borderBottom: "1px solid #f3f4f6"
+    }}>
+        <div style={{
+            width: "2.25rem", height: "2.25rem", borderRadius: "50%",
+            backgroundColor: review.avatar ? "transparent" : "#d1d5db",
+            overflow: "hidden", flexShrink: 0,
+        }}>
+            {review.avatar
+                ? <img src={review.avatar} alt={review.userName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                : <div style={{ width: "100%", height: "100%", backgroundColor: "#6b7280" }} />
+            }
+        </div>
+        <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#111827" }}>{review.userName}</div>
+                <StarRating rating={review.rating ?? 4} />   {/* ← StarRating wired in */}
+            </div>
+            <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "2px" }}>{review.msg}</div>
         </div>
     </div>
 );
@@ -239,7 +267,6 @@ export default function host() {
                     ))}
                 </div>
 
-                {/* EventCard defined but not yet used in JSX – will replace old card blocks in commit 12 */}
                 <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
                     <div style={{
                         display: 'flex',
@@ -265,6 +292,7 @@ export default function host() {
                     </div>
                 </div>
 
+                {/* Old reviews block replaced in commit 12; ReviewCard is ready but not wired yet */}
                 <div style={{
                     marginTop: '2.5rem',
                     paddingBottom: '1.25rem',
@@ -277,32 +305,7 @@ export default function host() {
                 }}>
                     <div style={{ marginTop: '1.25rem', fontWeight: 'bold' }}>Reviews</div>
                     {reviews.map((review) => (
-                        <div key={review.id} style={{
-                            height: '2.5rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginTop: '1rem',
-                            marginBottom: '1rem'
-                        }}>
-                            <div style={{
-                                width: '2rem',
-                                height: '2rem',
-                                borderRadius: '50%',
-                                backgroundColor: 'black',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}></div>
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-between',
-                                paddingLeft: '1rem'
-                            }}>
-                                <div style={{ fontWeight: 'bold' }}>{review.userName}</div>
-                                <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>{review.msg}</div>
-                            </div>
-                        </div>
+                        <ReviewCard key={review.id} review={review} />   /* ← now uses ReviewCard */
                     ))}
                 </div>
             </div>
