@@ -160,19 +160,24 @@ return ()=>clearTimeout(timer)
 const handleOpenThread = (threadId: number,other:string) => {
     navigate("/chat", { state: { threadId, other} });
   };
-  const handleStartThread=async (threadId:number)=>{
-    if(!threadId){
+  const handleStartThread=async (user:UserSummary)=>{
+    if(!user?.id){
       setStatus("no user exist")
       return 
     }
-    const res= await fetch(`${BACKEND_URL}/chat/threads/:${threadId}/messages`,
-{credentials:"include"}
-    )
-    const data=await res.json()
-    const id=data.id
-    const email=data.email
-    navigate("/chat",{state:{id,email}})
-    
+    const res= await fetch(`${BACKEND_URL}/chat/threads`,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      credentials:"include",
+      body:JSON.stringify({hostId:user.id}),
+    })
+    const data=await res.json().catch(()=>({}))
+    if(!res.ok||typeof data.threadId!=="number"){
+      setStatus(data.message||"Fail to create thread")
+      return
+    }
+    navigate("/chat",{state:{threadId:data.threadId,other:user.name||user.email}})
+     
 
   }
 
@@ -220,9 +225,9 @@ return(
           {/* if statement in JSX */}
 
           {!isSearching&&(
-            <section className="conversationlist">
+            <section className="conversations-list">
               {conversations.map((item)=>(
-                <article key={item.threadId} onClick={()=>{handleOpenThread(item.threadId,item.email)}}>
+                <article className="conversation-card" key={item.threadId} onClick={()=>{handleOpenThread(item.threadId,item.email)}}>
                    <div className="avatar">
                 {/*  span doesn't do anything*/}
                 <span>{getInitials(item.name[0])}</span>
@@ -244,9 +249,9 @@ return(
               )}
 
               {isSearching&&(
-                <section>
+                <section className="conversations-list">
               {!status&&dbUsers.map((user)=>(
-                <article key={user.id} onClick={()=>handleStartThread(user.id)}>
+                <article className="conversation-card" key={user.id} onClick={()=>handleStartThread(user)}>
                      <div className="avatar">
                 {/*  span doesn't do anything*/}
                 <span>{getInitials(user.email[0])}</span>
