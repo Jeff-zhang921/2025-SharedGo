@@ -51,6 +51,23 @@ Deployment and configuration support - AI assisted with environment setup questi
 
 
 **Oliver**
+
+**Tools used**
+
+- Gemini
+- ChatGPT
+
+
+#### Where did you use AI tools and why 
+
+Frontend - I used AI to support the development of the website for example I used it to help me integrate the leaflet map API into our project. I also use it to help with CSS if Im struggling to make something look a certain way.
+
+Backend - I used AI to explain the backend code that had already been written and it helped me understand it. I used it to aid me in connecting the frontend to the backend.
+
+Debugging - If I got stuck on a bug I would explain my problem to AI and see if it could find the bug.
+
+**Examples of Prompts I used:**
+
 - Debugging: "Its giving me this error... Can you suggest how to fix it?"
 
 - Coding: "How can I make this button look a certain way?"
