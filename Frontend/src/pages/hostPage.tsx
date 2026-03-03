@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 
-
 interface HostData {
     id: number,
     name: string,
@@ -142,14 +141,13 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => (
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const [host, setHost] = useState<HostData | null>(null);
-    const [selectedTab, setSelectedTab] = useState<number>(0);  // ← renamed from selectedTag
+    const [selectedTab, setSelectedTab] = useState<number>(0);
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
     const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats] = useState<HostStats>(MOCK_STATS);
 
-    // ← NEW: tab config derived from data, includes counts
     const tabs = [
         { label: "Upcoming events", count: upcomingEvents.length },
         { label: "Past events",     count: pastEvents.length },
@@ -192,8 +190,12 @@ export default function Host() {
         }
     }, [hostId]);
 
-    if (isLoading) return <p>Loading Host Profile...</p>;
-    if (!host) return <p>Host not found.</p>;
+    if (isLoading) return <p style={{ padding: "2rem" }}>Loading Host Profile...</p>;
+    if (!host) return <p style={{ padding: "2rem" }}>Host not found.</p>;
+
+    // ← current event list driven by selected tab
+    const currentEvents = selectedTab === 0 ? upcomingEvents : pastEvents;
+
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
 
@@ -243,7 +245,7 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* ── Tab bar (redesigned) ── */}
+            {/* Tab bar */}
             <div style={{ backgroundColor: "white", padding: "0.875rem 1.25rem 0", marginTop: "0.5rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                     {tabs.map((tab, i) => (
@@ -252,9 +254,9 @@ export default function Host() {
                             onClick={() => setSelectedTab(i)}
                             style={{
                                 padding: "0.4rem 0.875rem",
-                                borderRadius: "999px",                                          // pill
+                                borderRadius: "999px",
                                 border: "1px solid #e5e7eb",
-                                backgroundColor: selectedTab === i ? "#111827" : "white",       // black when active
+                                backgroundColor: selectedTab === i ? "#111827" : "white",
                                 color: selectedTab === i ? "white" : "#374151",
                                 fontWeight: "600",
                                 fontSize: "0.8125rem",
@@ -269,41 +271,44 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* Content (still old cards – replaced in commit 12) */}
-            <div style={{ width: '100%', overflowX: 'auto', scrollbarWidth: 'none', marginTop: "1rem", padding: "0 1.25rem" }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {upcomingEvents.map((card, index) => (
-                        <div key={index} style={{
-                            width: '100%',
-                            height: '5rem',
-                            backgroundColor: 'white',
-                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '0.5rem',
-                            marginBottom: '0.75rem'
-                        }}>
-                            <div style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Date</div>
-                            <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>TiTle</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            {/* ── Three-column content grid ── */}
+            <div style={{ padding: "1rem 1.25rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
 
-            {/* Reviews */}
-            <div style={{
-                marginTop: '1rem',
-                paddingBottom: '1.25rem',
-                marginLeft: '1.25rem',
-                marginRight: '1.25rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.75rem',
-                paddingLeft: '0.75rem',
-                paddingRight: '0.75rem'
-            }}>
-                {reviews.map((review) => (
-                    <ReviewCard key={review.id} review={review} />
-                ))}
+                {selectedTab < 2 ? (
+                    <>
+                        {/* Col 1: first half of event list */}
+                        <div>
+                            {currentEvents
+                                .slice(0, Math.ceil(currentEvents.length / 2))
+                                .map((c, i) => <EventCard key={i} card={c} />)}
+                        </div>
+                        {/* Col 2: second half of event list */}
+                        <div>
+                            {currentEvents
+                                .slice(Math.ceil(currentEvents.length / 2))
+                                .map((c, i) => <EventCard key={i} card={c} />)}
+                        </div>
+                    </>
+                ) : (
+                    /* Review tab: full-width review list */
+                    <div style={{ gridColumn: "span 2" }}>
+                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
+                    </div>
+                )}
+
+                {/* Col 3: reviews panel – always visible on events tabs */}
+                {selectedTab < 2 && (
+                    <div style={{
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "0.75rem",
+                        padding: "0.875rem 0.875rem 0.25rem",
+                        alignSelf: "start",
+                    }}>
+                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
+                    </div>
+                )}
             </div>
         </div>
-    )
+    );
 }
