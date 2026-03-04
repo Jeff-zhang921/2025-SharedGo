@@ -96,7 +96,7 @@ const ConversationPage=()=>{
           }
     }
    catch{
-            if (isMounted) setStatus("Failed to load conversations.");
+          if (isMounted) setStatus("Failed to load conversations.");
   }
   }
   load()
