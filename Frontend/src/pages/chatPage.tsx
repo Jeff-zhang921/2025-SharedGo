@@ -1,6 +1,6 @@
 import {ChangeEvent, useEffect,useMemo,useRef,useState} from 'react';
 import{useLocation,useNavigate}from"react-router-dom";
-import{io,type Socket}from "socket.io-client"
+import{io,Socket}from "socket.io-client"
 //chatPage/css has not been commited.
 import"./chatPage.css"
 
@@ -223,9 +223,8 @@ useEffect(()=>{
     createThreadForHostId(state.hostId)
   }
 },[location.state])
-const handleSendFile=
 //the input element
-(event:ChangeEvent<HTMLInputElement>)=>{
+const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
   //event is the object
   //target is the <input type=file>
 const file=event.target.files?.[0]
@@ -257,6 +256,40 @@ if(!threadId){
   }
   setIsUploadingImage(true);
   setStatus("Uploading image...");
+  try{
+    const response=await fetch(`${Backend_URL}/chat/upload`,{
+      method:"POST",
+      credentials:"include",
+      body:formData
+    })
+    const raw=await response.text()
+        let data: Record<string, string> = {};
+    if (raw) {
+      try {
+        data = JSON.parse(raw) as Record<string, string>;
+        //first is name second is url
+      } catch {
+        data = {};
+      }
+    }
+    if(!response.ok){
+      setStatus(
+        data.error|| `Fail to upload image(HTTP ${response.status}).`
+      )
+      return
+    }
+    const imageURL=typeof data.url==="string"?data.url.trim():""
+    if(!imageURL){
+      setStatus("upload success but url missing")
+      return
+    }
+    socketRef.current.emit("message:send",{
+      threadId,
+     
+    })
+  }catch{
+
+  }
 }
   
 
