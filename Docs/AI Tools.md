@@ -45,9 +45,23 @@ Deployment and configuration support - AI assisted with environment setup questi
 
 
 **Thibault:**
-- Debugging: "I have come across this error ... can you pin-point the problem?"
 
-- CSS Styling: "Provide a rough template for a .css container/input-form"
+**Tools used**
+
+- ChatGPT
+
+
+#### Where did you use AI tools and why 
+
+- Debugging, issues that would be looked up on stackoverflow.com are more easily accessible through AI.
+
+- CSS Styling, each change for adjusting to suit the design is already fidly, so having AI (rather than w3schools.com) provide a basic start saves on research time.
+
+**Examples of Prompt I input:**
+
+- "I have come across this error ... can you pin-point the problem?"
+
+- "Provide a rough basic template for a .css container/input-form"
 
 
 **Oliver**
