@@ -30,7 +30,9 @@ model User {
   hostThread  ChatThread[] @relation("HostThreads")
   guestThread ChatThread[] @relation("GuestThreads")
   message     ChatMessage[] 
-  answer Answer[]
+  answers Answer[]
+  questions Question[]
+  generals General[]
   }
 
 
@@ -52,8 +54,8 @@ model Event {
   reviews      Review[]
   createdAt    DateTime           @default(now()) 
   updatedAt    DateTime           @updatedAt 
-  question Question[]    
-  general General[]
+  questions Question[]    
+  generals General[]
 } 
 
 enum Category {
@@ -139,10 +141,11 @@ model Question{
 id Int @id @default(autoincrement())
 eventId Int
 body String
-event Event @relation(fields:[eventId],references:[id])
+event Event @relation(fields:[eventId],references:[id], onDelete: Cascade)
 createdAt DateTime @default(now())
-answer Answer[]
+answers Answer[]
 authorId Int
+author User @relation(fields:[authorId],references: [id], onDelete: Cascade)
 @@index([eventId, createdAt])
 }
 
@@ -153,15 +156,19 @@ body String
 authorId Int
 
 createdAt DateTime @default(now())
-question Question @relation(fields:[questionId],references: [id])
-author User @relation(fields:[authorId],references:[id])
+question Question @relation(fields:[questionId],references: [id], onDelete: Cascade)
+author User @relation(fields:[authorId],references:[id], onDelete: Cascade)
+@@index([questionId, createdAt])
 }
 
 model General{
   id Int @id @default(autoincrement())
   eventId Int
+  authorId Int
   body String
-  event Event @relation(fields:[eventId],references:[id])
+  event Event @relation(fields:[eventId],references:[id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  author User @relation(fields:[authorId],references: [id], onDelete: Cascade)
   @@index([eventId, createdAt])
+
 }
