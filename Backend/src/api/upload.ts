@@ -1,7 +1,6 @@
 import{Router,Request,Response} from "express"
 import { UTApi, UTFile } from "uploadthing/server";
 import multer from "multer";
-import { error } from "console";
 const utapi = new UTApi();
 
 const MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -22,8 +21,8 @@ router.post("/upload",upload.single("file"),async (req:Request,res:Response)=>{
         res.status(400).json({message:"No file uploaded"})
         return
     }
-    if(!process.env.UPLOADTHING_SECRET_KEY){
-        res.status(500).json({message:"Server misconfiguration"})
+    if(!process.env.UPLOADTHING_TOKEN && !process.env.UPLOADTHING_SECRET_KEY){
+        res.status(500).json({message:"Server misconfiguration: missing UploadThing token"})
         return
     }
     if (!req.session.user){
@@ -37,10 +36,6 @@ router.post("/upload",upload.single("file"),async (req:Request,res:Response)=>{
         res.status(400).json({message:"Only image and video files are allowed"})
         return
     }
-   if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
-    res.status(400).json({ message: "File size exceeds the limit of 10MB." });
-    return 
-   }
    try{
     if (isVideo||isImage){
       //new UTFile(parts, name, options)
@@ -77,3 +72,4 @@ router.post("/upload",upload.single("file"),async (req:Request,res:Response)=>{
   })
 
 
+export default router

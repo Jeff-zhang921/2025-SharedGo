@@ -252,7 +252,7 @@ if(!threadId){
   }
   
   const formData=new FormData()
-  formData.append("image",file)
+  formData.append("file",file)
   setIsUploadingImage(true);
   setStatus("Uploading image...");
   try{
@@ -272,8 +272,9 @@ if(!threadId){
       }
     }
     if(!response.ok){
+      const serverMessage = typeof data.message === "string" ? data.message : "";
       setStatus(
-        data.error|| `Fail to upload image(HTTP ${response.status}).`
+        serverMessage || data.error|| `Fail to upload image(HTTP ${response.status}).`
       )
       return
     }
