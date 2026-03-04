@@ -78,8 +78,32 @@ router.get("/threads",async (req:Request,res:Response)=>{
     })
     res.json(threads)
 }
-
 )
+router.get("/users",async(req:Request,res:Response)=>{
+const userId=req.session.user?.id
+const query=typeof req.query?.query==="string"?req.query.query.trim():""
+if(!userId){
+    res.status(401).json({message:"Unauthorized"})
+    return
+}
+const users=await prisma.user.findMany({
+    where:query
+    ?{
+        id:{not:userId},
+        OR:[
+            {email:{contains:query,mode:"insensitive"}},
+            {name:{contains:query,mode:"insensitive"}}
+        ]
+    }
+    :{
+        id:{not:userId}
+    },
+    select:{id:true,name:true,email:true},
+    orderBy:{email:"asc"},
+    take:25
+})
+return res.json(users)
+})
 
 router.get("/threads/:threadId/messages",async (req:Request,res:Response)=>{
     const userId=req.session.user?.id

@@ -58,6 +58,8 @@ const ConversationPage=()=>{
   const[thread,setThread]=useState<ThreadResponse[]>([])
   const [status,setStatus]=useState("loading...")
   const [searchTerm, setSearchTerm] = useState("");
+  const [dbUsers,setDbUsers]=useState<UserSummary[]>([])
+   const isSearching = searchTerm.trim() !== "";
   //async function is use to let function inside and outside async func to run when async is running, no need to wait
   //await only contain inside async func
   //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected
@@ -129,17 +131,55 @@ const mapped =thread.map((thread)=>{
 return mapped
 },[thread,me])
 
-const filteredConversations = useMemo(() => {
-  const query = searchTerm.trim().toLowerCase();
-  if (!query) return conversations;
-  return conversations.filter((item) =>
-    item.name.includes(query)
-  );
-}, [conversations, searchTerm]);
+useEffect(()=>{
+  const q=searchTerm.trim()
+ 
+  if(!q){
+    setDbUsers([])
+    return
+  }
+//this is debounce command
+  const timer=setTimeout(async()=>{
+const res=await fetch(`${BACKEND_URL}/chat/users?query=${q}`,
+{credentials:"include"})
+if (!res.ok){
+  return setStatus("fail to fetch")
+}
+const data=await res.json()
+
+setDbUsers(Array.isArray(data)?data:[]);
+}
+,300)
+
+return ()=>clearTimeout(timer)
+
+},[searchTerm])
+
+
 
 const handleOpenThread = (threadId: number,other:string) => {
     navigate("/chat", { state: { threadId, other} });
   };
+  const handleStartThread=async (user:UserSummary)=>{
+    if(!user?.id){
+      setStatus("no user exist")
+      return 
+    }
+    const res= await fetch(`${BACKEND_URL}/chat/threads`,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      credentials:"include",
+      body:JSON.stringify({hostId:user.id}),
+    })
+    const data=await res.json().catch(()=>({}))
+    if(!res.ok||typeof data.threadId!=="number"){
+      setStatus(data.message||"Fail to create thread")
+      return
+    }
+    navigate("/chat",{state:{threadId:data.threadId,other:user.name||user.email}})
+     
+
+  }
 
 
 return(
@@ -166,7 +206,7 @@ return(
 
         <div className="conversations-meta">
           <h2>
-           Messages
+           {isSearching?"Search Result":"Message"}
           </h2>
         </div>
         
@@ -175,28 +215,20 @@ return(
         {!status && conversations.length === 0 && (
           <div>No conversations yet.</div>
         )}
-        {!status && conversations.length > 0 && filteredConversations.length === 0 && (
+        {/* {!status && conversations.length > 0 &&  (
           <div>
             No conversations match "{searchTerm.trim()}".
           </div>
-        )}
+        )} */}
         {/* section: It tells the browser (and search engines) that "everything inside this box belongs to one specific theme." */}
-         <section className="conversations-list">
-          {filteredConversations.map((item) => (
-            // If you "cut" an article out of your website and put it on a different page, it should still make sense by itself.
-            <article
-              key={item.threadId}
-              className="conversation-card"
-              style={{ ["--accent" as any]: item.accent }}
-              onClick={() => handleOpenThread(item.threadId,item.email)}
-              role="button"
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  handleOpenThread(item.threadId, item.email);
-                }
-              }}
-            >
-              <div className="avatar">
+
+          {/* if statement in JSX */}
+
+          {!isSearching&&(
+            <section className="conversations-list">
+              {conversations.map((item)=>(
+                <article className="conversation-card" key={item.threadId} onClick={()=>{handleOpenThread(item.threadId,item.email)}}>
+                   <div className="avatar">
                 {/*  span doesn't do anything*/}
                 <span>{getInitials(item.name[0])}</span>
               </div>
@@ -210,9 +242,31 @@ return(
                 </div>
                 <p className="preview">{item.preview}</p>
               </div>
-            </article>
-          ))}
-        </section>
+              
+                </article>
+              ))}
+                </section>
+              )}
+
+              {isSearching&&(
+                <section className="conversations-list">
+              {!status&&dbUsers.map((user)=>(
+                <article className="conversation-card" key={user.id} onClick={()=>handleStartThread(user)}>
+                     <div className="avatar">
+                {/*  span doesn't do anything*/}
+                <span>{getInitials(user.email[0])}</span>
+              </div>
+              <div className="conversation-body">
+                <div className="conversation-top">
+                  <h3>{user.email}</h3>
+                </div>
+              </div>
+                </article>
+              ))}
+                </section>
+              )}
+         
+
 
     </div>
   </div>

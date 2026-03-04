@@ -45,9 +45,10 @@ This section documents the endpoints used by **Frontend**
 - [6. Chat (REST + Socket)](#6-chat-rest--socket)
   - [6.1 Create Or Find Thread](#61-create-or-find-thread)
   - [6.2 List My Threads](#62-list-my-threads)
-  - [6.3 Thread Messages](#63-thread-messages)
-  - [6.4 Socket Events](#64-socket-events)
-  - [6.5 Manual Test Sequence](#65-manual-test-sequence)
+  - [6.3 Search Users (Conversation Search)](#63-search-users-conversation-search)
+  - [6.4 Thread Messages](#64-thread-messages)
+  - [6.5 Socket Events](#65-socket-events)
+  - [6.6 Manual Test Sequence](#66-manual-test-sequence)
 
 ---
 
@@ -905,7 +906,39 @@ Returns all threads where the current user is either host or guest.
 
 ---
 
-### 6.3 Thread Messages
+### 6.3 Search Users (Conversation Search)
+**GET** `/chat/users`
+
+Search users in the database for starting a new conversation.
+
+**Query params**
+
+| Param   | Type   | Required | Description |
+|---------|--------|----------|-------------|
+| `query` | string | no       | Case-insensitive substring match against `User.email` and `User.name`. |
+
+**Response**
+
+Returns up to 25 users ordered by email:
+
+```json
+[
+  { "id": 2, "name": "Alex", "email": "alex@example.com" }
+]
+```
+
+**Notes**
+
+- Excludes the current logged-in user.
+- If `query` is empty, returns the first 25 users (excluding current user) sorted by email.
+- Typical conversation flow is:
+  1. `GET /chat/users?query=...`
+  2. click a user result
+  3. `POST /chat/threads` with `{ hostId }` to get/create `threadId`
+
+---
+
+### 6.4 Thread Messages
 **GET** `/chat/threads/:threadId/messages`
 
 **URL params**
@@ -919,7 +952,7 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.4 Socket Events
+### 6.5 Socket Events
 
 **Connection**
 - Client connects to Socket.IO on the same base URL.
@@ -946,13 +979,14 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.5 Manual Test Sequence
+### 6.6 Manual Test Sequence
 
 1. Login via `/auth/email/verify`.
-2. Create or fetch a thread with `POST /chat/threads`.
-3. Connect Socket.IO and emit `thread:join`.
-4. Emit `message:send` and confirm:
+2. Search a user with `GET /chat/users?query=<text>`.
+3. Create or fetch a thread with `POST /chat/threads`.
+4. Connect Socket.IO and emit `thread:join`.
+5. Emit `message:send` and confirm:
    - Message saved in DB
    - `message:new` received by both users
-5. Load history with `GET /chat/threads/:threadId/messages`.
+6. Load history with `GET /chat/threads/:threadId/messages`.
 

@@ -38,7 +38,7 @@
 
 .conversations-toolbar {
   /* display: flex; */
-  margin-top:-100px;
+  margin-top: 0;
   align-items: center;
 }
 
@@ -62,16 +62,15 @@
 }
 
 .conversations-meta {
-  
-  margin-top: -150px;
-width: 1px;
+  margin-top: 0;
+  width: auto;
   font-size: 0.8rem;
 }
 
 .conversations-list {
-  margin-top:-250px;
+  margin-top: 0;
   display: grid;
-  
+  gap: 0.5rem;
 }
 
 .conversation-card {
@@ -97,6 +96,7 @@ width: 1px;
 }
 
 .conversation-body h3 {
+  /* margin: 0; */
   font-size: 1rem;
 }
 
