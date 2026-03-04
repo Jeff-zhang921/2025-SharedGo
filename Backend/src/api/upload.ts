@@ -16,7 +16,8 @@ const upload = multer({
 
 const router=Router()
 //workflow:assign the type of file,, use UTFile change them to format that UploadThing API can accept, then call the API to upload the file, and get the upload.data which contain the url of the file by calling .ufsUrl
-router.post("/upload-image",upload.single("file"),async (req:Request,res:Response)=>{
+router.post("/upload",upload.single("file"),async (req:Request,res:Response)=>{
+  
     if (!req.file){
         res.status(400).json({message:"No file uploaded"})
         return
@@ -44,6 +45,7 @@ router.post("/upload-image",upload.single("file"),async (req:Request,res:Respons
     if (isVideo||isImage){
       //new UTFile(parts, name, options)
       //Multer’s in-memory data to “byte array”
+      //UTFile expects a BlobPart which can be ArrayBuffer, ArrayBufferView, Blob, or string. Buffer from multer can be treated as a BlobPart.
       const uploadFile=new UTFile([file.buffer as BlobPart],file.originalname||`chat${Date.now()}`,{
       type:file.mimetype,
       lastModified:Date.now()

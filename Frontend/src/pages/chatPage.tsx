@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {ChangeEvent, useEffect,useMemo,useRef,useState} from 'react';
 import{useLocation,useNavigate}from"react-router-dom";
 import{io,type Socket}from "socket.io-client"
 //chatPage/css has not been commited.
@@ -35,12 +35,14 @@ const ChatPage = () => {
   //when refresh the page, stuff inside will not vanish. to call the stuff inside call var.current
   //when call <div className="chat-body" ref={messageListRef}>, it wll do 
   //messageListRef.current = <the actual div DOM node>: the stuff that inside the div will auto scroll or do some action
+  const MAX_UPLOAD=100*1024*1024
   const messageListRef=useRef<HTMLDivElement|null>(null)
   const threadIdRef = useRef<number | null>(null);
   //change a useState value, React rerender the UI to show the new information."
   const [status,setStatus]=useState("Not connected")
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   //<> is the generic: this box is empty right now (null), but eventually, it is going to hold an object with an id, an email, and a name. Please get the memory ready for that
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
@@ -221,6 +223,42 @@ useEffect(()=>{
     createThreadForHostId(state.hostId)
   }
 },[location.state])
+const handleSendFile=
+//the input element
+(event:ChangeEvent<HTMLInputElement>)=>{
+  //event is the object
+  //target is the <input type=file>
+const file=event.target.files?.[0]
+if(!file){
+  return 
+}
+if(!file.type.startsWith("image/")||!file.type.startsWith("video/")){
+  setStatus("only image and file are allowed")
+  return
+}
+
+if(file.size>MAX_UPLOAD){
+    setStatus("Image or video can not exceed 100mb")
+return
+}
+if(!threadId){
+  setStatus("Create or Join a chat first")}
+
+  if(!socketRef.current||!socketRef.current.connected){
+    setStatus("please relogin")
+    return
+  }
+  
+  const formData=new FormData()
+  if( file.type.startsWith("image/")){
+    formData.append("image",file)
+  }else if(file.type.startsWith("video/")){
+    formData.append("video",file)
+  }
+  setIsUploadingImage(true);
+  setStatus("Uploading image...");
+}
+  
 
 const handleSendMessage=()=>{
   //socketRef is the container for socket
@@ -243,6 +281,7 @@ const handleSendMessage=()=>{
   //The message is gone; now make the paper blank again
   setMessageBody("")
 }
+
 
   return (
     <div className='chat-shell'>
