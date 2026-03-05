@@ -41,4 +41,13 @@ router.get("/general/:eventId",async (req:Request,res:Response)=>{
         res.status(500).json({ message: "Failed to load general board messages" });
     }
 })
+
+router.post("/general/:eventId",async (req:Request,res:Response)=>{
+    const userId=req.session.user?.id
+    if (!userId){
+        res.status(401).json({message:"Unauthorized"})
+        return
+    }
+    
+})
 export default router
