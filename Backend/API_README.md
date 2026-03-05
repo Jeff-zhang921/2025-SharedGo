@@ -47,8 +47,9 @@ This section documents the endpoints used by **Frontend**
   - [6.2 List My Threads](#62-list-my-threads)
   - [6.3 Search Users (Conversation Search)](#63-search-users-conversation-search)
   - [6.4 Thread Messages](#64-thread-messages)
-  - [6.5 Socket Events](#65-socket-events)
-  - [6.6 Manual Test Sequence](#66-manual-test-sequence)
+  - [6.5 Upload Chat Media](#65-upload-chat-media)
+  - [6.6 Socket Events](#66-socket-events)
+  - [6.7 Manual Test Sequence](#67-manual-test-sequence)
 
 ---
 
@@ -952,7 +953,40 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.5 Socket Events
+### 6.5 Upload Chat Media
+**POST** `/chat/upload`
+
+Upload one media file and return a public URL.
+
+**Request**
+
+- `Content-Type`: `multipart/form-data`
+
+| Field  | Type | Required | Notes |
+|--------|------|----------|-------|
+| `file` | file | yes      | Accepts `image/*` or `video/*`; max size 10MB |
+
+**Response**
+```json
+{ "url": "https://..." }
+```
+
+**Common error responses**
+
+- `400` `{ "message": "No file uploaded" }`
+- `400` `{ "message": "Only image and video files are allowed" }`
+- `401` `{ "message": "Unauthorized" }`
+- `500` `{ "message": "Server misconfiguration: missing UploadThing token" }`
+- `500` `{ "message": "Failed to upload file" }`
+
+**Notes**
+
+- Route is mounted under `/chat`, so the full path is `/chat/upload`.
+- Requires `UPLOADTHING_TOKEN` (preferred) or `UPLOADTHING_SECRET_KEY` (legacy compatibility).
+
+---
+
+### 6.6 Socket Events
 
 **Connection**
 - Client connects to Socket.IO on the same base URL.
@@ -970,6 +1004,7 @@ Returns messages in ascending `createdAt` order.
 - Server saves message
 - Server updates `lastMessageAt`
 - Server emits `message:new` to the room
+- Media messages can use `body` as a URL marker string, e.g. `IMG::<url>`.
 
 **message:new**
 - Server emits: `{ id, threadId, senderId, body, createdAt }`
@@ -979,14 +1014,15 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.6 Manual Test Sequence
+### 6.7 Manual Test Sequence
 
 1. Login via `/auth/email/verify`.
 2. Search a user with `GET /chat/users?query=<text>`.
 3. Create or fetch a thread with `POST /chat/threads`.
-4. Connect Socket.IO and emit `thread:join`.
-5. Emit `message:send` and confirm:
+4. (Optional media) Upload with `POST /chat/upload` (`multipart/form-data`, field: `file`) and get `url`.
+5. Connect Socket.IO and emit `thread:join`.
+6. Emit `message:send` and confirm:
    - Message saved in DB
    - `message:new` received by both users
-6. Load history with `GET /chat/threads/:threadId/messages`.
+7. Load history with `GET /chat/threads/:threadId/messages`.
 

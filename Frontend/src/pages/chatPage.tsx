@@ -1,8 +1,9 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {ChangeEvent, useEffect,useMemo,useRef,useState} from 'react';
 import{useLocation,useNavigate}from"react-router-dom";
-import{io,type Socket}from "socket.io-client"
+import{io,Socket}from "socket.io-client"
 //chatPage/css has not been commited.
 import"./chatPage.css"
+
 
 
 
@@ -34,12 +35,15 @@ const ChatPage = () => {
   //when refresh the page, stuff inside will not vanish. to call the stuff inside call var.current
   //when call <div className="chat-body" ref={messageListRef}>, it wll do 
   //messageListRef.current = <the actual div DOM node>: the stuff that inside the div will auto scroll or do some action
+  const MAX_UPLOAD=100*1024*1024
+  const IMAGE_PREFIX="IMG::"
   const messageListRef=useRef<HTMLDivElement|null>(null)
   const threadIdRef = useRef<number | null>(null);
   //change a useState value, React rerender the UI to show the new information."
   const [status,setStatus]=useState("Not connected")
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   //<> is the generic: this box is empty right now (null), but eventually, it is going to hold an object with an id, an email, and a name. Please get the memory ready for that
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
@@ -220,6 +224,79 @@ useEffect(()=>{
     createThreadForHostId(state.hostId)
   }
 },[location.state])
+//the input element
+const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
+  //event is the object
+  //target is the <input type=file>
+const file=event.target.files?.[0]
+if(!file){
+  return 
+}
+if(!file.type.startsWith("image/")){
+  setStatus("Only image files are allowed")
+  return
+}
+
+if(file.size>MAX_UPLOAD){
+    setStatus("Image can not exceed 100mb")
+return
+}
+if(!threadId){
+  setStatus("Create or Join a chat first")
+  return
+}
+
+  if(!socketRef.current||!socketRef.current.connected){
+    setStatus("please relogin")
+    return
+  }
+  
+  const formData=new FormData()
+  formData.append("file",file)
+  setIsUploadingImage(true);
+  setStatus("Uploading image...");
+  try{
+    const response=await fetch(`${Backend_URL}/chat/upload`,{
+      method:"POST",
+      credentials:"include",
+      body:formData
+    })
+    const raw=await response.text()
+        let data: Record<string, string> = {};
+    if (raw) {
+      try {
+        data = JSON.parse(raw) as Record<string, string>;
+        //first is name second is url
+      } catch {
+        data = {};
+      }
+    }
+    if(!response.ok){
+      const serverMessage = typeof data.message === "string" ? data.message : "";
+      setStatus(
+        serverMessage || data.error|| `Fail to upload image(HTTP ${response.status}).`
+      )
+      return
+    }
+    const imageURL=typeof data.url==="string"?data.url.trim():""
+    if(!imageURL){
+      setStatus("upload success but url missing")
+      return
+    }
+    socketRef.current.emit("message:send",{
+      threadId,
+      body:`${IMAGE_PREFIX}${imageURL}`,
+    })
+    setStatus("Image sent")
+
+  }catch{
+    setStatus("Failt ot upload")
+  }finally{
+    setIsUploadingImage(false)
+    event.target.value=""
+  }
+}
+  
 
 const handleSendMessage=()=>{
   //socketRef is the container for socket
@@ -242,6 +319,7 @@ const handleSendMessage=()=>{
   //The message is gone; now make the paper blank again
   setMessageBody("")
 }
+
 
   return (
     <div className='chat-shell'>
@@ -279,6 +357,8 @@ const handleSendMessage=()=>{
           
           {message.map((msg, index) => {
             const isMe = msg.senderId === me?.id;
+            const isImageMessage = msg.body.startsWith(IMAGE_PREFIX);
+            const imageUrl = isImageMessage ? msg.body.slice(IMAGE_PREFIX.length) : "";
             //If True: It gives the div the class chat-row me.
             //If False: It gives the div the class chat-row them.
             return (
@@ -290,7 +370,11 @@ const handleSendMessage=()=>{
               //using --i so each chat message is in different i
               >
                  <div className={`chat-bubble ${isMe ? "bubble-me" : "bubble-them"}`}>
-                  <p>{msg.body}</p>
+                  {isImageMessage ? (
+                    <img src={imageUrl} alt="shared" className="chat-image" />
+                  ) : (
+                    <p>{msg.body}</p>
+                  )}
                   <span className="chat-timestamp">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
@@ -302,8 +386,17 @@ const handleSendMessage=()=>{
 
 
         <div className='chat-input'>
-          {/* <button type="button" className="input-icon" >
-          </button> */}
+          <label className={`photo-button ${isUploadingImage ? "disabled" : ""}`} htmlFor="chat-photo-input">
+            {isUploadingImage ? "Uploading..." : "Photo"}
+          </label>
+          <input
+            id="chat-photo-input"
+            className="photo-input"
+            type="file"
+            accept="image/*"
+            onChange={handleSendFile}
+            disabled={isUploadingImage}
+          />
           <input
             type="text"
             placeholder="Messages..."
