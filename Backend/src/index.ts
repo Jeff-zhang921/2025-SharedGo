@@ -15,7 +15,7 @@ import chatRouter from "./routes/chat";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", //frontend URL
+    origin: process.env.FRONTEND_URL, //frontend URL
     credentials: true, //Allows the browser to see the response and save cookies
   }),
 );
