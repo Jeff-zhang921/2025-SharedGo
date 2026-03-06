@@ -104,7 +104,7 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
 
 .chat-input {
   display: grid;
-  grid-template-columns:  1fr auto;
+  grid-template-columns: auto 1fr auto;
   gap: 8px;
   border-radius:12px;
   /* space inside the bar */
@@ -113,6 +113,29 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   background: #ffffff;
   position: relative;
   bottom: 24px;
+}
+
+.photo-input {
+  display: none;
+}
+
+.photo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.photo-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 /* where you type */
 .chat-input input {
@@ -167,6 +190,12 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   flex-direction: column;
   gap:4px;
   line-height: 1.5;
+}
+
+.chat-image {
+  max-width: min(280px, 70vw);
+  border-radius: 10px;
+  display: block;
 }
 
 

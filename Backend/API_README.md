@@ -45,9 +45,11 @@ This section documents the endpoints used by **Frontend**
 - [6. Chat (REST + Socket)](#6-chat-rest--socket)
   - [6.1 Create Or Find Thread](#61-create-or-find-thread)
   - [6.2 List My Threads](#62-list-my-threads)
-  - [6.3 Thread Messages](#63-thread-messages)
-  - [6.4 Socket Events](#64-socket-events)
-  - [6.5 Manual Test Sequence](#65-manual-test-sequence)
+  - [6.3 Search Users (Conversation Search)](#63-search-users-conversation-search)
+  - [6.4 Thread Messages](#64-thread-messages)
+  - [6.5 Upload Chat Media](#65-upload-chat-media)
+  - [6.6 Socket Events](#66-socket-events)
+  - [6.7 Manual Test Sequence](#67-manual-test-sequence)
 
 ---
 
@@ -905,7 +907,39 @@ Returns all threads where the current user is either host or guest.
 
 ---
 
-### 6.3 Thread Messages
+### 6.3 Search Users (Conversation Search)
+**GET** `/chat/users`
+
+Search users in the database for starting a new conversation.
+
+**Query params**
+
+| Param   | Type   | Required | Description |
+|---------|--------|----------|-------------|
+| `query` | string | no       | Case-insensitive substring match against `User.email` and `User.name`. |
+
+**Response**
+
+Returns up to 25 users ordered by email:
+
+```json
+[
+  { "id": 2, "name": "Alex", "email": "alex@example.com" }
+]
+```
+
+**Notes**
+
+- Excludes the current logged-in user.
+- If `query` is empty, returns the first 25 users (excluding current user) sorted by email.
+- Typical conversation flow is:
+  1. `GET /chat/users?query=...`
+  2. click a user result
+  3. `POST /chat/threads` with `{ hostId }` to get/create `threadId`
+
+---
+
+### 6.4 Thread Messages
 **GET** `/chat/threads/:threadId/messages`
 
 **URL params**
@@ -919,7 +953,40 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.4 Socket Events
+### 6.5 Upload Chat Media
+**POST** `/chat/upload`
+
+Upload one media file and return a public URL.
+
+**Request**
+
+- `Content-Type`: `multipart/form-data`
+
+| Field  | Type | Required | Notes |
+|--------|------|----------|-------|
+| `file` | file | yes      | Accepts `image/*` or `video/*`; max size 10MB |
+
+**Response**
+```json
+{ "url": "https://..." }
+```
+
+**Common error responses**
+
+- `400` `{ "message": "No file uploaded" }`
+- `400` `{ "message": "Only image and video files are allowed" }`
+- `401` `{ "message": "Unauthorized" }`
+- `500` `{ "message": "Server misconfiguration: missing UploadThing token" }`
+- `500` `{ "message": "Failed to upload file" }`
+
+**Notes**
+
+- Route is mounted under `/chat`, so the full path is `/chat/upload`.
+- Requires `UPLOADTHING_TOKEN` (preferred) or `UPLOADTHING_SECRET_KEY` (legacy compatibility).
+
+---
+
+### 6.6 Socket Events
 
 **Connection**
 - Client connects to Socket.IO on the same base URL.
@@ -937,6 +1004,7 @@ Returns messages in ascending `createdAt` order.
 - Server saves message
 - Server updates `lastMessageAt`
 - Server emits `message:new` to the room
+- Media messages can use `body` as a URL marker string, e.g. `IMG::<url>`.
 
 **message:new**
 - Server emits: `{ id, threadId, senderId, body, createdAt }`
@@ -946,13 +1014,15 @@ Returns messages in ascending `createdAt` order.
 
 ---
 
-### 6.5 Manual Test Sequence
+### 6.7 Manual Test Sequence
 
 1. Login via `/auth/email/verify`.
-2. Create or fetch a thread with `POST /chat/threads`.
-3. Connect Socket.IO and emit `thread:join`.
-4. Emit `message:send` and confirm:
+2. Search a user with `GET /chat/users?query=<text>`.
+3. Create or fetch a thread with `POST /chat/threads`.
+4. (Optional media) Upload with `POST /chat/upload` (`multipart/form-data`, field: `file`) and get `url`.
+5. Connect Socket.IO and emit `thread:join`.
+6. Emit `message:send` and confirm:
    - Message saved in DB
    - `message:new` received by both users
-5. Load history with `GET /chat/threads/:threadId/messages`.
+7. Load history with `GET /chat/threads/:threadId/messages`.
 

@@ -11,6 +11,7 @@ import filterRouter from "./routes/filter";
 import { sessionMiddleware } from "./session";
 import { initSocket } from "./socket";
 import chatRouter from "./routes/chat";
+import uploadRouter from "./api/upload";
 
 const app = express();
 app.use(

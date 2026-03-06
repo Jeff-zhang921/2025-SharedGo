@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
+    
     /* File Layout */
     "rootDir": ".",
     "outDir": "./dist",
 
     /* Environment */
     "target": "ES2023",
-    "lib": ["ES2023"],
+    "lib": ["ES2023","DOM", "DOM.Iterable"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node","express", "jest"],
+    "types": ["node","express", "jest", "multer"],
     "skipLibCheck": true,
 
     /* Build Output */
