@@ -3,6 +3,8 @@ services:
     image: 588738568626.dkr.ecr.eu-north-1.amazonaws.com/sharedgo:latest
     ports:
       - 3000:3000
+    env_file:
+      - .env
     networks:
       - app-network
   frontend:
