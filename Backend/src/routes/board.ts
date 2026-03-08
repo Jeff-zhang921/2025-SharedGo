@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Router, Request, Response } from "express";
+import {requireSession } from "../middleware/requireSession";
 
 const router = Router();
 const prisma = new PrismaClient();
 
 
-router.get("/general/:eventId",async (req:Request,res:Response)=>{
+router.get("/general/:eventId",requireSession,async (req:Request,res:Response)=>{
     const parsedEventId = Number(req.params.eventId);
     if (!Number.isInteger(parsedEventId) || parsedEventId <= 0) {
         res.status(400).json({ message: "Valid eventId is required" });
@@ -42,7 +43,7 @@ router.get("/general/:eventId",async (req:Request,res:Response)=>{
     }
 })
 
-router.post("/general/:eventId",async (req:Request,res:Response)=>{
+router.post("/general/:eventId",requireSession,async (req:Request,res:Response)=>{
     const userId=req.session.user?.id
     if (!userId){
         res.status(401).json({message:"Unauthorized"})
@@ -58,11 +59,18 @@ router.post("/general/:eventId",async (req:Request,res:Response)=>{
         res.status(400).json({message:"Message body is required"})
         return
     }
+    if (body.length>1000){
+        res.status(400).json({message:"Message body must be less than 1000 characters"})
+        return
+    }
+
     try {
         const event=await prisma.event.findUnique({
             where:{
                 id:parsedEventId
-            },
+            },select:{
+                hostId:true,
+            }
         })
         if (!event){
             res.status(404).json({message:"Event not found"})
@@ -79,16 +87,70 @@ router.post("/general/:eventId",async (req:Request,res:Response)=>{
                 authorId:userId
             }
         })
-        if (!general){
-            res.status(500).json({ message: "Failed to post message to general board" });
-            return
-        }
+        
         res.status(201).json(general)
     }catch{
         res.status(500).json({ message: "Failed to post message to general board" });
         return
     }
-}
+})
 
-)
+router.get("/qna/:eventId",requireSession,async (req:Request,res:Response)=>{
+    const parsedEventId = Number(req.params.eventId);
+    if (!Number.isInteger(parsedEventId) || parsedEventId <= 0) {
+        res.status(400).json({ message: "Valid eventId is required" });
+        return;
+    }
+
+    try {
+        const event=await prisma.event.findUnique({
+            where:{
+                id:parsedEventId
+            },select:{
+                id:true
+            }
+        })
+
+        if (!event){
+            res.status(404).json({message:"Event not found"})
+            return
+        }
+        const question=await prisma.question.findMany({
+            where:{
+                eventId:parsedEventId
+            },select:{
+                id:true,
+                body:true,
+                authorId:true,
+
+                createdAt:true,
+            },orderBy:{
+                createdAt:"asc"
+            }
+        })
+        const answers=await prisma.answer.findMany({
+            where:{
+                question:{
+                    eventId:parsedEventId
+                }
+            },select:{
+                id:true,
+                body:true,
+                questionId:true,
+                authorId:true,
+                createdAt:true
+            },orderBy:{
+                createdAt:"asc"
+            }
+        })
+        const questionWithAnswers=question.map(q=>({
+            //unwrap question
+            ...q,
+            answers:answers.filter(a=>a.questionId===q.id)
+        }))
+        res.json(questionWithAnswers)
+    } catch {
+        res.status(500).json({ message: "Failed to load Q&A board messages" });
+    }
+})
 export default router
