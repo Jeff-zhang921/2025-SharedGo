@@ -48,6 +48,47 @@ router.post("/general/:eventId",async (req:Request,res:Response)=>{
         res.status(401).json({message:"Unauthorized"})
         return
     }
-    
-})
+    const parsedEventId = Number(req.params.eventId);
+    if (!Number.isInteger(parsedEventId) || parsedEventId <= 0) {
+        res.status(400).json({ message: "Valid eventId is required" });
+        return;
+    }
+    const body=typeof req.body?.body==="string"?req.body.body.trim():""
+    if (!body){
+        res.status(400).json({message:"Message body is required"})
+        return
+    }
+    try {
+        const event=await prisma.event.findUnique({
+            where:{
+                id:parsedEventId
+            },
+        })
+        if (!event){
+            res.status(404).json({message:"Event not found"})
+            return
+        }
+        if (event?.hostId !== userId) {
+            res.status(403).json({ message: "Only the event host can post messages to the general board" });
+            return;
+        }
+        const general=await prisma.general.create({
+            data:{
+                eventId:parsedEventId,
+                body:body,
+                authorId:userId
+            }
+        })
+        if (!general){
+            res.status(500).json({ message: "Failed to post message to general board" });
+            return
+        }
+        res.status(201).json(general)
+    }catch{
+        res.status(500).json({ message: "Failed to post message to general board" });
+        return
+    }
+}
+
+)
 export default router
