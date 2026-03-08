@@ -122,8 +122,69 @@ describe("Auth Routes", () => {
             expect(res.status).toBe(429);
             expect(res.body.message).toContain("already active");
         });
-
     });
-});
+    describe("POST /auth/email/verify", () => {
+        it("should return 401 for incorrect code", async () => {
+            mockPrisma.loginCode.findFirst.mockResolvedValue({
+                id: "code-123",
+                codeHash: "hashedcode",
+                attempt: 0,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), // valid for 5 minutes
+            });
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "123456" });
+            
+            expect(res.status).toBe(401);
+            expect(mockPrisma.loginCode.update).toHaveBeenCalledWith({
+                where: { id: "code-123" },
+                data: { attempts: { increment: 1 } },
+            });
+        });
+        it("should return 401 for expired code", async () => {
+            mockPrisma.loginCode.findFirst.mockResolvedValue(null); // No valid code found
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "123456" });
+            expect(res.status).toBe(401);
+        });
+        it("should return 429 after 5 failed attempts", async () => {
+            mockPrisma.loginCode.findFirst.mockResolvedValue({
+                id: "code-123",
+                codeHash: "hashedcode", 
+                attempts: 5,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), // valid for 5 minutes
+            });
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "123456" });
+            expect(res.status).toBe(429);
+            expect(res.body.message).toBe("Too many attempts. Request a new code.");
+        });
+        it("should return 200 and set session for correct code", async () => {  
+            const crypto = require("crypto");
+            const validHash = crypto
+                .createHmac("sha256", "testsecret")
+                .update("123456")
+                .digest("hex");
+            mockPrisma.loginCode.findFirst.mockResolvedValue({
+                id: "code-123",
+                codeHash: validHash,
+                attempts: 0,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), // valid for 5 minutes
+            });
+            mockPrisma.user.upsert.mockResolvedValue({
+                id: "1",
+                email: "test@gmail.com",
+                name: "Tester"
+            });
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "123456" });
+            expect(res.status).toBe(200);
+            expect(res.body.message).toBe("Logged in.");
+            expect(res.body.user.email).toBe("test@gmail.com");
+        });
 
-    
+});
+});
