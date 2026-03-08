@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router, Request, Response } from "express";
 import {requireSession } from "../middleware/requireSession";
 
+
 const router = Router();
 const prisma = new PrismaClient();
 
@@ -242,7 +243,8 @@ router.post("/qna/:eventId/answer",requireSession,async (req:Request,res:Respons
         res.status(400).json({ message: "Valid eventId is required" });
         return;
     }
-    const questionId=typeof req.body?.questionId==="number"?Number(req.body.questionId):NaN
+    const questionIdRaw=req.body?.questionId
+    const questionId=typeof questionIdRaw==="number"||typeof questionIdRaw==="string"?Number(questionIdRaw):NaN
     if (!Number.isInteger(questionId)||questionId<=0){
         res.status(400).json({message:"Valid questionId is required"})
         return

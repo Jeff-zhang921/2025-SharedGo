@@ -35,7 +35,7 @@ app.use("/profile", profileRouter);
 app.use("/home", homeRouter);
 app.use("/filter", filterRouter);
 app.use("/chat", chatRouter);
-app.use("/upload", uploadRouter);
+app.use("/chat", uploadRouter);
 app.use("/board", boardRouter);
 
 app.get("/",(request:Request,response:Response)=>{

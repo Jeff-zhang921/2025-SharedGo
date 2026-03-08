@@ -50,6 +50,12 @@ This section documents the endpoints used by **Frontend**
   - [6.5 Upload Chat Media](#65-upload-chat-media)
   - [6.6 Socket Events](#66-socket-events)
   - [6.7 Manual Test Sequence](#67-manual-test-sequence)
+- [7. Board Endpoints (General + Q&A)](#7-board-endpoints-general--qa)
+  - [7.1 Get General Messages](#71-get-general-messages)
+  - [7.2 Post General Message (Host Only)](#72-post-general-message-host-only)
+  - [7.3 Get Q&A Messages](#73-get-qa-messages)
+  - [7.4 Post Question](#74-post-question)
+  - [7.5 Post Answer](#75-post-answer)
 
 ---
 
@@ -1025,4 +1031,149 @@ Upload one media file and return a public URL.
    - Message saved in DB
    - `message:new` received by both users
 7. Load history with `GET /chat/threads/:threadId/messages`.
+
+---
+
+## 7. Board Endpoints (General + Q&A)
+
+All board endpoints require a valid session cookie from `/auth/email/verify`.
+Routes are mounted under `/board`.
+
+### 7.1 Get General Messages
+**GET** `/board/general/:eventId`
+
+Returns general board messages for an event (oldest first).
+
+**URL params**
+
+| Param | Type   | Required |
+|-------|--------|----------|
+| `eventId` | number | yes |
+
+**Response**
+
+```json
+[
+  {
+    "id": 1,
+    "body": "Welcome everyone!",
+    "createdAt": "2026-03-08T12:00:00.000Z"
+  }
+]
+```
+
+---
+
+### 7.2 Post General Message (Host Only)
+**POST** `/board/general/:eventId`
+
+Only the event host can post to the general board.
+
+**Request body (JSON)**
+
+| Field  | Type   | Required | Notes |
+|--------|--------|----------|-------|
+| `body` | string | yes      | Trimmed, max length 1000 |
+
+**Response**
+
+Returns the created `General` record.
+
+**Common error responses**
+
+- `400` invalid `eventId` or empty/too-long `body`
+- `401` not authenticated
+- `403` user is not the event host
+- `404` event not found
+
+---
+
+### 7.3 Get Q&A Messages
+**GET** `/board/qna/:eventId`
+
+Returns all questions for an event with nested answers, ordered by `createdAt` ascending.
+Only the event host or a participant can view.
+
+**URL params**
+
+| Param | Type   | Required |
+|-------|--------|----------|
+| `eventId` | number | yes |
+
+**Response**
+
+```json
+[
+  {
+    "id": 10,
+    "body": "Is parking available?",
+    "authorId": 3,
+    "createdAt": "2026-03-08T12:00:00.000Z",
+    "answers": [
+      {
+        "id": 21,
+        "body": "Yes, free parking nearby.",
+        "authorId": 1,
+        "createdAt": "2026-03-08T12:05:00.000Z"
+      }
+    ]
+  }
+]
+```
+
+**Common error responses**
+
+- `400` invalid `eventId`
+- `401` not authenticated
+- `403` user is not host/participant for this event
+- `404` event not found
+
+---
+
+### 7.4 Post Question
+**POST** `/board/qna/:eventId/question`
+
+Only the event host or a participant can post a question.
+
+**Request body (JSON)**
+
+| Field  | Type   | Required | Notes |
+|--------|--------|----------|-------|
+| `body` | string | yes      | Trimmed, max length 1000 |
+
+**Response**
+
+Returns the created `Question` record.
+
+**Common error responses**
+
+- `400` invalid `eventId` or empty/too-long `body`
+- `401` not authenticated
+- `403` user is not host/participant for this event
+- `404` event not found
+
+---
+
+### 7.5 Post Answer
+**POST** `/board/qna/:eventId/answer`
+
+Only the event host or a participant can post an answer.
+
+**Request body (JSON)**
+
+| Field       | Type             | Required | Notes |
+|-------------|------------------|----------|-------|
+| `questionId`| number \| string | yes      | Must be a valid positive integer and belong to this event |
+| `body`      | string           | yes      | Trimmed, max length 1000 |
+
+**Response**
+
+Returns the created `Answer` record.
+
+**Common error responses**
+
+- `400` invalid `eventId`, `questionId`, or empty/too-long `body`
+- `401` not authenticated
+- `403` user is not host/participant for this event
+- `404` event not found, or question does not belong to that event
 
