@@ -104,7 +104,6 @@ describe("Auth Routes", () => {
             expect(res.status).toBe(200);
             expect(res.body.message).toBe("Verification code sent.");
         });
-
         it ("should send code if no active code exists", async () => {
             mockPrisma.loginCode.findFirst.mockResolvedValue(null);
             mockPrisma.user.findFirst.mockResolvedValue({ name: "Tester"}); // User exists
