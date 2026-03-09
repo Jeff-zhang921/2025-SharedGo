@@ -55,7 +55,6 @@ jest.mock("../src/middleware/requireSession", () => ({
 import app from "../src";
 import session from "express-session";
 import authRouter from "../src/routes/auth";
-import { create } from "domain";
 app.use(express.json());
 app.use(session({
     secret: "test",
@@ -241,8 +240,49 @@ describe("Auth Routes", () => {
                 .send({ email: "test@gmail.com", code: "123456" });
             expect(res.status).toBe(500);
         });
+        it("should return 400 if code is missing or not string", async () => {
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({email: "test@gmail.com", code: ""}); //empty string
+            expect(res.status).toBe(400);
+        });
+        //it("should return 400 for invalid email or code format", async () => {
+        it("should use fallbacl name during upsert if user name is missing", async () => {
+            const crypto = require("crypto");
+            const validHash = crypto
+                .createHmac("sha256", "testsecret")
+                .update("123456")
+                .digest("hex");
+            mockPrisma.loginCode.findFirst.mockResolvedValue({
+                id: "code-123",
+                codeHash: validHash,
+                attempts: 0,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
+            });
+            mockPrisma.user.upsert.mockResolvedValue({
+                id: "1",
+                email: "test@gmail.com",
+                name: null 
+            });
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "123456" });
+            expect(res.status).toBe(200);
+        });
+        it("should return 500 if database fails while updating login code attemps", async () => {
+            mockPrisma.loginCode.findFirst.mockResolvedValue({
+                id: "code-123",
+                codeHash: "incorrect-hash",
+                attempt: 0,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
+            });
+            mockPrisma.loginCode.update.mockRejectedValueOnce(new Error("DB Update Error"));
+            const res = await request(app)
+                .post("/auth/email/verify")
+                .send({ email: "test@gmail.com", code: "000000"});
+            expect(res.status).toBe(500);
+        });
     });
-    
     it("should return 401 for /me if not authenticated", async () => {
         const res = await request(app).get("/auth/me");
         expect(res.status).toBe(401);
@@ -272,5 +312,4 @@ describe("Auth Routes", () => {
         expect(response.status).toBe(500);
         expect(response.body.message).toBe("Failed to log out.");
     });
-
 });
