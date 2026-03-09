@@ -6,13 +6,8 @@ process.env.NODE_ENV = "test";
 
 import request from "supertest";
 import express from "express";
-import { Request, Response, NextFunction } from "express";
-import { mockDeep, DeepMockProxy, mock } from "jest-mock-extended";
-//import session from "express-session";
-
-
 import { PrismaClient } from "@prisma/client";
-
+import { Request, Response, NextFunction } from "express";
 const mockPrisma = {
     user: {
             upsert: jest.fn(),
@@ -54,6 +49,9 @@ jest.mock("nodemailer", () => ({
     })
 }));
 
+jest.mock("../src/middleware/requireSession", () => ({
+  requireSession: (req: Request, res: Response, next: NextFunction) => next(),
+}));
 
 import app from "../src";
 import session from "express-session";
@@ -122,6 +120,15 @@ describe("Auth Routes", () => {
             expect(res.status).toBe(429);
             expect(res.body.message).toContain("already active");
         });
+        it("should return 500 when database fails during transaction", async () => {
+        mockPrisma.loginCode.findFirst.mockResolvedValue(null); // No active code
+        mockPrisma.user.findFirst.mockResolvedValue(null); // User does not exist
+        mockPrisma.$transaction.mockRejectedValue(new Error("Database error"));
+        const res = await request(app)
+            .post("/auth/email/start")
+            .send({ email: "test@gmail.com"});
+        expect(res.status).toBe(500);
+       });
     });
     describe("POST /auth/email/verify", () => {
         it("should return 401 for incorrect code", async () => {
@@ -186,5 +193,36 @@ describe("Auth Routes", () => {
             expect(res.body.user.email).toBe("test@gmail.com");
         });
 
-});
+    });
+    
+    it("should return 401 for /me if not authenticated", async () => {
+        const res = await request(app).get("/auth/me");
+        expect(res.status).toBe(401);
+        expect(res.body.message).toBe("Not authenticated.");
+    });
+    it("should successfully log out", async () => {
+        const res = await request(app).post("/auth/logout");
+        expect(res.status).toBe(204);
+    });
+    it("should handle session destruction error on logout", async () => {
+        //error triggering route
+        app.post("/auth/logout-error", (req, internalRes) => {
+            (req.session as any).destroy = (callback: (err: any) => void) => {
+                return callback(new Error("Session destroy error"));
+            };
+            req.session.destroy((err) => {
+                if (err) {
+                    return internalRes.status(500).json({ message: "Failed to log out." });
+                }
+                return internalRes.status(204).end();
+            });
+        });
+
+        const response = await request(app)
+            .post("/auth/logout-error");
+    
+        expect(response.status).toBe(500);
+        expect(response.body.message).toBe("Failed to log out.");
+    });
+
 });
