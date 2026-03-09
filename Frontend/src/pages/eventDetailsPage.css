@@ -120,7 +120,7 @@ html, body {
 
 
 /* Adjust for portrait/mobile view (responsive design) */
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .event-details {
         flex-direction: column;
         gap: 50px;

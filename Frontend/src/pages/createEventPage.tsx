@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import './createEventPage.css';
-//import Button from "./../components/Button"
+import Button from "./../components/Button"
+import Navigation from "../components/Navigation";
 
 type EventForm = {
   title: string;
@@ -11,8 +12,8 @@ type EventForm = {
   hostEmail: string;
   capacity?: number | "";
   category: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | "";
+  longitude: number | "";
   imageUrl?: string;
   externalUrl?: string;
   attendees?: Array<{ //Attendees section as backend also included this (maybe implement into page later)
@@ -39,8 +40,8 @@ const CreateEventPage = () => {
     externalUrl: "",
     capacity: "",
     category: "",
-    latitude: initialCoords?.lat || 0, //Use coordinates from map or default to zero
-    longitude: initialCoords?.lng || 0,
+    latitude: initialCoords?.lat ?? "", //Use coordinates from map or default to zero
+    longitude: initialCoords?.lng ?? "",
     //Attendees section as backend also included this (maybe implement into page later)
     attendees: [],
     attendeeCount: 0,
@@ -108,6 +109,12 @@ const CreateEventPage = () => {
   };
 
   return (
+    <div className="create-event-layout">
+
+      <aside className="navbar">
+        <Navigation/>
+      </aside>
+
     <div className="create-event-container">
       <form className="event-form" onSubmit={onSubmit}>
         <header className="form-header">
@@ -130,22 +137,24 @@ const CreateEventPage = () => {
             <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
           </label>
 
-        <label>
+        <label className= "select-field">
           <span>CATEGORY</span>
-          <select name="category" value={form.category} onChange={onChange}>
-            <option value="">Select Category</option>
-            <option value="Physical_Activities">Physical Activities</option>
-            <option value="Festivals">Festivals</option>
-            <option value="Educational">Educational</option>
-            <option value="Networking">Networking</option>
-            <option value="Arts_Culture">Arts & Culture</option>
-            <option value="Food_Drink">Food & Drink</option>
-            <option value="Music_Concerts">Music & Concerts</option>
-            <option value="Tech_Gaming">Tech & Gaming</option>
-            <option value="Wellness_Meditation">Wellness & Meditation</option>
-            <option value="Volunteer_Charity">Volunteer & Charity</option>
-            <option value="Other">Other</option>
-          </select>
+          <div className="select-wrapper">
+            <select name="category" value={form.category} onChange={onChange}>
+              <option value="">Select Category</option>
+              <option value="Physical_Activities">Physical Activities</option>
+              <option value="Festivals">Festivals</option>
+              <option value="Educational">Educational</option>
+              <option value="Networking">Networking</option>
+              <option value="Arts_Culture">Arts & Culture</option>
+              <option value="Food_Drink">Food & Drink</option>
+              <option value="Music_Concerts">Music & Concerts</option>
+              <option value="Tech_Gaming">Tech & Gaming</option>
+              <option value="Wellness_Meditation">Wellness & Meditation</option>
+              <option value="Volunteer_Charity">Volunteer & Charity</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
         </label>
 
           <label>
@@ -182,7 +191,18 @@ const CreateEventPage = () => {
       <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
     </form>
     </div>
+    <div className="tips">
+      <h3>Publishing Tips</h3>
+      <ul>
+        <li>Use a clear and descriptive event title.</li>
+        <li>Add the exact meeting location so attendees can find it easily.</li>
+        <li>Include an image to make your event stand out.</li>
+        <li>Provide an external link if tickets or signup are required.</li>
+        <li>Write a short description explaining what people should expect.</li>
+      </ul>
+    </div>
+    </div>
   );
-};
+}
 
 export default CreateEventPage;
