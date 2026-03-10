@@ -89,6 +89,23 @@ Debugging - If I got stuck on a bug I would explain my problem to AI and see if 
 - General advice: "What is the best Map API I could use for this project"
 
 **Soko**
+
+**Tools used**
+
+- Gemini
+- ChatGPT
+
+
+#### Where did you use AI tools and why 
+
+Backend - used AI to assist with debugging and explaining concepts related to node.js and express. 
+
+Deployment - used AI to troubleshoot and optimize CI/CD pipeline. It helped to explain errors, suggest configuration fixes and understand AWS infrastructure. 
+
+Unit testing - used AI to understand Jest error and improve test structure. It helped to explain failing tests and suggest better assertions.
+
+**Examples of Prompts I used:**
+
 - Design brainstorming: "What are the must have features", "suggest layout for ... page"
 
 - Unit testing (Jest): "Explain this Jest error message" 
