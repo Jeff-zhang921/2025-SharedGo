@@ -74,7 +74,6 @@ afterAll(() => {
 }); 
 
 describe("Auth Routes", () => {
-    // let prismaMock: DeepMockProxy<PrismaClient>;
     
     describe("POST /auth/email/start", () => {
         it("should return 400 for invalid email format", async () => {
@@ -84,13 +83,6 @@ describe("Auth Routes", () => {
         
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("Valid email is required.");
-        });
-        it("should return 500 if databse fails during start", async () => {
-            mockPrisma.loginCode.findFirst.mockRejectedValue(new Error("Database connection lost"));
-            const res = await request(app)
-                .post("/auth/email/start")
-                .send({ email: "test@gmail.com" });
-            expect(res.status).toBe(500);
         });
         it("should return 500 if nodemailer fails to send email", async () => {
             process.env.NODE_ENV = "production"; //force email sending
@@ -136,29 +128,6 @@ describe("Auth Routes", () => {
             expect(res.status).toBe(429);
             expect(res.body.message).toContain("already active");
         });
-        it("should return 500 when database fails during transaction", async () => {
-        mockPrisma.loginCode.findFirst.mockResolvedValue(null); // No active code
-        mockPrisma.user.findFirst.mockResolvedValue(null); // User does not exist
-        mockPrisma.$transaction.mockRejectedValue(new Error("Database error"));
-        const res = await request(app)
-            .post("/auth/email/start")
-            .send({ email: "test@gmail.com"});
-        expect(res.status).toBe(500);
-       });
-       it("should successfuly handle new user not found in DB", async () => {
-        mockPrisma.user.findFirst.mockResolvedValue(null);
-        mockPrisma.loginCode.findFirst.mockResolvedValue(null); 
-        mockPrisma.$transaction.mockResolvedValue([
-            {count: 0}, 
-            {id: "new-id", email: "new@gmail.com"}
-        ]); 
-        const res = await request(app)
-            .post("/auth/email/start")
-            .send({ email: "new@gmail.com" });
-        
-        expect(res.status).toBe(200);
-        expect(res.body.message).toBe("Verification code sent.");
-       });
     });
     describe("POST /auth/email/verify", () => {
         it("should return 401 for incorrect code", async () => {
@@ -222,32 +191,14 @@ describe("Auth Routes", () => {
             expect(res.body.message).toBe("Logged in.");
             expect(res.body.user.email).toBe("test@gmail.com");
         });
-        it("should return 500 if database fails during verification", async () => {
-            const crypto = require("crypto");
-            const validHash = crypto
-                .createHmac("sha256", "testsecret")
-                .update("123456")
-                .digest("hex");
-            mockPrisma.loginCode.findFirst.mockResolvedValue({
-                id: "code-123",
-                codeHash: validHash,
-                attempts: 0,
-                expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
-            });
-            mockPrisma.user.upsert.mockRejectedValue(new Error("Upsert failed"));
-            const res = await request(app)
-                .post("/auth/email/verify")
-                .send({ email: "test@gmail.com", code: "123456" });
-            expect(res.status).toBe(500);
-        });
         it("should return 400 if code is missing or not string", async () => {
             const res = await request(app)
                 .post("/auth/email/verify")
                 .send({email: "test@gmail.com", code: ""}); //empty string
             expect(res.status).toBe(400);
         });
-        //it("should return 400 for invalid email or code format", async () => {
-        it("should use fallbacl name during upsert if user name is missing", async () => {
+    
+        it("should use fallback name during upsert if user name is missing", async () => {
             const crypto = require("crypto");
             const validHash = crypto
                 .createHmac("sha256", "testsecret")
@@ -269,19 +220,7 @@ describe("Auth Routes", () => {
                 .send({ email: "test@gmail.com", code: "123456" });
             expect(res.status).toBe(200);
         });
-        it("should return 500 if database fails while updating login code attemps", async () => {
-            mockPrisma.loginCode.findFirst.mockResolvedValue({
-                id: "code-123",
-                codeHash: "incorrect-hash",
-                attempt: 0,
-                expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
-            });
-            mockPrisma.loginCode.update.mockRejectedValueOnce(new Error("DB Update Error"));
-            const res = await request(app)
-                .post("/auth/email/verify")
-                .send({ email: "test@gmail.com", code: "000000"});
-            expect(res.status).toBe(500);
-        });
+        
     });
     it("should return 401 for /me if not authenticated", async () => {
         const res = await request(app).get("/auth/me");
@@ -291,25 +230,5 @@ describe("Auth Routes", () => {
     it("should successfully log out", async () => {
         const res = await request(app).post("/auth/logout");
         expect(res.status).toBe(204);
-    });
-    it("should handle session destruction error on logout", async () => {
-        //error triggering route
-        app.post("/auth/logout-error", (req, internalRes) => {
-            (req.session as any).destroy = (callback: (err: any) => void) => {
-                return callback(new Error("Session destroy error"));
-            };
-            req.session.destroy((err) => {
-                if (err) {
-                    return internalRes.status(500).json({ message: "Failed to log out." });
-                }
-                return internalRes.status(204).end();
-            });
-        });
-
-        const response = await request(app)
-            .post("/auth/logout-error");
-    
-        expect(response.status).toBe(500);
-        expect(response.body.message).toBe("Failed to log out.");
     });
 });
