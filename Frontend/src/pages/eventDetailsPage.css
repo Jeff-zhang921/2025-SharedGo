@@ -11,8 +11,7 @@ html, body {
     width: 100%;
 }
 
-.navigation-buttons {
-    display: flex;
+.title {
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
@@ -121,7 +120,7 @@ html, body {
 
 
 /* Adjust for portrait/mobile view (responsive design) */
-@media (max-width: 750px) {
+@media (max-width: 820px) {
     .event-details {
         flex-direction: column;
         gap: 50px;
@@ -129,7 +128,7 @@ html, body {
 
     .event-details-container {
         min-height: auto;
-        padding: 10px;
+        padding: 70px;
     }
 
     .btn-host {

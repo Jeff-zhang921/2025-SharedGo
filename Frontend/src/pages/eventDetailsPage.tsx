@@ -135,15 +135,9 @@ const EventDetailsPage = () => {
 
   return (
     <div className="event-details-container">
-      <div className="navigation-buttons">
-        {/*back button links to map page, using react-router-dom*/}
-        <Button link="/map" imgSrc="/src/assets/back.svg" text="back" size={60} className="btn-nav"/>
-
+      <div className="title">
         {/*Page Title*/}
         <h1 className="event-title">Event details</h1>
-
-        {/*home button links to home page, using react-router-dom*/}
-        <Button link="/home" imgSrc="/src/assets/home.svg" text="home" size={60} className="btn-nav"/>
       </div>
 
       <section className="event-details">

@@ -110,11 +110,6 @@ const CreateEventPage = () => {
 
   return (
     <div className="create-event-layout">
-      {/*Navigation Bar*/}
-      <aside className="navbar">
-        <Navigation/>
-      </aside>
-
       {/*Create Event Form*/}
       <div className="create-event-container">
         <form className="event-form" onSubmit={onSubmit}>
@@ -180,6 +175,7 @@ const CreateEventPage = () => {
           </section>
         </form>
       </div>
+
       {/*Image and Website link inputs*/}
       <div className="create-event-container">
         <form className="event-form" onSubmit={onSubmit}>
@@ -196,15 +192,16 @@ const CreateEventPage = () => {
           </section>
 
           {/*Live Preview*/}
+          <i><b>Live Preview:</b></i>
           <section className="event-details">
               <div className="event-image-wrapper">
-              {form?.imageUrl && (
-                <img src={form.imageUrl} alt={form.title} className="event-image"/>
-              )}
-              {form?.externalUrl && (
-              <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">
-                Visit Event Website</a>
-              )}
+                {form?.imageUrl && (
+                  <img src={form.imageUrl} alt={form.title} className="event-image"/>
+                )}
+                {form?.externalUrl && (
+                <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">
+                  Visit Event Website</a>
+                )}
               </div>
           </section>
           {/*all event details listed as shown in the design*/}
