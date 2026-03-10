@@ -8,12 +8,12 @@ html, body {
     min-height: 100vh;
 }
 
-.create-event-container { /* Ensuring everything is centred again */ 
+.create-event-container {
     display: flex;
     flex-direction: column;
-    align-items: center;    /* Horizontal centering */
-    justify-content: center; /* Vertical centering */
-    min-height: 100vh;      /* Full screen height */
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     width: 100%;
     padding: 40px 20px 100px;
     background-color: white;
@@ -103,6 +103,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     color: black;
 }
 
+/*navbar*/
 .navbar {
     position: fixed;
     width: 70px;
@@ -127,6 +128,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     transition: 0.2s;
 }
 
+
+/*publishing tips*/
 .tips {
     margin-top: 30px;
   padding: 16px;
@@ -149,8 +152,55 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   color: #555;
 }
 
+
+/*from event details css, for the live preview*/
+.event-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.event-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 60px;
+}
+
+.event-info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.event-info-row h3 {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.event-info-row p {
+    margin: 0;
+    text-align: left;
+}
+
+/*adjusted as picture is above rather than to the side in the preview*/
+.event-image-wrapper {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.event-image {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+
+
 /* Adjust for portrait/mobile view (responsive design) */
-@media (max-width: 750px) {
+@media (max-width: 820px) {
     .navbar {
         position: fixed;
         top: auto;

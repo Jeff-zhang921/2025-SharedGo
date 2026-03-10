@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './createEventPage.css';
-import Button from "./../components/Button"
 import Navigation from "../components/Navigation";
 
 type EventForm = {
   title: string;
   description?: string;
   startsAt: string;
-  location: string;
+  location?: string;
   hostEmail: string;
   capacity?: number | "";
   category: string;
@@ -108,99 +107,158 @@ const CreateEventPage = () => {
     }
   };
 
+
   return (
     <div className="create-event-layout">
-
+      {/*Navigation Bar*/}
       <aside className="navbar">
         <Navigation/>
       </aside>
 
-    <div className="create-event-container">
-      <form className="event-form" onSubmit={onSubmit}>
-        <header className="form-header">
-          <h1>Create Event</h1>
-        </header>
+      {/*Create Event Form*/}
+      <div className="create-event-container">
+        <form className="event-form" onSubmit={onSubmit}>
+          <header className="form-header">
+            <h1>Create Event</h1>
+          </header>
 
-        <section className="form-section">
-          <label>
-            <span>TITLE</span>
-            <input name="title" placeholder="Title" onChange={onChange} required/>
-          </label>
+          <section className="form-section">
+            <label>
+              <span>TITLE</span>
+              <input name="title" placeholder="Title" onChange={onChange} required/>
+            </label>
 
-          <label>
-            <span>DATE</span>
-            <input name="startsAt" type="datetime-local" onChange={onChange} required/>
-          </label>
-        
-          <label>
-            <span>CAPACITY</span>
-            <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
-          </label>
+            <label>
+              <span>DATE</span>
+              <input name="startsAt" type="datetime-local" onChange={onChange} required/>
+            </label>
+            
+            <label>
+              <span>CAPACITY</span>
+              <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
+            </label>
 
-        <label className= "select-field">
-          <span>CATEGORY</span>
-          <div className="select-wrapper">
-            <select name="category" value={form.category} onChange={onChange}>
-              <option value="">Select Category</option>
-              <option value="Physical_Activities">Physical Activities</option>
-              <option value="Festivals">Festivals</option>
-              <option value="Educational">Educational</option>
-              <option value="Networking">Networking</option>
-              <option value="Arts_Culture">Arts & Culture</option>
-              <option value="Food_Drink">Food & Drink</option>
-              <option value="Music_Concerts">Music & Concerts</option>
-              <option value="Tech_Gaming">Tech & Gaming</option>
-              <option value="Wellness_Meditation">Wellness & Meditation</option>
-              <option value="Volunteer_Charity">Volunteer & Charity</option>
-              <option value="Other">Other</option>
-            </select>
+            <label className= "select-field">
+              <span>CATEGORY</span>
+              <div className="select-wrapper">
+                <select name="category" value={form.category} onChange={onChange}>
+                  <option value="">Select Category</option>
+                  <option value="Physical_Activities">Physical Activities</option>
+                  <option value="Festivals">Festivals</option>
+                  <option value="Educational">Educational</option>
+                  <option value="Networking">Networking</option>
+                  <option value="Arts_Culture">Arts & Culture</option>
+                  <option value="Food_Drink">Food & Drink</option>
+                  <option value="Music_Concerts">Music & Concerts</option>
+                  <option value="Tech_Gaming">Tech & Gaming</option>
+                  <option value="Wellness_Meditation">Wellness & Meditation</option>
+                  <option value="Volunteer_Charity">Volunteer & Charity</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </label>
+
+            <label>
+              <span>LOCATION</span>
+              <input name="location" placeholder="Add location" onChange={onChange}/>
+            </label>
+
+            <label>
+              <span>LATITUDE</span>
+              <input name="latitude" type="number" step="any" placeholder="e.g. 51.4561" value={form.latitude} onChange={onChange} required/>
+            </label>
+
+            <label>
+              <span>LONGITUDE</span>
+              <input name="longitude" type="number" step="any" placeholder="e.g. 2.6031" value={form.longitude} onChange={onChange} required/>
+            </label>
+
+            <label>
+              <span>Description</span>
+              <textarea name="description" placeholder="No description provided" onChange={onChange}/>
+            </label>
+          </section>
+        </form>
+      </div>
+      {/*Image and Website link inputs*/}
+      <div className="create-event-container">
+        <form className="event-form" onSubmit={onSubmit}>
+          <section className="form-section">
+            <label>
+              <span>Image</span>
+              <input type="text" placeholder="https://example.com/image.png" value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})}/>
+            </label>
+
+            <label>
+              <span>Website</span>
+              <input type="text" placeholder="https://example.com" value={form.externalUrl} onChange={(e) => setForm({...form, externalUrl: e.target.value})}/>
+            </label>
+          </section>
+
+          {/*Live Preview*/}
+          <section className="event-details">
+              <div className="event-image-wrapper">
+              {form?.imageUrl && (
+                <img src={form.imageUrl} alt={form.title} className="event-image"/>
+              )}
+              {form?.externalUrl && (
+              <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">
+                Visit Event Website</a>
+              )}
+              </div>
+          </section>
+          {/*all event details listed as shown in the design*/}
+          <section className="event-details">
+            <div className="event-info">
+              <div className="event-info-row">
+                <h3>TITLE:</h3><p>{form.title}</p>
+              </div>
+
+              <div className="event-info-row">
+                <h3>DATE:</h3>
+                <p>{new Date(form.startsAt).toLocaleString()}</p>
+              </div>
+
+              <div className="event-info-row">
+                <h3>CAPACITY:</h3>
+                <p>{form.capacity === null ? 'Unlimited' : form.capacity}</p>
+              </div>
+
+              <div className="event-info-row">
+                <h3>CATEGORY</h3>
+                <p>{form.category ?? "Other"}</p>
+              </div>
+
+              <div className="event-info-row">
+                <h3>LOCATION:</h3>
+                <p>{form.location}</p>
+              </div>
+
+              <div className="event-info-row">
+                <h3>DESCRIPTION:</h3>
+                
+              </div>
+              <div className="event-description">
+                  <p>{form.description || "No description provided"}</p>
+              </div>
+            </div>
+          </section>
+
+          {/*Publishing Tips*/}
+          <div className="tips">
+            <h3>Publishing Tips</h3>
+            <ul>
+              <li>Use a clear and descriptive event title.</li>
+              <li>Add an image so the event stands out on the map.</li>
+              <li>External links are perfect for ticketing or signup.</li>
+            </ul>
+            <Link to="/">Need to sign in?</Link>
           </div>
-        </label>
-
-          <label>
-            <span>LOCATION</span>
-            <input name="location" placeholder="Add location" onChange={onChange} required/>
-          </label>
-
-        <label>
-          <span>LATITUDE</span>
-          <input name="latitude" type="number" step="any" placeholder="e.g. 51.4561" value={form.latitude} onChange={onChange} required/>
-        </label>
-
-        <label>
-          <span>LONGITUDE</span>
-          <input name="longitude" type="number" step="any" placeholder="e.g. 2.6031" value={form.longitude} onChange={onChange} required/>
-        </label>
-
-        <label>
-          <span>Image</span>
-          <input type="text" placeholder="https://example.com/image.png" value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})}/>
-        </label>
-
-        <label>
-          <span>Website</span>
-          <input type="text" placeholder="https://example.com" value={form.externalUrl} onChange={(e) => setForm({...form, externalUrl: e.target.value})}/>
-        </label>
-
-        <label>
-          <span>Description</span>
-          <textarea name="description" placeholder="No description provided" onChange={onChange}/>
-        </label>
-      </section>
-      
-      <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
-    </form>
-    </div>
-    <div className="tips">
-      <h3>Publishing Tips</h3>
-      <ul>
-        <li>Use a clear and descriptive event title.</li>
-        <li>Add the exact meeting location so attendees can find it easily.</li>
-        <li>Include an image to make your event stand out.</li>
-        <li>Provide an external link if tickets or signup are required.</li>
-        <li>Write a short description explaining what people should expect.</li>
-      </ul>
-    </div>
+          
+          {/*Publish Button*/}
+          <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
+        </form>
+      </div>
     </div>
   );
 }

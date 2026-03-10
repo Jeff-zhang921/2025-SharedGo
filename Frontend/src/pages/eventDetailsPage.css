@@ -109,6 +109,7 @@ html, body {
 .event-image-wrapper {
     width: 100%;
     margin-bottom: 100px;
+    padding-left: 60px;
 }
 
 .event-image {
