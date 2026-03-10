@@ -111,23 +111,6 @@ const MapPage = () => {
   return (
     <div className="map-container">
       <div className="ui-overlay">
-        {/*HOME BUTTON*/}
-        <div className="home-btn"
-          style={{
-            position: "absolute",
-            top: "20px",        // Positioning 
-            left: "20px",
-            zIndex: 10          // layer above the map and icons
-          }}
-        >
-          <Button
-            link="/home"                // Link to the home page
-            imgSrc="/src/assets/home.svg"       // Path to home icon
-            text="Home"
-            size={60}                       // Adjust size in pixels
-          />
-        </div>
-
         <Link to="/createEvent" className='create-event'>Create Event</Link>
 
         <div className='profile-page'>
@@ -135,8 +118,8 @@ const MapPage = () => {
             <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
           </Link>
         </div>
+        
       </div>
-
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
         zoom={13}
