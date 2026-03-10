@@ -255,7 +255,7 @@ if(!threadId){
   setIsUploadingImage(true);
   setStatus("Uploading image...");
   try{
-    const response=await fetch(`${Backend_URL}/chat/upload`,{
+    const response=await fetch(`${Backend_URL}/upload/upload`,{
       method:"POST",
       credentials:"include",
       body:formData

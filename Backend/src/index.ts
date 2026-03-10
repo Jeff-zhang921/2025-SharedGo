@@ -21,7 +21,7 @@ app.use(
   cors({
     origin: frontendOrigin, // frontend URL
     credentials: true, //Allows the browser to see the response and save cookies
-  })
+  }),
 );
 app.use(express.json());
 
