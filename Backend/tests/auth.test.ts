@@ -6,8 +6,8 @@ process.env.NODE_ENV = "test";
 
 import request from "supertest";
 import express from "express";
+import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { PrismaClient } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
 const mockPrisma = {
     user: {
@@ -168,7 +168,6 @@ describe("Auth Routes", () => {
             expect(res.body.message).toBe("Too many attempts. Request a new code.");
         });
         it("should return 200 and set session for correct code", async () => {  
-            const crypto = require("crypto");
             const validHash = crypto
                 .createHmac("sha256", "testsecret")
                 .update("123456")
@@ -199,7 +198,6 @@ describe("Auth Routes", () => {
         });
     
         it("should use fallback name during upsert if user name is missing", async () => {
-            const crypto = require("crypto");
             const validHash = crypto
                 .createHmac("sha256", "testsecret")
                 .update("123456")
