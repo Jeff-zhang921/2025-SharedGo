@@ -121,7 +121,11 @@ describe("Auth Routes", () => {
         });
 
         it("should return 429 if an active code already exists", async () => {
-            mockPrisma.loginCode.findFirst.mockResolvedValue({ id: 1 });
+            mockPrisma.loginCode.findFirst.mockResolvedValue({ 
+                id: "active-123",
+                email: "test@gmail.com",
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), 
+            });
             const res = await request(app)
                 .post("/auth/email/start")
                 .send({ email: "test@gmail.com"});
