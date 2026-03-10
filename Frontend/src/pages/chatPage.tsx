@@ -1,7 +1,6 @@
 import {ChangeEvent, useEffect,useMemo,useRef,useState} from 'react';
 import{useLocation,useNavigate}from"react-router-dom";
 import{io,Socket}from "socket.io-client"
-//chatPage/css has not been commited.
 import"./chatPage.css"
 
 
