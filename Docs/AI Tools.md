@@ -34,7 +34,7 @@ Real-time chat flow - Connections. AI helped reason about event flow and safety 
 
 Documentation and troubleshooting - AI was used to draft and improve API docs, clarify unclear error messages, and generate candidate fixes faster for login/chat issues.
 
-Deployment and configuration support - AI assisted with environment setup questions such as SMTP/email auth config, Prisma generate/migrate flow, Docker-related setup, and cookie/session behavior across frontend and backend.
+Deployment and configuration support - AI assisted with environment setup questions such as how to setup SMTP/email auth config, Prisma generate/migrate flow, and cookie/session behavior across frontend and backend.
 
 **Examples of Prompt I input:**
 - System Design: "Provide a general requirement analysis and a recommended tech stack for designing a real-time map system."

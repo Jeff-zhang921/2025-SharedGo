@@ -12,6 +12,7 @@ import { sessionMiddleware } from "./session";
 import { initSocket } from "./socket";
 import chatRouter from "./routes/chat";
 import uploadRouter from "./api/upload";
+import boardRouter from "./routes/board";
 
 const app = express();
 app.use(
@@ -26,6 +27,7 @@ app.use(sessionMiddleware);
 
 const PORT = Number(process.env.PORT) || 3000;
 
+
 //wrapping everything in /api so Nginx can route traffic easily \
 const apiRouter = express.Router();
 apiRouter.use("/auth", authRouter);
@@ -35,6 +37,7 @@ apiRouter.use("/profile", profileRouter);
 apiRouter.use("/home", homeRouter);
 apiRouter.use("/filter", filterRouter);
 apiRouter.use("/chat", chatRouter);
+apiRouter.use("/board", boardRouter);
 
 apiRouter.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});
