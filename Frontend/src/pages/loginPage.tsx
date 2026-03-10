@@ -17,7 +17,7 @@ const CreateLoginPage = () => {
 setStatus(message);
                     return
                 }
-            const response = await fetch("http://localhost:3000/auth/email/start", {
+            const response = await fetch("http://localhost:3000/api/auth/email/start", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
@@ -27,11 +27,12 @@ setStatus(message);
                 //Move to verify page and pass the email so we can use it there
                 navigate("/verify", { state: { email } });
             } else {
-                const data = await response.json();
-                setStatus(data.message || "Something went wrong");
+                const data = await response.json().catch(() => ({}));
+                setStatus(data.message || `Request failed (HTTP ${response.status}).`);
             }
         } catch (err) {
             console.error("Connection error:", err);
+            setStatus("Cannot reach backend. Make sure it is running on http://localhost:3000/api.");
         }
     };
     return (

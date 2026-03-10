@@ -13,7 +13,7 @@ type ChatMessage={
   body:string;
   createdAt:string
 }
-const Backend_URL="http://localhost:3000";
+const Backend_URL="http://localhost:3000/api";
 
 //TIMELINE:
 //0ms	React reads useState(remember in memory).	Blank screen.
@@ -287,7 +287,6 @@ if(!threadId){
       body:`${IMAGE_PREFIX}${imageURL}`,
     })
     setStatus("Image sent")
-
   }catch{
     setStatus("Failt ot upload")
   }finally{
@@ -295,7 +294,7 @@ if(!threadId){
     event.target.value=""
   }
 }
-  
+ 
 
 const handleSendMessage=()=>{
   //socketRef is the container for socket
@@ -357,6 +356,7 @@ const handleSendMessage=()=>{
           {message.map((msg, index) => {
             const isMe = msg.senderId === me?.id;
             const isImageMessage = msg.body.startsWith(IMAGE_PREFIX);
+            //"Start at the character position equal to the length of the prefix, and give me everything from there until the very end."
             const imageUrl = isImageMessage ? msg.body.slice(IMAGE_PREFIX.length) : "";
             //If True: It gives the div the class chat-row me.
             //If False: It gives the div the class chat-row them.
@@ -385,6 +385,7 @@ const handleSendMessage=()=>{
 
 
         <div className='chat-input'>
+
           <label className={`photo-button ${isUploadingImage ? "disabled" : ""}`} htmlFor="chat-photo-input">
             {isUploadingImage ? "Uploading..." : "Photo"}
           </label>

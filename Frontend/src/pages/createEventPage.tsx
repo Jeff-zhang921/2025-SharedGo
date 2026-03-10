@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {ChangeEvent,useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './createEventPage.css';
-import Navigation from "../components/Navigation";
+
 
 type EventForm = {
   title: string;
@@ -28,7 +28,11 @@ type EventForm = {
 const CreateEventPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+   const MAX_UPLOAD=100*1024*1024
+  const [status,setStatus]=useState("")
+  const [image,setImage]=useState<FormData>()
   const initialCoords = location.state as { lat: number; lng: number } | null; //getting lat/long from navigation state
+
   const [form, setForm] = useState<EventForm>({
     title: "",
     description: "",
@@ -61,12 +65,13 @@ const CreateEventPage = () => {
     }
   };
 
-  const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
+  const backendBaseURL = 'http://localhost:3000/api'; //Change to the correct URL which the backend is running on (3000)
 
   // handle submition of the form
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+    
 
     try {
       const res = await fetch(`${backendBaseURL}/events/create`, {
@@ -80,7 +85,7 @@ const CreateEventPage = () => {
           longitude: form.longitude,
           description: form.description || null,
           category: form.category,
-          imageUrl: form.imageUrl || null,
+          imageUrl: image || null,
           externalUrl: form.externalUrl || null,
         }),
       });
@@ -106,6 +111,28 @@ const CreateEventPage = () => {
       setLoading(false);
     }
   };
+
+const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
+    const file=event.target.files?.[0]
+    if(!file){
+  return 
+}
+if(!file.type.startsWith("image/")){
+  setStatus("Only image files are allowed")
+  return
+}
+if (file.size>MAX_UPLOAD){
+  setStatus("Image can not exceed 100mb")
+  return
+}
+const formData=new FormData()
+//this related to the backend ,upload.single("file")
+formData.append("file",file)
+ setStatus("Uploading image...");
+ setImage(formData)
+}
+
+
 
 
   return (
