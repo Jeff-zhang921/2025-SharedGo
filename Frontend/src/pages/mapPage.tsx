@@ -46,6 +46,8 @@ const MapPage = () => {
   const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     //Only run if map is ready and we have coordinates
