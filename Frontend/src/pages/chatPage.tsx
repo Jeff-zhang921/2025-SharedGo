@@ -13,7 +13,8 @@ type ChatMessage={
   body:string;
   createdAt:string
 }
-const Backend_URL="http://localhost:3000/api";
+const API_URL = "http://localhost:3000/api";
+const SOCKET_URL = "http://localhost:3000";
 
 //TIMELINE:
 //0ms	React reads useState(remember in memory).	Blank screen.
@@ -54,7 +55,7 @@ const [messageBody,setMessageBody]=useState("")
 
 const loadMe=async()=>{
   try{
-    const res=await fetch(`${Backend_URL}/auth/me`,{
+    const res=await fetch(`${API_URL}/auth/me`,{
       credentials:"include"
     })
     if(!res.ok){
@@ -77,7 +78,7 @@ const loadMe=async()=>{
 
 const loadMessages=async(id:number)=>{
   try{
-    const res = await fetch(`${Backend_URL}/chat/threads/${id}/messages`, {
+    const res = await fetch(`${API_URL}/chat/threads/${id}/messages`, {
      credentials: "include",
     });
     if (!res.ok) {
@@ -103,7 +104,7 @@ const connectSocket=()=>{
  //normal http open and close in each request
  //io Stays open as long as you're on the page.
  //The Verification (Sending)
- const socket=io(Backend_URL,{withCredentials:true})
+ const socket=io(SOCKET_URL,{withCredentials:true})
 socketRef.current=socket
 //connect is a reserved keyword in socket unlike thread:id
 //when they connect it will execute the following code
@@ -182,7 +183,7 @@ socketRef.current=socket
   }
   //when you call setstatus, or set... it immediately broadcast
   try{
-    const res=await fetch(`${Backend_URL}/chat/threads`,{
+    const res=await fetch(`${API_URL}/chat/threads`,{
       method:"POST",
       headers: { "Content-Type": "application/json" },
       credentials:"include",
@@ -255,7 +256,7 @@ if(!threadId){
   setIsUploadingImage(true);
   setStatus("Uploading image...");
   try{
-    const response=await fetch(`${Backend_URL}/upload/upload`,{
+    const response=await fetch(`${API_URL}/upload/upload`,{
       method:"POST",
       credentials:"include",
       body:formData

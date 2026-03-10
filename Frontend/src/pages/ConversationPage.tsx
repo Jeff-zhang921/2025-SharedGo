@@ -38,8 +38,9 @@ const BACKEND_URL = "http://localhost:3000/api";
 //accent is used for the avater
 const ACCENTS = ["#1f98b0", "#c43642", "#cb7e4a", "#37c9b8", "#7743ac", "#42a679"];
 
+//convert name to right format
 const getInitials=(name:string)=>{
-  const parts=name.split(" ").filter(Boolean)
+  const parts=name.trim().split(" ")
   if (parts.length===0)return'Unknown'
    return parts.join(" ")
 }
