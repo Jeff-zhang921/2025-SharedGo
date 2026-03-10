@@ -34,7 +34,7 @@ Real-time chat flow - Connections. AI helped reason about event flow and safety 
 
 Documentation and troubleshooting - AI was used to draft and improve API docs, clarify unclear error messages, and generate candidate fixes faster for login/chat issues.
 
-Deployment and configuration support - AI assisted with environment setup questions such as how to setup SMTP/email auth config, Prisma generate/migrate flow, and cookie/session behavior across frontend and backend.
+Deployment and configuration support - AI assisted with environment setup questions such as SMTP/email auth config, Prisma generate/migrate flow, Docker-related setup, and cookie/session behavior across frontend and backend.
 
 **Examples of Prompt I input:**
 - System Design: "Provide a general requirement analysis and a recommended tech stack for designing a real-time map system."
@@ -45,23 +45,9 @@ Deployment and configuration support - AI assisted with environment setup questi
 
 
 **Thibault:**
+- Debugging: "I have come across this error ... can you pin-point the problem?"
 
-**Tools used**
-
-- ChatGPT
-
-
-#### Where did you use AI tools and why 
-
-- Debugging, issues that would be looked up on stackoverflow.com are more easily accessible through AI.
-
-- CSS Styling, each change for adjusting to suit the design is already fidly, so having AI (rather than w3schools.com) provide a basic start saves on research time.
-
-**Examples of Prompt I input:**
-
-- "I have come across this error ... can you pin-point the problem?"
-
-- "Provide a rough basic template for a .css container/input-form"
+- CSS Styling: "Provide a rough template for a .css container/input-form"
 
 
 **Oliver**
