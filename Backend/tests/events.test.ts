@@ -90,7 +90,7 @@ describe("Event API", () => {
     
     //send POST request to create event
     const res = await request(app)
-      .post("/events/create")
+      .post("/api/events/create")
       .send({
         title: "Test Event",
         description: "This is a test event",
@@ -116,7 +116,7 @@ describe("Event API", () => {
   // Validation: required fields missing should return 400
   it("should return 400 when required fields are missing", async () => {
     const res = await request(app)
-      .post("/events/create")
+      .post("/api/events/create")
       .send({
         description: "This is a test event",
         capacity: 50,
@@ -157,7 +157,7 @@ describe("Event API", () => {
     });
 
     const res = await request(app)
-      .post(`/events/${eventId}/join`)
+      .post(`/api/events/${eventId}/join`)
       .send({
         email: "user@example.com",
         name: "Test User",
@@ -173,7 +173,7 @@ describe("Event API", () => {
   // Joining validation missing email should return 400
   it("should not allow joining with missing email", async () => {
     const res = await request(app)
-      .post(`/events/${eventId}/join`)
+      .post(`/api/events/${eventId}/join`)
       .send({
         name: "Test User",
       });
@@ -186,7 +186,7 @@ describe("Event API", () => {
   it("should not allow joining non-existent event", async () => {
     mockPrisma.event.findUnique.mockResolvedValue(null); // event not found
     const res = await request(app)
-      .post("/events/9999/join")
+      .post("/api/events/9999/join")
       .send({
         email: "user@example.com",
       });
@@ -218,7 +218,7 @@ describe("Event API", () => {
     });
 
     const res = await request(app)
-      .post(`/events/${eventId}/join`)
+      .post(`/api/events/${eventId}/join`)
       .send({
         email: "newuser@example.com",
       });
@@ -249,7 +249,7 @@ describe("Event API", () => {
     });
 
     const res = await request(app)
-      .post(`/events/${eventId}/join`)
+      .post(`/api/events/${eventId}/join`)
       .send({
         email: "user@example.com", // same email trying to join
       });
@@ -289,7 +289,7 @@ describe("Event API", () => {
 
     mockPrisma.event.findUnique.mockResolvedValue(mockEvent);
 
-    const res = await request(app).get(`/events/${eventId}`);
+    const res = await request(app).get(`/api/events/${eventId}`);
 
     console.log("Get Event Response:", res.status, res.body);
 
@@ -309,7 +309,7 @@ describe("Event API", () => {
   it("should return 404 for non-existent event when getting details", async () => {
     mockPrisma.event.findUnique.mockResolvedValue(null);
 
-    const res = await request(app).get("/events/9999");
+    const res = await request(app).get("/api/events/9999");
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty("message", "Event not found.");
@@ -317,7 +317,7 @@ describe("Event API", () => {
 
   // Invalid event id format should return 400
   it("should return 400 for invalid event ID format", async () => {
-    const res = await request(app).get("/events/not-a-number");
+    const res = await request(app).get("/api/events/not-a-number");
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("message", "Event id must be a number.");
@@ -326,7 +326,7 @@ describe("Event API", () => {
   // Invalid coordinate range should return 400
   it("should return 400 for invalid coordinates", async () => {
     const res = await request(app)
-      .post("/events/create")
+      .post("/api/events/create")
       .send({
         title: "Test Event",
         description: "This is a test event",
@@ -361,7 +361,7 @@ describe("Event API", () => {
     });
 
     const res = await request(app)
-      .post(`/events/123/reviews`)
+      .post(`/api/events/123/reviews`)
       .send({
         email: "user@example.com",
         rating: 5,

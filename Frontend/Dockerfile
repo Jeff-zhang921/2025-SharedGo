@@ -17,6 +17,9 @@ RUN npm run build
 # Production using nginx
 FROM nginx:stable-alpine
 
+# Copy custom nginx configuration 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy the build output from Vite (defaults to 'dist')
 COPY --from=builder /app/dist /usr/share/nginx/html
 

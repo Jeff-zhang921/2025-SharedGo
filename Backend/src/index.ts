@@ -17,7 +17,7 @@ import boardRouter from "./routes/board";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", //frontend URL
+    origin: process.env.FRONTEND_URL, //frontend URL
     credentials: true, //Allows the browser to see the response and save cookies
   }),
 );
@@ -28,19 +28,23 @@ app.use(sessionMiddleware);
 const PORT = Number(process.env.PORT) || 3000;
 
 
-app.use("/auth", authRouter);
-app.use("/events", eventsRouter);
-app.use("/hosts", hostsRouter);
-app.use("/profile", profileRouter);
-app.use("/home", homeRouter);
-app.use("/filter", filterRouter);
-app.use("/chat", chatRouter);
-app.use("/chat", uploadRouter);
-app.use("/board", boardRouter);
+//wrapping everything in /api so Nginx can route traffic easily \
+const apiRouter = express.Router();
+apiRouter.use("/auth", authRouter);
+apiRouter.use("/events", eventsRouter);
+apiRouter.use("/hosts", hostsRouter);
+apiRouter.use("/profile", profileRouter);
+apiRouter.use("/home", homeRouter);
+apiRouter.use("/filter", filterRouter);
+apiRouter.use("/chat", chatRouter);
+apiRouter.use("/board", boardRouter);
 
-app.get("/",(request:Request,response:Response)=>{
+apiRouter.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});
 });
+
+app.use("/api", apiRouter);
+
 
 // Only start the server if this file is run directly (not when imported)
 //create a server and attach app to it, then pass that server to initsocket

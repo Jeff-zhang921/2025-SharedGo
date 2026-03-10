@@ -1,4 +1,4 @@
-name: Deploy to AWS ECS
+name: Deploy to AWS EC2
 on:
   push:
     branches: [ "dev", "main"]
@@ -7,9 +7,6 @@ env:
   AWS_REGION: eu-north-1
   BACKEND_ECR_REPOSITORY: sharedgo
   FRONTEND_ECR_REPOSITORY: sharedgo_frontend
-  ECS_CLUSTER: sharedgo_cluster
-  BACKEND_ECS_SERVICE: sharedgo_service
-  FRONTEND_ECS_SERVICE: sharedgo_frontend_service
   IMAGE_TAG: ${{ github.sha }}
 
 permissions:
@@ -17,7 +14,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to ECS
+    name: Deploy to EC2
     runs-on: ubuntu-latest
     
     steps:
@@ -39,62 +36,45 @@ jobs:
         id: build-backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.BACKEND_ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build the Docker image
           docker build -t $BACKEND_ECR_REPOSITORY:$IMAGE_TAG Backend/
           # Tag the image to ECR
-          docker tag $BACKEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG
+          docker tag $BACKEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:latest
           # Push the image to ECR
-          docker push $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
-      
+          docker push $ECR_REGISTRY/${BACKEND_ECR_REPOSITORY}:latest
+        
       - name: Build, tag, and push Frontend image to Amazon ECR
         id: build-frontend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.FRONTEND_ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build the Docker image
           docker build -t $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG Frontend/
           # Tag the image to ECR
-          docker tag $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG
+          docker tag $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:latest
           # Push the image to ECR
-          docker push $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:latest
 
-      - name: Render backendtask definition
-        id: backend-task
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with: 
-          task-definition: Backend/task-definition.json
-          container-name: backend_container
-          image: ${{ steps.build-backend.outputs.image }}
       
-      - name: Render frontend task definition
-        id: frontend-task
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with: 
-          task-definition: Frontend/task-definition.json
-          container-name: frontend_container
-          image: ${{ steps.build-frontend.outputs.image }}
-
-      - name: Deploy Backend
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with: 
-          task-definition: ${{ steps.backend-task.outputs.task-definition }}
-          service: ${{ env.BACKEND_ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
-      
-      - name: Deploy Frontend
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with: 
-          task-definition: ${{ steps.frontend-task.outputs.task-definition }}
-          service: ${{ env.FRONTEND_ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          host: 51.21.55.14
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: AWS_REGION,ECR_REGISTRY
+          script: |
+            # login to ECR on the EC2 instance
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+            # navigate to compose file
+            cd /home/ec2-user/app
+            # Pull the latest images
+            docker compose pull
+            # Restart the containers 
+            docker compose up -d --remove-orphans
 
         
