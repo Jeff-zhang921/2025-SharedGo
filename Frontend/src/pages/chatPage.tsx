@@ -98,6 +98,7 @@ const loadMessages=async(id:number)=>{
 
   
 //connect to socket function
+//this only run once so i
 const connectSocket=()=>{
   //check if already connect
  if (socketRef.current)return
@@ -108,6 +109,7 @@ const connectSocket=()=>{
 socketRef.current=socket
 //connect is a reserved keyword in socket unlike thread:id
 //when they connect it will execute the following code
+//when need reconnect,the socket.on will rerun. but the handler won't read threadid if directlyconst active=threadid even tho threadid is updated. so use ref.current method will make sure that handler will read the updated version of threadid 
  socket.on("connect",()=>{
   setStatus("Connected")
   const activeThreadId = threadIdRef.current;
@@ -117,7 +119,7 @@ socketRef.current=socket
     loadMessages(activeThreadId);
   }
  })
-
+ //you will use emit to call socket.on function 
   socket.on("connect_error", () => {
       setStatus("Socket connection error.");
     });
@@ -225,6 +227,9 @@ useEffect(()=>{
   }
 },[location.state])
 //the input element
+//receive the file,call the backend, backend will give a url to frontend 
+//url will be added a IMG prefix and send to the backend. backend will send to correponding user frontend
+//frotend loop through the list found if the msg start wil IMG: intepret at a picture, add a img tag on css
 const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
   //event is the object
   //target is the <input type=file>
@@ -278,6 +283,7 @@ if(!threadId){
       )
       return
     }
+    
     const imageURL=typeof data.url==="string"?data.url.trim():""
     if(!imageURL){
       setStatus("upload success but url missing")

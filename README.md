@@ -73,53 +73,55 @@
 ## Project structure
 > [!NOTE]
 > For a more thorough explanation of project structure details, see [Docs](https://github.com/spe-uob/2025-SharedGo/tree/dev/Docs).
-
+>
 > For a more thorough explanation of the Backend structure, see the [API_README](https://github.com/spe-uob/2025-SharedGo/blob/dev/Backend/API_README.md).
-
->For a more thorough explanation of AWS, PostgreSQL setup Detail, see[Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md)
+>
+> For a more thorough explanation of AWS and PostgreSQL setup details, see [Setup Guide](https://github.com/spe-uob/2025-SharedGo/blob/180-upload-vertification-detail-step/Docs/database_setup.md).
 
 ```text
-SharedGO/
-├── .github/
-│   ├── ISSUE_TEMPLATE/           # Custom issue reporting forms
-│   ├── PULL_REQUEST_TEMPLATE/    # PR template
-│   └── workflows/                # CI/CD automation files 
-├── Backend/                      # Node.js/Express server logic
-│   ├── prisma/                   # Database schema and migrations
-│   ├── src/
-│   │   ├── generated/            # Auto-generated types/files
-│   │   ├── middleware/           # Auth and request validation
-│   │   ├── routes/               # API endpoints
-│   │   ├── socket/               # Real-time communication (Socket.io)
-│   │   ├── types/                # express session
-│   │   ├── index.ts              # Server entry point
-│   │   ├── seed.ts               # Database seeding script
-│   │   └── session.ts            # Session management
-│   ├── tests/                    # Backend unit tests
-│   ├── Dockerfile                # Containerization config
-│   ├── API_README.md             # Documentation for API endpoints
-│   └── DEVELOPER_README.md       # Setup guide for backend devs
-├── Frontend/                     # React/Vite web application
-│   ├── public/                   # Static assets
-│   ├── src/
-│   │   ├── assets/               # Icons
-│   │   ├── components/           # Reusable UI components
-│   │   ├── pages/                # View/Screen components
-│   │   ├── App.tsx               # Main application component
-│   │   └── main.tsx              # React entry point
-│   ├── vite.config.ts            # Vite build configuration
-│   └── README.md                 # Frontend-specific documentation
-└── Docs/                         # Project management & design
-│   ├── Architecture/             # System diagrams and logic flow
-│   ├── database/                 # DB diagrams
-│   ├── design/                   # Figma designs
-│   ├── Minutes/                  # Client and team meeting notes
-│   ├── Presentations/            # Slide materials
-│   ├── AI Tools.md               # Log of AI usage in development
-│   └── testing_day_survey.pdf    # User testing feedback & results
-├── README.md                     # Project documentation
+2025-SharedGo/
+|-- .github/
+|   |-- ISSUE_TEMPLATE/            # Custom issue reporting forms
+|   |-- PULL_REQUEST_TEMPLATE/     # PR template
+|   `-- workflows/                 # CI/CD workflows
+|-- Backend/                       # Node.js + Express API
+|   |-- prisma/                    # Prisma schema + migrations
+|   |-- src/
+|   |   |-- api/                   # Upload / API utility routes
+|   |   |-- generated/             # Auto-generated files
+|   |   |-- middleware/            # Auth / request middleware
+|   |   |-- routes/                # REST route handlers
+|   |   |-- socket/                # Socket.IO server logic
+|   |   |-- types/                 # Express/session typings
+|   |   |-- index.ts               # Backend entrypoint
+|   |   |-- seed.ts                # Seed script
+|   |   `-- session.ts             # Session middleware
+|   |-- tests/                     # Backend tests
+|   |-- API_README.md              # API documentation
+|   `-- DEVELOPER_README.md        # Backend developer guide
+|-- Frontend/                      # React + Vite web app
+|   |-- public/                    # Public static files
+|   |-- src/
+|   |   |-- assets/                # Images/icons
+|   |   |-- components/            # Shared components
+|   |   |-- pages/                 # Page components
+|   |   |-- App.tsx                # App routes/layout
+|   |   `-- main.tsx               # React entrypoint
+|   |-- vite.config.ts             # Vite configuration
+|   `-- README.md                  # Frontend notes
+|-- Docs/                          # Project docs and artifacts
+|   |-- Architecture/              # Architecture and diagrams
+|   |-- database/                  # DB docs
+|   |-- design/                    # Design assets
+|   |-- Minutes/                   # Meeting minutes
+|   |-- Presentations/             # Presentation decks
+|   |-- Workflow/                  # Workflow diagrams
+|   |-- AI Tools.md                # AI usage log
+|   |-- database_setup.md          # Database setup guide
+|   `-- testing_day_survey.pdf     # Testing feedback
+|-- docker-compose.yml             # Local multi-service setup
+`-- README.md                      # Main project documentation
 ```
-
 ## TechStack
 <!-- ### MVP Architecture
 
@@ -209,3 +211,4 @@ SharedGO/
 |  Minzhe Hu        | 2594564 | qp24108@bristol.ac.uk |
 | Thibault Crosnier | 2519193 | pv24925@bristol.ac.uk |
 |  Oliver Clease    | 2588166 | ph24475@bristol.ac.uk |
+

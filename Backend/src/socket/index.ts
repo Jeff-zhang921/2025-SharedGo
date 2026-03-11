@@ -112,6 +112,8 @@ socket.on("thread:join", async (payload) => {
         socket.data.role="guest"
       }
       //join the room
+      //use socket.join join the room 
+      //user id is not use to pick user directly, it use as validate access
       socket.join(`thread:${threadid}`);
     }
 

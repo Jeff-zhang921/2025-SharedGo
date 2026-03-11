@@ -63,7 +63,7 @@ const ConversationPage=()=>{
    const isSearching = searchTerm.trim() !== "";
   //async function is use to let function inside and outside async func to run when async is running, no need to wait
   //await only contain inside async func
-  //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected
+  //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected/
 
  useEffect(()=>{
   //usecase of mount:这个组件还在屏幕上吗(is this component still on the screen), if don't, throw the data
