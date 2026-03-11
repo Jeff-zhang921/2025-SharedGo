@@ -33,12 +33,12 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/verify" element={<VerifyPage />} />
       <Route path="/home" element={<HomePage />} />
-      <Route path="/map" element={<MapPage />} />
       {/*Will implement in chat page later (only left hand side)*/}
       <Route path="/chat" element={<ChatPage />} />
 
       {/*NAVBAR IMPLEMENTED (gap left/bottom if landscape/portrait)*/}
       <Route element={<NavBar/>}>
+        <Route path="/map" element={<MapPage />} />
         {/* set the path for the event details page, now with id system to route to distinct event details pages */}
         <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} /> 
         {/* set the paths for the create event page */}

@@ -112,13 +112,6 @@ const MapPage = () => {
     <div className="map-container">
       <div className="ui-overlay">
         <Link to="/createEvent" className='create-event'>Create Event</Link>
-
-        <div className='profile-page'>
-          <Link to="/profile">
-            <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
-          </Link>
-        </div>
-        
       </div>
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
