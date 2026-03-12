@@ -1,16 +1,53 @@
 import Button from "./Button";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom"; //to check current page
 
 type Props = {
     userId?: string | number;
 };
 
-export default function Navigation({ userId }: Props) {
+// export default function Navigation({ userId }: Props) {
+//     return (
+//     <aside className="navbar">
+//         <Button link="/home" imgSrc="/src/assets/home.svg" text="home" size={30}/>
+//         <Button link="/map" imgSrc="/src/assets/map.svg" text="map" size={30}/>
+//         <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
+//         <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
+//     </aside>
+//     );
+// }
+
+export default function Navigation() {
+    const location = useLocation();
+    const isMapPage = location.pathname === "/map"; //Check if user is on the map (only show search bar if yes)
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
     return (
-    <aside className="navbar">
-        <Button link="/home" imgSrc="/src/assets/home.svg" text="home" size={30}/>
-        <Button link="/map" imgSrc="/src/assets/map.svg" text="map" size={30}/>
-        <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
-        <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
-    </aside>
+        <aside className="navbar">
+            <Button link="/map" imgSrc="/src/assets/home.svg" text="home" size={30}/>
+            {/* <Button link="/map" imgSrc="/src/assets/map.svg" text="map" size={30}/> */}
+            
+            {/* Only show Search button if on the map page */}
+            {isMapPage && (
+                <div className="search-nav-item">
+                    <button 
+                        className="nav-action-btn" 
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                    >
+                        <img src="/src/assets/search.svg" alt="search" style={{ width: '30px', height: '30px' }} />
+                    </button>
+
+                    {/* Search Bar */}
+                    {isSearchOpen && (
+                        <div className="nav-search-container">
+                            <input type="text" placeholder="Search events..." className="nav-search-input" />
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
+            <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
+        </aside>
     );
 }
