@@ -6,27 +6,13 @@ type Props = {
     userId?: string | number;
 };
 
-// export default function Navigation({ userId }: Props) {
-//     return (
-//     <aside className="navbar">
-//         <Button link="/home" imgSrc="/src/assets/home.svg" text="home" size={30}/>
-//         <Button link="/map" imgSrc="/src/assets/map.svg" text="map" size={30}/>
-//         <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
-//         <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
-//     </aside>
-//     );
-// }
-
 export default function Navigation() {
     const location = useLocation();
     const isMapPage = location.pathname === "/map"; //Check if user is on the map (only show search bar if yes)
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     return (
-        <aside className="navbar">
-            <Button link="/map" imgSrc="/src/assets/home.svg" text="home" size={30}/>
-            {/* <Button link="/map" imgSrc="/src/assets/map.svg" text="map" size={30}/> */}
-            
+        <aside className="navbar">            
             {/* Only show Search button if on the map page */}
             {isMapPage && (
                 <div className="search-nav-item">
@@ -45,7 +31,8 @@ export default function Navigation() {
                     )}
                 </div>
             )}
-
+            
+            <Button link="/map" imgSrc="/src/assets/home.svg" text="home" size={30}/>
             <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
             <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
         </aside>

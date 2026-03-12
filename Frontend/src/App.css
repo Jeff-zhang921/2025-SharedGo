@@ -46,6 +46,8 @@ html, body, #root {
     padding-top: 15px;
     gap: 40px;
     flex-direction: column;
+    z-index: 2000 !important; /* higher than map */
+    overflow: visible !important; /* lets the search bar pop out */
 }
 
 .navbar button {
@@ -93,4 +95,30 @@ html, body, #root {
     .page-content {
       padding-left: 0px;
     }
+}
+
+.search-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-search-container {
+  position: fixed;
+  left: 85px; /* How much the search bar comes off the nav bar */
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  display: flex;
+  z-index: 2000;
+  white-space: nowrap;
+}
+
+.nav-search-input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px 10px;
+  outline: none;
 }
