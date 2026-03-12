@@ -23,6 +23,7 @@ interface EventData {
   latitude: number;
   longitude: number;
   imageUrl: string | null;
+  category: string;
   externalUrl: string | null;
   host: User; //Whomever hosted the event
   attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
@@ -107,6 +108,16 @@ const MapPage = () => {
       iconAnchor: [size / 2, size / 2], //Centre circle exactly on top of coordinates
     });
   };
+
+  //Filtering
+  const filteredEvents = dbEvents.filter((event) => { //Goes through all events in the database
+    const matchedSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||  //Checks if word searched is in title or description
+                          event.description?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchedCategory = category === "" || event.category === category; //Checks event category matches category you picked
+  
+    return matchedSearch && matchedCategory;
+  });
 
   return (
     <div className="map-container">
