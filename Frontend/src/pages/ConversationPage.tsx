@@ -34,12 +34,13 @@ type ThreadResponse = {
   } | null;
 };
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = "http://localhost:3000/api";
 //accent is used for the avater
 const ACCENTS = ["#1f98b0", "#c43642", "#cb7e4a", "#37c9b8", "#7743ac", "#42a679"];
 
+//convert name to right format
 const getInitials=(name:string)=>{
-  const parts=name.split(" ").filter(Boolean)
+  const parts=name.trim().split(" ")
   if (parts.length===0)return'Unknown'
    return parts.join(" ")
 }
@@ -62,7 +63,7 @@ const ConversationPage=()=>{
    const isSearching = searchTerm.trim() !== "";
   //async function is use to let function inside and outside async func to run when async is running, no need to wait
   //await only contain inside async func
-  //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected
+  //await is use when function inside async meet await, it need to wait until the await func to finish to execute next. outside is not affected/
 
  useEffect(()=>{
   //usecase of mount:这个组件还在屏幕上吗(is this component still on the screen), if don't, throw the data

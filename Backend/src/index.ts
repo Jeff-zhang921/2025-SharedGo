@@ -1,3 +1,4 @@
+
 import express, { Request, Response } from "express";
 import cors from "cors";
 import http from "http";
@@ -15,9 +16,10 @@ import uploadRouter from "./api/upload";
 import boardRouter from "./routes/board";
 
 const app = express();
+const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, //frontend URL
+    origin: frontendOrigin, // frontend URL
     credentials: true, //Allows the browser to see the response and save cookies
   }),
 );
@@ -38,6 +40,7 @@ apiRouter.use("/home", homeRouter);
 apiRouter.use("/filter", filterRouter);
 apiRouter.use("/chat", chatRouter);
 apiRouter.use("/board", boardRouter);
+apiRouter.use("/upload", uploadRouter);
 
 apiRouter.get("/",(request:Request,response:Response)=>{
      response.json({message:"SharedGo backend running"});

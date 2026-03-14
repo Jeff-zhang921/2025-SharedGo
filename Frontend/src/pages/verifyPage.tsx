@@ -40,7 +40,7 @@ const CreateVerifyPage = () => {
         const fullCode = code.join(""); //Merges 6 digit code into a single string
         setStatus("Verifying");
         try {
-            const response = await fetch("http://localhost:3000/auth/email/verify", { 
+            const response = await fetch("http://localhost:3000/api/auth/email/verify", { 
                 method: "POST", //Send data to auth/email/verify endpoint
                 headers: { "Content-Type": "application/json" },
                 credentials: "include", //Required to save session cookie, keeps user logged in

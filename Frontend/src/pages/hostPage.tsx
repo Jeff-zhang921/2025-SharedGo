@@ -157,7 +157,7 @@ export default function Host() {
     useEffect(() => {
         const fetchHostData = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/hosts/${hostId}/overview`);
+                const response = await fetch(`http://localhost:3000/api/hosts/${hostId}/overview`);
                 const data = await response.json();
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);

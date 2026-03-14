@@ -13,7 +13,8 @@ type ChatMessage={
   body:string;
   createdAt:string
 }
-const Backend_URL="http://localhost:3000";
+const API_URL = "http://localhost:3000/api";
+const SOCKET_URL = "http://localhost:3000";
 
 //TIMELINE:
 //0ms	React reads useState(remember in memory).	Blank screen.
@@ -54,7 +55,7 @@ const [messageBody,setMessageBody]=useState("")
 
 const loadMe=async()=>{
   try{
-    const res=await fetch(`${Backend_URL}/auth/me`,{
+    const res=await fetch(`${API_URL}/auth/me`,{
       credentials:"include"
     })
     if(!res.ok){
@@ -77,7 +78,7 @@ const loadMe=async()=>{
 
 const loadMessages=async(id:number)=>{
   try{
-    const res = await fetch(`${Backend_URL}/chat/threads/${id}/messages`, {
+    const res = await fetch(`${API_URL}/chat/threads/${id}/messages`, {
      credentials: "include",
     });
     if (!res.ok) {
@@ -97,16 +98,18 @@ const loadMessages=async(id:number)=>{
 
   
 //connect to socket function
+//this only run once so i
 const connectSocket=()=>{
   //check if already connect
  if (socketRef.current)return
  //normal http open and close in each request
  //io Stays open as long as you're on the page.
  //The Verification (Sending)
- const socket=io(Backend_URL,{withCredentials:true})
+ const socket=io(SOCKET_URL,{withCredentials:true})
 socketRef.current=socket
 //connect is a reserved keyword in socket unlike thread:id
 //when they connect it will execute the following code
+//when need reconnect,the socket.on will rerun. but the handler won't read threadid if directlyconst active=threadid even tho threadid is updated. so use ref.current method will make sure that handler will read the updated version of threadid 
  socket.on("connect",()=>{
   setStatus("Connected")
   const activeThreadId = threadIdRef.current;
@@ -116,7 +119,7 @@ socketRef.current=socket
     loadMessages(activeThreadId);
   }
  })
-
+ //you will use emit to call socket.on function 
   socket.on("connect_error", () => {
       setStatus("Socket connection error.");
     });
@@ -182,7 +185,7 @@ socketRef.current=socket
   }
   //when you call setstatus, or set... it immediately broadcast
   try{
-    const res=await fetch(`${Backend_URL}/chat/threads`,{
+    const res=await fetch(`${API_URL}/chat/threads`,{
       method:"POST",
       headers: { "Content-Type": "application/json" },
       credentials:"include",
@@ -224,6 +227,9 @@ useEffect(()=>{
   }
 },[location.state])
 //the input element
+//receive the file,call the backend, backend will give a url to frontend 
+//url will be added a IMG prefix and send to the backend. backend will send to correponding user frontend
+//frotend loop through the list found if the msg start wil IMG: intepret at a picture, add a img tag on css
 const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
   //event is the object
   //target is the <input type=file>
@@ -255,7 +261,7 @@ if(!threadId){
   setIsUploadingImage(true);
   setStatus("Uploading image...");
   try{
-    const response=await fetch(`${Backend_URL}/chat/upload`,{
+    const response=await fetch(`${API_URL}/upload/upload`,{
       method:"POST",
       credentials:"include",
       body:formData
@@ -277,6 +283,7 @@ if(!threadId){
       )
       return
     }
+    
     const imageURL=typeof data.url==="string"?data.url.trim():""
     if(!imageURL){
       setStatus("upload success but url missing")
@@ -287,7 +294,6 @@ if(!threadId){
       body:`${IMAGE_PREFIX}${imageURL}`,
     })
     setStatus("Image sent")
-
   }catch{
     setStatus("Failt ot upload")
   }finally{
@@ -295,7 +301,7 @@ if(!threadId){
     event.target.value=""
   }
 }
-  
+ 
 
 const handleSendMessage=()=>{
   //socketRef is the container for socket
@@ -357,6 +363,7 @@ const handleSendMessage=()=>{
           {message.map((msg, index) => {
             const isMe = msg.senderId === me?.id;
             const isImageMessage = msg.body.startsWith(IMAGE_PREFIX);
+            //"Start at the character position equal to the length of the prefix, and give me everything from there until the very end."
             const imageUrl = isImageMessage ? msg.body.slice(IMAGE_PREFIX.length) : "";
             //If True: It gives the div the class chat-row me.
             //If False: It gives the div the class chat-row them.
@@ -385,6 +392,7 @@ const handleSendMessage=()=>{
 
 
         <div className='chat-input'>
+
           <label className={`photo-button ${isUploadingImage ? "disabled" : ""}`} htmlFor="chat-photo-input">
             {isUploadingImage ? "Uploading..." : "Photo"}
           </label>

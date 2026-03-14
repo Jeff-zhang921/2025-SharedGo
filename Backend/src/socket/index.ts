@@ -19,6 +19,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma=new PrismaClient();
 
 export function initSocket(server: HttpServer) {
+  const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 //attach http server to a new server
 //If a visitor arrives via HTTP: The "Big Server" sends them to the Express office.
 //If a visitor arrives via WebSocket: The "Big Server" sends them to the Socket.io offce.
@@ -27,7 +28,7 @@ export function initSocket(server: HttpServer) {
 //socket is one client connection. user a, b, c has different socket
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: frontendOrigin,
       credentials: true,
     },
   });
@@ -111,6 +112,8 @@ socket.on("thread:join", async (payload) => {
         socket.data.role="guest"
       }
       //join the room
+      //use socket.join join the room 
+      //user id is not use to pick user directly, it use as validate access
       socket.join(`thread:${threadid}`);
     }
 

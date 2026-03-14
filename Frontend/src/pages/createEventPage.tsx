@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {ChangeEvent,useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './createEventPage.css';
-import Navigation from "../components/Navigation";
+
 
 type EventForm = {
   title: string;
@@ -28,7 +28,10 @@ type EventForm = {
 const CreateEventPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+   const MAX_UPLOAD=100*1024*1024
+  const [status,setStatus]=useState("")
   const initialCoords = location.state as { lat: number; lng: number } | null; //getting lat/long from navigation state
+
   const [form, setForm] = useState<EventForm>({
     title: "",
     description: "",
@@ -47,6 +50,7 @@ const CreateEventPage = () => {
     averageRating: null,
   });
   const [loading, setLoading] = useState(false);
+  const isUploadSuccess = status === "Image uploaded";
 
   // handle changes on input
   const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>) => {
@@ -61,12 +65,13 @@ const CreateEventPage = () => {
     }
   };
 
-  const backendBaseURL = 'http://localhost:3000'; //Change to the correct URL which the backend is running on (3000)
+  const backendBaseURL = 'http://localhost:3000/api'; //Change to the correct URL which the backend is running on (3000)
 
   // handle submition of the form
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+    
 
     try {
       const res = await fetch(`${backendBaseURL}/events/create`, {
@@ -106,6 +111,65 @@ const CreateEventPage = () => {
       setLoading(false);
     }
   };
+
+const handleSendFile=async(event:ChangeEvent<HTMLInputElement>)=>{
+    const file=event.target.files?.[0]
+    if(!file){
+  return 
+}
+if(!file.type.startsWith("image/")){
+  setStatus("Only image files are allowed")
+  return
+}
+if (file.size>MAX_UPLOAD){
+  setStatus("Image can not exceed 100mb")
+  return
+}
+const formData=new FormData()
+//this related to the backend ,upload.single("file")
+formData.append("file",file)
+ setStatus("Uploading image...");
+ try{
+  const response=await fetch(`${backendBaseURL}/upload/upload`,{
+    method:"POST",
+    credentials:"include",
+    body:formData
+  })
+  const raw=await response.text()
+  //like hashmap
+  let data:Record<string,string>={}
+  if(raw){
+    try{
+      data=JSON.parse(raw) as Record<string,string>
+    }catch{
+      data={}
+    }
+  }
+  if(!response.ok){
+      const serverMessage = typeof data.message === "string" ? data.message : "";
+      setStatus(
+        serverMessage || data.error|| `Fail to upload image(HTTP ${response.status}).`
+      )
+      return
+    }
+     const imageURL=typeof data.url ==="string"?data.url.trim():""
+    if(!imageURL){
+      setStatus("upload success but url missing")
+      return
+    }
+    setForm((previous) => ({
+      ...previous,
+      imageUrl: imageURL,
+    }));
+    setStatus("Image uploaded");
+ }catch{
+  setStatus("Failt ot upload")
+ }finally{
+  event.target.value=""
+ }
+}
+
+
 
 
   return (
@@ -180,15 +244,17 @@ const CreateEventPage = () => {
       <div className="create-event-container">
         <form className="event-form" onSubmit={onSubmit}>
           <section className="form-section">
-            <label>
-              <span>Image</span>
-              <input type="text" placeholder="https://example.com/image.png" value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})}/>
-            </label>
-
-            <label>
-              <span>Website</span>
-              <input type="text" placeholder="https://example.com" value={form.externalUrl} onChange={(e) => setForm({...form, externalUrl: e.target.value})}/>
-            </label>
+            <div className="upload-field">
+              <span>Photo</span>
+              
+              <input
+                id="event-photo-upload"
+                className="photo-upload-input"
+                type="file"
+                accept="image/*"
+                onChange={handleSendFile}
+              />
+            </div>
           </section>
 
           {/*Live Preview*/}
@@ -197,10 +263,6 @@ const CreateEventPage = () => {
               <div className="event-image-wrapper">
                 {form?.imageUrl && (
                   <img src={form.imageUrl} alt={form.title} className="event-image"/>
-                )}
-                {form?.externalUrl && (
-                <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">
-                  Visit Event Website</a>
                 )}
               </div>
           </section>
@@ -247,7 +309,7 @@ const CreateEventPage = () => {
             <ul>
               <li>Use a clear and descriptive event title.</li>
               <li>Add an image so the event stands out on the map.</li>
-              <li>External links are perfect for ticketing or signup.</li>
+              <li>Pick a bright photo so people can spot your event quickly.</li>
             </ul>
             <Link to="/">Need to sign in?</Link>
           </div>
