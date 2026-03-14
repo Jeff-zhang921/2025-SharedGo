@@ -27,6 +27,19 @@ export default function Navigation() {
                     {isSearchOpen && (
                         <div className="nav-search-container">
                             <input type="text" placeholder="Search events..." className="nav-search-input" />
+                            <select className="nav-filter-select">
+                                <option value="">All Categories</option>
+                                <option value="Physical Activities">Physical Activities</option>
+                                <option value="Festivals">Festivals</option>
+                                <option value="Educational">Educational</option>
+                                <option value="Networking">Networking</option>
+                                <option value="Arts & Culture">Arts & Culture</option>
+                                <option value="Food & Drink">Food & Drink</option>
+                                <option value="Music & Concerts">Music & Concerts</option>
+                                <option value="Tech & Gaming">Tech & Gaming</option>
+                                <option value="Wellness & Meditation">Wellness & Meditation</option>
+                                <option value="Volunteer & Charity">Volunteer & Charity</option>
+                            </select>
                         </div>
                     )}
                 </div>
