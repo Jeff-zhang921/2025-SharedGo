@@ -92,3 +92,37 @@ afterAll(() => {
     jest.resetAllMocks();
 }); 
 
+describe("Hosts Routes", () => {
+    
+    describe("GET /hosts/:hostId/overview", () => {
+        it("should return 404 for non-existent host", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(null);
+            const res = await request(app)
+                .get(`/hosts/${hostId}/overview`);
+            expect(res.status).toBe(404);
+            expect(res.body.message).toBe("Host not found.");
+        });
+
+        it("should return 400 for invalid ID format", async () => {
+            const res = await request(app).get("/hosts/notnumber/overview");
+            expect(res.status).toBe(400);
+        });
+
+        it("should return valid overview ", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockHost);
+            mockPrisma.event.findMany
+                .mockResolvedValueOnce([mockEvent]) //upcomingEvents
+                .mockResolvedValueOnce([])          //pastEvents
+                .mockResolvedValueOnce([mockEvent]); // eventsForStats
+            mockPrisma.event.count  
+                .mockResolvedValueOnce(1) //total upcoming
+                .mockResolvedValueOnce(0); //total past
+            mockPrisma.review.findMany.mockResolvedValue([]);  //recent reviews
+            const res = await request(app)
+                .get(`/hosts/${hostId}/overview`);
+            expect(res.status).toBe(200);
+            expect(res.body.host.id).toBe(hostId);
+            expect(res.body.stats.upcomingCount).toBe(1);
+        });
+    });
+});
