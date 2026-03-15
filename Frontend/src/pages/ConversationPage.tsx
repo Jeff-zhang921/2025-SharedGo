@@ -198,7 +198,7 @@ return(
             <input
               id="conversation-search"
               type="text"
-              placeholder="Search by name or event"
+              placeholder="Search chats by email"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />

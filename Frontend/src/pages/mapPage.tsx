@@ -3,6 +3,7 @@ import "./mapPage.css"
 import Button from '../components/Button';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { useSearch } from './../searchFile';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -23,6 +24,7 @@ interface EventData {
   latitude: number;
   longitude: number;
   imageUrl: string | null;
+  category: string;
   externalUrl: string | null;
   host: User; //Whomever hosted the event
   attendees: Array<{ //Attendees section as backend also included this (maybe implement into page later)
@@ -46,6 +48,7 @@ const MapPage = () => {
   const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
+  const { search, category } = useSearch(); //Gets real time values from the sidebar
 
   useEffect(() => {
     //Only run if map is ready and we have coordinates
@@ -106,35 +109,21 @@ const MapPage = () => {
     });
   };
 
+  //Filtering
+  const filteredEvents = dbEvents.filter((event) => { //Goes through all events in the database
+    const matchedSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||  //Checks if word searched is in title or description
+                          event.description?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchedCategory = category === "" || event.category === category; //Checks event category matches category you picked
+  
+    return matchedSearch && matchedCategory;
+  });
+
   return (
     <div className="map-container">
       <div className="ui-overlay">
-        {/*HOME BUTTON*/}
-        <div className="home-btn"
-          style={{
-            position: "absolute",
-            top: "20px",        // Positioning 
-            left: "20px",
-            zIndex: 10          // layer above the map and icons
-          }}
-        >
-          <Button
-            link="/home"                // Link to the home page
-            imgSrc="/src/assets/home.svg"       // Path to home icon
-            text="Home"
-            size={60}                       // Adjust size in pixels
-          />
-        </div>
-
         <Link to="/createEvent" className='create-event'>Create Event</Link>
-
-        <div className='profile-page'>
-          <Link to="/profile">
-            <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
-          </Link>
-        </div>
       </div>
-
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
         zoom={13}
@@ -163,17 +152,16 @@ const MapPage = () => {
           </Popup>
         )}
 
-        {dbEvents.map((event) => (
-        <Marker 
-          key={event.id} 
-          position={[event.latitude, event.longitude]} 
-          icon={createEventIcon(event.title)}
-          eventHandlers={{
-            click: () => navigate(`/eventDetails/${event.id}`)
-          }}
-        >
-        </Marker>
-      ))}
+          {filteredEvents.map((event) => (
+            <Marker 
+              key={event.id} 
+              position={[event.latitude, event.longitude]} 
+              icon={createEventIcon(event.title)}
+              eventHandlers={{
+                click: () => navigate(`/eventDetails/${event.id}`)
+              }}
+            />
+        ))}
     </MapContainer>
     </div>
   );
