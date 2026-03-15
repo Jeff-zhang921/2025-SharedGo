@@ -3,6 +3,7 @@ import "./mapPage.css"
 import Button from '../components/Button';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { useSearch } from './../searchFile';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -47,8 +48,7 @@ const MapPage = () => {
   const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const { search, category } = useSearch(); //Gets real time values from the sidebar
 
   useEffect(() => {
     //Only run if map is ready and we have coordinates
@@ -152,17 +152,16 @@ const MapPage = () => {
           </Popup>
         )}
 
-        {dbEvents.map((event) => (
-        <Marker 
-          key={event.id} 
-          position={[event.latitude, event.longitude]} 
-          icon={createEventIcon(event.title)}
-          eventHandlers={{
-            click: () => navigate(`/eventDetails/${event.id}`)
-          }}
-        >
-        </Marker>
-      ))}
+          {filteredEvents.map((event) => (
+            <Marker 
+              key={event.id} 
+              position={[event.latitude, event.longitude]} 
+              icon={createEventIcon(event.title)}
+              eventHandlers={{
+                click: () => navigate(`/eventDetails/${event.id}`)
+              }}
+            />
+        ))}
     </MapContainer>
     </div>
   );
