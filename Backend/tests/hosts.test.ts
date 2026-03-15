@@ -176,7 +176,7 @@ describe("Hosts Routes", () => {
         });
     });
 
-    describe("GET /hosts/hostid/events", () => {
+    describe("GET /hosts/hostId/events", () => {
         it("should handle 'all' status for events", async () => {
             mockPrisma.user.findUnique.mockResolvedValue(mockHost);
             mockPagination([mockEvent], 1);
@@ -228,7 +228,7 @@ describe("Hosts Routes", () => {
         });
     });
 
-    describe("GET /hosts/:hostId/reviews", () => {
+    describe("GET /hosts/hostId/reviews", () => {
         it("should return correctly mapped review", async () => {
             mockPrisma.user.findUnique.mockResolvedValue(mockHost);
             mockPagination([mockReview], 1);
