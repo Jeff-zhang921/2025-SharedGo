@@ -112,6 +112,8 @@ html, body, #root {
   border-radius: 8px;
   box-shadow: 4px 0 15px rgba(0,0,0,0.1);
   display: flex;
+  align-items: center;
+  gap: 15px; /* Spacing between search bar and category select */
   z-index: 2000;
   white-space: nowrap;
 }

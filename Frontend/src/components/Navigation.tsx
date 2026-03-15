@@ -45,12 +45,12 @@ export default function Navigation() {
                                 <option value="Festivals">Festivals</option>
                                 <option value="Educational">Educational</option>
                                 <option value="Networking">Networking</option>
-                                <option value="Arts & Culture">Arts & Culture</option>
-                                <option value="Food & Drink">Food & Drink</option>
-                                <option value="Music & Concerts">Music & Concerts</option>
-                                <option value="Tech & Gaming">Tech & Gaming</option>
-                                <option value="Wellness & Meditation">Wellness & Meditation</option>
-                                <option value="Volunteer & Charity">Volunteer & Charity</option>
+                                <option value="Arts_Culture">Arts & Culture</option>
+                                <option value="Food_Drink">Food & Drink</option>
+                                <option value="Music_Concerts">Music & Concerts</option>
+                                <option value="Tech_Gaming">Tech & Gaming</option>
+                                <option value="Wellness_Meditation">Wellness & Meditation</option>
+                                <option value="Volunteer_Charity">Volunteer & Charity</option>
                             </select>
                         </div>
                     )}
