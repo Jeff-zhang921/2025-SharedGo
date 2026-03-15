@@ -57,7 +57,7 @@ const mockEvent = {
       id: 123,
       title: "Test Event",
       description: "This is a test event",
-      startsAt: new Date("2024-12-31T22:00:00.000Z"),
+      startsAt: new Date(),
       capacity: 100,
       category: "Other",
       location: "Test Location",
@@ -65,7 +65,7 @@ const mockEvent = {
       longitude: 0,
       hostId: 1,
       participants: Array(20).fill({ joinedAt: new Date()}),
-      reviews: [],
+      reviews: [] as { rating: number | null }[],
 };
 
 const mockReview = {
@@ -79,7 +79,7 @@ const mockReview = {
     event: { id: 123, title: "Test Event"},
 };
 
-const overviewMock = ({
+const mockOverview = ({
     upcomingEvents = [mockEvent],
     pastEvents = [],
     totalUpcoming = 1,
@@ -97,7 +97,7 @@ const overviewMock = ({
     mockPrisma.review.findMany.mockResolvedValue(recentReviews);
 };
 
-const setupPaginationMock = (data: any[], total: number) => {
+const mockPagination = (data: any[], total: number) => {
   mockPrisma.event.findMany.mockResolvedValue(data);
   mockPrisma.event.count.mockResolvedValue(total);
   mockPrisma.review.findMany.mockResolvedValue(data);
@@ -132,17 +132,15 @@ describe("Hosts Routes", () => {
         const overbookedEvent = { 
             ...mockEvent, 
             capacity: 10, 
-            //participants: Array(15).fill({ joinedAt: new Date() }) 
         };
-        setupPaginationMock([overbookedEvent], 1);
+        mockPagination([overbookedEvent], 1);
         const res = await request(app).get(`/hosts/${hostId}/events`);
-        // Math.max(10 - 20, 0) should be 0
         expect(res.body.events[0].seatsRemaining).toBe(0);
     });
     describe("GET /hosts/hostId/overview", () => {
         it("should return valid overview ", async () => {
             mockPrisma.user.findUnique.mockResolvedValue(mockHost);
-            overviewMock();
+            mockOverview();
 
             const res = await request(app)
                 .get(`/hosts/${hostId}/overview`);
@@ -154,37 +152,90 @@ describe("Hosts Routes", () => {
         it("should compute averageFillRate correctly", async () => {
             //20 participants, 100 capacity -> fill rate 0.2
             mockPrisma.user.findUnique.mockResolvedValue(mockHost);
-            overviewMock();
+            mockOverview();
             const res = await request(app).get(`/hosts/${hostId}/overview`);
             expect(res.status).toBe(200);
             expect(res.body.stats.averageFillRate).toBe(0.2);
         });
-        // it("should compute averageRating", async () => {
+        
+        it("should compute averageRating correctly and ignore null ratings", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockHost);
+            const eventWithMixedRatings = {
+                ...mockEvent,
+                reviews: [
+                    { rating: 5 },
+                    { rating: null },
+                    { rating: 3},
+                    { rating: 4},
+                ] 
+            };
+            mockOverview({ eventsForStats: [eventWithMixedRatings] });
+            const res = await request(app).get(`/hosts/${hostId}/overview`);
+            expect(res.body.stats.averageRating).toBe(4); // (5+3+4)/3=4
+            expect(res.body.stats.reviewCount).toBe(3);
+        });
     });
 
     describe("GET /hosts/hostid/events", () => {
+        it("should handle 'all' status for events", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockHost);
+            mockPagination([mockEvent], 1);
+            const res = await request(app)
+                .get(`/hosts/${hostId}/events`)
+                .query({ status: "all" }); //upcoming, past 
+
+            expect(res.status).toBe(200);
+            // Verify Prisma 'where' was just { hostId } without the startsAt filter
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: { hostId }
+                })
+            );
+        });
+
+        it("should return past events with descending order", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockHost);
+            mockPagination([], 0);
+            const res = await request(app)
+                .get(`/hosts/${hostId}/events`)
+                .query({ status: "past" });
+
+            expect(res.status).toBe(200);
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    orderBy: { startsAt: "desc" }
+                })
+            );
+        });
+
         it("should calculate 'skip' correctly for page 3", async () => {
-            setupPaginationMock([], 0);
-
+            mockPagination([], 0);
             await request(app).get(`/hosts/${hostId}/events`).query({ page: 3, limit: 10 });
-
             // (3 - 1) * 10 = 20
             expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({ skip: 20 })
             );
         });
-        it("should clamp the limit to MAX_PAGE_SIZE (50)", async () => {
-        setupPaginationMock([], 0);
 
-        // Try to request 100 items
-        await request(app).get(`/hosts/${hostId}/events`).query({ limit: 100 });
+        it("should limit to MAX_PAGE_SIZE (50)", async () => {
+            mockPagination([], 0);
+            // Try to request 100 items
+            await request(app).get(`/hosts/${hostId}/events`).query({ limit: 100 });
 
-        expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
-            expect.objectContaining({ take: 50 })
-        );
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({ take: 50 })
+            );
+        });
     });
-    
-     });
-    
+
+    describe("GET /hosts/:hostId/reviews", () => {
+        it("should return correctly mapped review", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockHost);
+            mockPagination([mockReview], 1);
+            const res = await request(app).get(`/hosts/${hostId}/reviews`);
+            expect(res.status).toBe(200);
+            expect(res.body.reviews[0].author.name).toBe("John");
+        });
+    });
 
 });
