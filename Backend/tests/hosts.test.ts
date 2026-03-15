@@ -42,7 +42,7 @@ jest.mock("@prisma/client", () => ({
 
 import app from "../src";
 import hostsRouter from "../src/routes/hosts";
-import { reconstructFieldPath } from "express-validator/lib/field-selection";
+
 app.use(express.json());
 app.use("/hosts", hostsRouter);
 
