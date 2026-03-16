@@ -13,7 +13,7 @@ function HomePage() {
 
       <div className='profile-page'>
         <Link to="/profile">
-          <img src="/src/assets/user-icon.png" alt="View Profile" className="profile-img" />
+          <img src="/user-icon.png" alt="View Profile" className="profile-img" />
         </Link>
       </div>
 

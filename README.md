@@ -102,7 +102,6 @@
 |-- Frontend/                      # React + Vite web app
 |   |-- public/                    # Public static files
 |   |-- src/
-|   |   |-- assets/                # Images/icons
 |   |   |-- components/            # Shared components
 |   |   |-- pages/                 # Page components
 |   |   |-- App.tsx                # App routes/layout
