@@ -18,9 +18,11 @@ What it does: It pushes other boxes away. */
 
   /* ensure chati s at least as tall as screen */
   min-height: 100vh;
+  min-height: 100dvh;
   /* Locks the height to exactly the screen size. */
   height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100%;
   /* Tells the shell to use a "Grid" layout (good for dividing space). */
   display: grid;
 
@@ -57,7 +59,8 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   display: flex;
   flex-direction: column;
   background: var(--panel-2);
-  height: 100vh;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -65,8 +68,10 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
 .chat-body {
   /* flex:1 make sure chat body fit the exact size that is screen- (header+input) */
   flex: 1;
+  min-height: 0;
   padding: 24px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   /* Create the scrollbar */
   display: flex;
   /* stack them top to bottom */
@@ -81,12 +86,13 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   background: var(--bg);
 }
 
-.chat-bar .back-button {
+.chat-bar .chat-back-button {
    font-size: 22px;
    font-weight: 900;
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  position: static;
   align-items: center;
   padding: 0;
   background: var(--bg);
@@ -106,13 +112,15 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 8px;
-  border-radius:12px;
+  border-radius: 12px;
   /* space inside the bar */
-  padding: 22px 20px;
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   background: #ffffff;
-  position: relative;
-  bottom: 24px;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .photo-input {

@@ -38,6 +38,7 @@ const ChatPage = () => {
   const MAX_UPLOAD=100*1024*1024
   const IMAGE_PREFIX="IMG::"
   const messageListRef=useRef<HTMLDivElement|null>(null)
+  const messageInputRef = useRef<HTMLInputElement | null>(null);
   const threadIdRef = useRef<number | null>(null);
   //change a useState value, React rerender the UI to show the new information."
   const [status,setStatus]=useState("Not connected")
@@ -304,18 +305,24 @@ if(!threadId){
  
 
 const handleSendMessage=()=>{
+  const keepMessageInputFocused = () => {
+    messageInputRef.current?.focus();
+  };
   //socketRef is the container for socket
   if(!socketRef.current||!socketRef.current.connected){
     setStatus("socket Not conencted")
+    keepMessageInputFocused();
     return
   }
   if (!threadId){
     setStatus("create or join a thread first")
+    keepMessageInputFocused();
     return
   }
   const trimmed=messageBody.trim()
   if (!trimmed){
     setStatus("mesage cannot be empty")
+    keepMessageInputFocused();
     return
   }
   socketRef.current.emit("message:send",{
@@ -323,6 +330,7 @@ const handleSendMessage=()=>{
   })
   //The message is gone; now make the paper blank again
   setMessageBody("")
+  keepMessageInputFocused();
 }
 
 
@@ -333,7 +341,7 @@ const handleSendMessage=()=>{
         <div className='chat-bar'>
           <button 
           type='button'
-          className='back-button'
+          className='chat-back-button'
           onClick={()=>navigate(-1)}
           >
            ⤺
@@ -405,6 +413,7 @@ const handleSendMessage=()=>{
             disabled={isUploadingImage}
           />
           <input
+            ref={messageInputRef}
             type="text"
             placeholder="Messages..."
             value={messageBody}
@@ -424,7 +433,12 @@ const handleSendMessage=()=>{
           />
            {/* <button type="button" className="input-icon">
           </button> */}
-          <button type="button" className="send-button" onClick={handleSendMessage}>
+          <button
+            type="button"
+            className="send-button"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={handleSendMessage}
+          >
             Send
           </button>
         </div>
