@@ -131,7 +131,7 @@
 ![Architecture](Docs/Architecture/Architecture2.0.png)
 
 ## CI/CD diagram
-![CI/CD Diagram](Docs/Architecture/ci,cd.png)
+![CI/CD Diagram](Docs/Architecture/ci_cd_2.png)
 
 ## Chat logic workflow
 ![chat system](Docs/Workflow/Chat%20Workflow.png)
