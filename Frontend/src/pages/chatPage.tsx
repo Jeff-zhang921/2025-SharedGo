@@ -13,8 +13,8 @@ type ChatMessage={
   body:string;
   createdAt:string
 }
-const API_URL = "http://localhost:3000/api";
-const SOCKET_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 //TIMELINE:
 //0ms	React reads useState(remember in memory).	Blank screen.

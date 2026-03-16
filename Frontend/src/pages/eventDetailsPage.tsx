@@ -52,7 +52,7 @@ const EventDetailsPage = () => {
 
     //Hardcoded URL at the moment, might change later
     //Backend seems to be on port 3000 atm
-    const backendBaseURL = 'http://localhost:3000/api'; //Change to the correct URL which the backend is running on (3000)
+    const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
 
     // provide current user id
@@ -112,7 +112,7 @@ const EventDetailsPage = () => {
   }
 
   const handleDelete = async () => {
-    const backendBaseURL = 'http://localhost:3000/api'; //Change to the correct URL which the backend is running on (3000)
+    const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
     try {
       setIsLoading(true);
