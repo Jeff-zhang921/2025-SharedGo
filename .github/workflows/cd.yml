@@ -48,9 +48,15 @@ jobs:
         id: build-frontend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_SOCKET_URL: ${{ secrets.VITE_SOCKET_URL }}
+
         run: |
           # Build the Docker image
-          docker build -t $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG Frontend/
+          docker build \
+            --build-arg VITE_API_URL=$VITE_API_URL \
+            --build-arg VITE_SOCKET_URL=$VITE_SOCKET_URL \
+            -t $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG Frontend/
           # Tag the image to ECR
           docker tag $FRONTEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/${FRONTEND_ECR_REPOSITORY}:latest
           # Push the image to ECR

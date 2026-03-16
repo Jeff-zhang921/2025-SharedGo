@@ -17,7 +17,7 @@ const CreateLoginPage = () => {
 setStatus(message);
                     return
                 }
-            const response = await fetch("http://localhost:3000/api/auth/email/start", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/email/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
@@ -32,7 +32,7 @@ setStatus(message);
             }
         } catch (err) {
             console.error("Connection error:", err);
-            setStatus("Cannot reach backend. Make sure it is running on http://localhost:3000/api.");
+            setStatus("Cannot reach backend. Make sure it is running.");
         }
     };
     return (

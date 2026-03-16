@@ -65,7 +65,7 @@ const CreateEventPage = () => {
     }
   };
 
-  const backendBaseURL = 'http://localhost:3000/api'; //Change to the correct URL which the backend is running on (3000)
+  const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
 
   // handle submition of the form
   const onSubmit = async (event: React.FormEvent) => {

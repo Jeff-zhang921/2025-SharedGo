@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",   // compiled files go here
-    "noEmit": true      // prevents TS from writing JS files, Vite handles it
+    "noEmit": true,      // prevents TS from writing JS files, Vite handles it
+    "types": ["vite/client"]
   },
   "include": ["src"]
 }

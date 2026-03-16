@@ -65,7 +65,7 @@ const MapPage = () => {
     // Fetch events from backend
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/events');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/events`);
         const data = await response.json();
         setDbEvents(data); // Put the events database into 'icons' state
       } catch (err) {
