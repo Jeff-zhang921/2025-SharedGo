@@ -225,7 +225,7 @@ export default function Host() {
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
                     <img
-                        src="/src/assets/user-icon.png"
+                        src="/user-icon.png"
                         alt="Host"
                         onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"; }}
                         style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}

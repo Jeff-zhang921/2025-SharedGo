@@ -22,7 +22,7 @@ export default function Navigation() {
                         className="nav-action-btn" 
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
                     >
-                        <img src="/src/assets/search.svg" alt="search" style={{ width: '30px', height: '30px' }} />
+                        <img src="/search.svg" alt="search" style={{ width: '30px', height: '30px' }} />
                     </button>
 
                     {/* Search Bar */}
@@ -57,9 +57,9 @@ export default function Navigation() {
                 </div>
             )}
             
-            <Button link="/map" imgSrc="/src/assets/home.svg" text="home" size={30}/>
-            <Button link="/conversations" imgSrc="/src/assets/chat.svg" text="chat" size={30}/>
-            <Button link="/profile" imgSrc="/src/assets/user.svg" text="profile" size={30}/>
+            <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+            <Button link="/conversations" imgSrc="/chat.svg" text="chat" size={30}/>
+            <Button link="/profile" imgSrc="/user.svg" text="profile" size={30}/>
         </aside>
     );
 }
