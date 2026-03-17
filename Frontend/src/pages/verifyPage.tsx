@@ -50,7 +50,7 @@ const CreateVerifyPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                navigate("/home"); //Redirect to home page on success
+                navigate("/map"); //Redirect to map page on success
             } else {
                 setStatus(data.message || "Invalid code.");
             }

@@ -48,7 +48,8 @@ const MapPage = () => {
   const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
-  const { search, category } = useSearch(); //Gets real time values from the sidebar
+  const { search, category, startDate, endDate } = useSearch(); //Gets real time values from the sidebar
+
 
   useEffect(() => {
     //Only run if map is ready and we have coordinates
@@ -115,8 +116,15 @@ const MapPage = () => {
                           event.description?.toLowerCase().includes(search.toLowerCase());
     
     const matchedCategory = category === "" || event.category === category; //Checks event category matches category you picked
+
+    //Date filtering
+    const eventTime = new Date(event.startsAt).getTime(); //Converts date to number using .getTime()
+    const startTime = startDate ? new Date(startDate).getTime() : null; //null if nothing picked
+    const endTime = endDate ? new Date(endDate).getTime() : null;
+
+    const matchedDate = (!startTime || eventTime >= startTime) && (!endTime || eventTime <= endTime);
   
-    return matchedSearch && matchedCategory;
+    return matchedSearch && matchedCategory && matchedDate;;
   });
 
   return (
@@ -132,7 +140,7 @@ const MapPage = () => {
         style={{ height: "100vh", width: "100vw" }} //Takes up whole page
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" //Nicer looking map
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
         />
         <MapEventsHandler />

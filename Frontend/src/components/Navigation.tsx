@@ -12,6 +12,7 @@ export default function Navigation() {
     const isMapPage = location.pathname === "/map"; //Check if user is on the map (only show search bar if yes)
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { search, setSearch, category, setCategory } = useSearch();
+    const { startDate, setStartDate, endDate, setEndDate } = useSearch();
 
     return (
         <aside className="navbar">            
@@ -52,6 +53,28 @@ export default function Navigation() {
                                 <option value="Wellness_Meditation">Wellness & Meditation</option>
                                 <option value="Volunteer_Charity">Volunteer & Charity</option>
                             </select>
+
+                            <div className="date-range-group">
+                                <div className="date-input-wrapper">
+                                    <label>From:</label>
+                                    <input 
+                                        type="date"  //Show browser calendar to pick from
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)} //When date picked, send that value to setStartDate
+                                        className="nav-search-input date-input"
+                                    />
+                                </div>
+                                <div className="date-input-wrapper">
+                                    <label>To:</label>
+                                    <input 
+                                        type="date" 
+                                        value={endDate}
+                                        min={startDate} //Prevents picking a 'to' date before 'from'
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        className="nav-search-input date-input"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
