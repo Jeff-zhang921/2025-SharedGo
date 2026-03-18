@@ -112,6 +112,11 @@ const EventDetailsPage = () => {
   }
 
   const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are your sure you want to delete this event?"
+    );
+    if (!confirmDelete) return;
+
     const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
     try {
