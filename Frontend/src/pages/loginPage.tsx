@@ -38,7 +38,7 @@ setStatus(message);
     return (
        <div className="authPage">
         <div className="authCard">
-        <img src="/src/assets/Logo.png" alt="SharedGo Logo" className="AppTitle" />
+        <img src="/Logo.png" alt="SharedGo Logo" className="AppTitle" />
                 <div className="headerGroup">
                  <h2 className="createAccount">Create an account</h2>
                  <p className="helperText">Enter your email to sign up for this app</p>

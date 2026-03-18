@@ -35,6 +35,7 @@ type ThreadResponse = {
 };
 
 const BACKEND_URL = import.meta.env.VITE_API_URL;
+const IMAGE_PREFIX = "IMG::";
 //accent is used for the avater
 const ACCENTS = ["#1f98b0", "#c43642", "#cb7e4a", "#37c9b8", "#7743ac", "#42a679"];
 
@@ -116,6 +117,8 @@ const mapped =thread.map((thread)=>{
   const other=isHost?thread.guest:thread.host
   //fall back chain 
   const latestMessage = thread.lastMessage ?? thread.Messages?.[0] ?? null;
+  const previewBody = latestMessage?.body ?? "";
+  const isImagePreview = previewBody.startsWith(IMAGE_PREFIX);
   //make sure they are different 
   const accent=ACCENTS[other.id%ACCENTS.length]
   return {
@@ -123,7 +126,7 @@ const mapped =thread.map((thread)=>{
     name:other.name||other.email,
     email:other.email,
     role:isHost? "Host":"Guest",
-    preview: latestMessage?.body || "No messages yet.",
+    preview: previewBody ? (isImagePreview ? "Image" : previewBody) : "No messages yet.",
     time:formatTime(latestMessage?.createdAt),
     accent,
   }
