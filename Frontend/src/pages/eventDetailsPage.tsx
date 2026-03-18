@@ -172,13 +172,11 @@ const EventDetailsPage = () => {
             <h3>LOCATION:</h3>
             <p>{event.location}</p>
           </div>
-
-          <div className="event-info-row">
-            <h3>DESCRIPTION:</h3>
-            
-          </div>
           <div className="event-description">
+            <div className="event-info-row">
+              <h3>DESCRIPTION:</h3>
               <p>{event.description || "No description provided"}</p>
+            </div>
           </div>
         </div>
 
