@@ -49,6 +49,7 @@ const MapPage = () => {
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
   const { search, category, startDate, endDate } = useSearch(); //Gets real time values from the sidebar
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
 
   useEffect(() => {
@@ -74,6 +75,21 @@ const MapPage = () => {
       }
     };
     fetchEvents();
+  }, []);
+
+  useEffect(() => { //For geolocation
+    //Check the browser supports Geolocation
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([latitude, longitude]); //Store the users position
+        },
+        (error) => {
+          console.error("User denied location access", error);
+        }
+      );
+    }
   }, []);
 
   const MapEventsHandler = () => {
@@ -170,6 +186,18 @@ const MapPage = () => {
               }}
             />
         ))}
+
+          {userLocation && (
+            <Marker 
+              position={userLocation} 
+              icon={new L.Icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', //icon
+                iconSize: [25, 25]
+              })}
+            >
+              <Popup>You are here!</Popup>
+            </Marker>
+          )}
     </MapContainer>
     </div>
   );
