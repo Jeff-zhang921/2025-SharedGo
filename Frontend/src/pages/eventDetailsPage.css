@@ -78,7 +78,9 @@ html, body {
 
 .action-buttons {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
     width: 100%;
 }
 
@@ -91,6 +93,9 @@ html, body {
     display: inline-block;
     width: auto;
     font-weight: bold;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-host {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, unstable_SerializesTo, useNavigate } from "react-router-dom"
-import Button from "./../components/Button"
+import { Link, useNavigate } from "react-router-dom"
 import './eventDetailsPage.css';
 import { useParams } from 'react-router-dom';
 
@@ -207,6 +206,7 @@ const EventDetailsPage = () => {
           <div className="action-buttons">
             {/* pass hostId so chat page can create/find the thread immediately */}
             <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Join Event</Link>
+            <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
             {/* IDEALLY: if hostId matches event host,, then show delete event button 
             HOWEVER: I have not worked out how to do that (I believe backend changes are necessary to get the current user id*/}
             {/*{currentUser?.id === event?.host?.id && (*insert line below in here*)*/}
