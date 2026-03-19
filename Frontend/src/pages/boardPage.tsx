@@ -77,3 +77,48 @@ const parseBody = (rawBody: string) => {
   const imageUrl = body.slice(markerIndex + marker.length).trim();
   return { text, imageUrl: imageUrl || null };
 };
+
+export default function BoardPage() {
+    
+  const navigate = useNavigate();
+  const { eventId } = useParams<{ eventId: string }>();
+  const parsedEventId = Number(eventId);
+  const isValidEventId = Number.isInteger(parsedEventId) && parsedEventId > 0;
+  
+  const [tab, setTab] = useState<Tab>("general");
+  const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  const [generalMessages, setGeneralMessages] = useState<GeneralMessage[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+
+  const [generalDraft, setGeneralDraft] = useState("");
+  const [questionDraft, setQuestionDraft] = useState("");
+  const [answerDraft, setAnswerDraft] = useState<Record<number, string>>({});
+  const [generalImage, setGeneralImage] = useState<File | null>(null);
+  const [questionImage, setQuestionImage] = useState<File | null>(null);
+  const [answerImage, setAnswerImage] = useState<Record<number, File | null>>({});
+
+  const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
+  useEffect(() => {
+    if (!showToast) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowToast(false);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showToast, toastMessage]);
+
+}
+
+
