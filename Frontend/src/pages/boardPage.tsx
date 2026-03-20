@@ -51,6 +51,7 @@ const validateImage = (file: File | null) => {
   return null;
 };
 const composeBody = (text: string, imageUrl: string | null) => {
+  // Store text and image URL in one string field for backend compatibility.
   const trimmed = text.trim();
   if (imageUrl && trimmed) {
     return `${trimmed}\n${IMAGE_PREFIX}${imageUrl}`;
@@ -62,14 +63,17 @@ const composeBody = (text: string, imageUrl: string | null) => {
 };
 const parseBody = (rawBody: string) => {
   const body = rawBody.trim();
+  // Case 1: image-only payload, e.g. "IMG::https://..."
   if (body.startsWith(IMAGE_PREFIX)) {
     const imageUrl = body.slice(IMAGE_PREFIX.length).trim();
     return { text: "", imageUrl: imageUrl || null };
   }
 
+  // Case 2: text + image payload, split by "\nIMG::"
   const marker = `\n${IMAGE_PREFIX}`;
   const markerIndex = body.indexOf(marker);
   if (markerIndex === -1) {
+    // Case 3: text-only payload
     return { text: body, imageUrl: null };
   }
 
@@ -95,9 +99,11 @@ export default function BoardPage() {
 
   const [generalDraft, setGeneralDraft] = useState("");
   const [questionDraft, setQuestionDraft] = useState("");
+  // Key is questionId, so each question keeps its own draft text.
   const [answerDraft, setAnswerDraft] = useState<Record<number, string>>({});
   const [generalImage, setGeneralImage] = useState<File | null>(null);
   const [questionImage, setQuestionImage] = useState<File | null>(null);
+  // Key is questionId, so each question keeps its own selected image.
   const [answerImage, setAnswerImage] = useState<Record<number, File | null>>({});
 
   const showSuccessToast = (message: string) => {
@@ -119,6 +125,66 @@ export default function BoardPage() {
     };
   }, [showToast, toastMessage]);
 
+  useEffect(() => {
+    if (!isValidEventId) {
+      return;
+    }
+
+    const loadBoard = async () => {
+      setLoading(true);
+
+      const endpoint =
+        tab === "general"
+          ? `${API_URL}/board/general/${parsedEventId}`
+          : `${API_URL}/board/qna/${parsedEventId}`;
+
+      try {
+        const response = await fetch(endpoint, { credentials: "include" });
+        if (!response.ok) {
+          if (tab === "general") {
+            setGeneralMessages([]);
+          } else {
+            setQuestions([]);
+          }
+          return;
+        }
+
+        const data = await response.json();
+        if (tab === "general") {
+          const messages = Array.isArray(data) ? (data as GeneralMessage[]) : [];
+          const newestFirst = [...messages].sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          );
+          setGeneralMessages(newestFirst);
+          return;
+        }
+
+        const list = Array.isArray(data) ? (data as Question[]) : [];
+        const normalized = list.map((item) => ({
+            ...item,
+            answers: Array.isArray(item.answers) ? item.answers : [],
+          }));
+        const newestFirst = [...normalized].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        setQuestions(newestFirst);
+      } catch {
+        if (tab === "general") {
+          setGeneralMessages([]);
+        } else {
+          setQuestions([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadBoard();
+  }, [isValidEventId, parsedEventId, tab]);
+
+  
 }
 
 
