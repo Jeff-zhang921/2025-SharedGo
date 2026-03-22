@@ -156,4 +156,52 @@ describe("Profile Routes", () => {
             expect(res.status).toBe(404);
         });
     });
+    describe("PATCH /profile/me", () => {
+        it("should update and return new profile name", async () => {
+            const updatedUser = {
+                id: 1,
+                name: "New name",
+                email: "user@gmail.com"
+            };
+            mockPrisma.user.update.mockResolvedValue(updatedUser);
+            const res = await request(testApp)
+                .patch("/me")
+                .send({name: "New mame"});
+            expect(res.status).toBe(200);
+            expect(res.body.user.name).toBe("New name");
+        });
+        it("should return 400 if name is not a string or null (e.g., a number)", async () => {
+            const res = await request(testApp)
+                .patch("/me").send({ name: 12345 });
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("Name must be a string or null.");
+        });
+        it("should return 400 if the name field is missing entirely", async () => {
+            const res = await request(testApp)
+                .patch("/me")
+                .send({ otherField: "ignore" });
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("No fields to update.");
+        });
+    });
+    describe("GET profile/me/overview", () => {
+        it("should return profile overview with stats and event previews", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+            mockOverview();
+            const res = await request(testApp).get("/me/overview");
+            expect(res.status).toBe(200);
+            expect(res.body.stats.upcomingCount).toBe(1)
+        });
+        it("should delete session and return 404 if user is missing from database", async () => {
+            mockUser = { id: 999, email: "test@gmail.com", name: null, provider: "email" }; // User is logged in...
+            mockPrisma.user.findUnique.mockResolvedValue(null); // ...but DB record is gone
+
+            const res = await request(testApp).get("/me/overview");
+        
+            expect(res.status).toBe(404);
+            expect(res.body.message).toBe("User not found.");
+        });
+        
+    });  
+    
 });
