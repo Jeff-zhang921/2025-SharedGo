@@ -92,17 +92,66 @@ describe("Filter Route", () => {
             expect(mockSession.location?.latitude).toBe(51.5033);
         });
         it("should return null for Latitude out of range", async () => {
-        const res = await request(testApp)
-            .get("/nearby")
-            .query({ latitude: 91, longitude: 0 });
-        expect(res.status).toBe(400);
+            const res = await request(testApp)
+                .get("/nearby")
+                .query({ latitude: 91, longitude: 0 });
+            expect(res.status).toBe(400);
         });
         it("should return null for Longitude out of range", async () => {
-        const res = await request(testApp)
-            .get("/nearby")
-            .query({ latitude: 0, longitude: -181 });
-        expect(res.status).toBe(400);
+            const res = await request(testApp)
+                .get("/nearby")
+                .query({ latitude: 0, longitude: -181 });
+            expect(res.status).toBe(400);
+        });
     });
-    });
+    describe("GET /search", () => {
+        it("should filter by category and attendeeCount", async () => {
+            const mockEvents = [
+                { title: "Rock Show", category: "Music", participants: [1, 2], startsAt: new Date() },
+                { title: "Tech Talk", category: "Tech", participants: [], startsAt: new Date() }
+            ];
+            mockPrisma.event.findMany.mockResolvedValue(mockEvents);
+            const res = await request(testApp)
+                .get("/search")
+                .query({ category: "Music",attendeeCountMin: "1"});
+            expect(res.body[0].event.title).toBe("Rock Show");
+        });
+        it("should filter by date correctly", async () => {
+            const testDate = new Date();
+            testDate.setUTCHours(0, 0, 0, 0); 
+            const mockEvents = [
+                { id: 100, title: "Today", startsAt: testDate, participants: [] }
+            ];
+            mockPrisma.event.findMany.mockResolvedValue(mockEvents);
+            const res = await request(testApp)
+                .get("/search")
+                .query({ rawdate: testDate.toISOString() });
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveLength(1);
+            expect(res.body[0].event.title).toBe("Today");
+        });
+        it("should cover Date and EndDate filter branches (Lines 170-171)", async () => {
+            const eventDate = "2026-05-20";
+            const res = await request(testApp)
+                .get("/search")
+                .query({ 
+                    rawdate: eventDate,
+                    enddate: "2026-05-21" 
+                });
+            expect(res.status).toBe(200);
+        });
     
+    });
+    describe("GET /name", () => {
+        it("should return 400 if name is empty", async () => {
+            const res = await request(testApp).get("/name").query({ name: "" });
+            expect(res.status).toBe(400);
+        });
+
+        it("should return list of host names", async () => {
+            mockPrisma.user.findMany.mockResolvedValue([{ name: "Alice" }, { name: "Alex" }]);
+            const res = await request(testApp).get("/name").query({ name: "Al" });
+            expect(res.body).toEqual(["Alice", "Alex"]);
+        });
+    });
 });
