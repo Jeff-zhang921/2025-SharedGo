@@ -32,15 +32,19 @@ function calcevent(event:any,userLat:number|null,userLong:number|null){
         attendeeCount:attendeeCount,
     }
 }
-function pharseCoords(raw:unknown):number|null{
+function pharseCoords(raw:unknown, type: 'lat' | 'long'):number|null{
  if (raw === undefined || raw === null || raw === "") return null;
 
    const coords= Number(raw)
    if (!Number.isFinite(coords)){
     return null
-   }else{
-    return coords
+   };
+   if (type === 'lat') {
+    if(coords < -90 || coords >90) return null;
+   } else {
+    if (coords < -180 || coords >180) return null;
    }
+   return coords;
 }
 
 function distanceKM(lat1: number, long1: number, lat2: number,long2: number):number{
@@ -59,8 +63,8 @@ const R = 6371; // Radius of the Earth in km
 }
 
 router.get("/nearby",async (req:Request,res:Response)=>{
-    const latitude=pharseCoords(req.query.latitude)
-    const longitude=pharseCoords(req.query.longitude)
+    const latitude=pharseCoords(req.query.latitude, 'lat')
+    const longitude=pharseCoords(req.query.longitude, 'long')
 const hasValidCoords=latitude!==null && longitude!==null
 if (hasValidCoords){
     req.session.location={latitude:latitude as number,
@@ -102,8 +106,8 @@ router.get("/search",async (req:Request,res:Response)=>{
 const name=typeof req.query.name==="string"?req.query.name.trim():""
  const distance=typeof req.query.distance==="string"?req.query.distance.trim():""
  const rawcategory=typeof req.query.category==="string" ?req.query.category.trim():""
- const latitude=pharseCoords(req.query.latitude)
- const longitude=pharseCoords(req.query.longitude)
+ const latitude=pharseCoords(req.query.latitude, 'lat')
+ const longitude=pharseCoords(req.query.longitude, 'long')
 const attendeeCountMin=typeof req.query.attendeeCountMin==="string"?req.query.attendeeCountMin.trim():""
 const rawdate=typeof req.query.rawdate==="string"?req.query.rawdate.trim().toLowerCase():""
 const rawenddate=typeof req.query.enddate==="string"?req.query.enddate.trim().toLowerCase():""  
