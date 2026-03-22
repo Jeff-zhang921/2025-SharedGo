@@ -203,5 +203,63 @@ describe("Profile Routes", () => {
         });
         
     });  
-    
+    describe("GET profile/me/events", () => {
+        it("should calculate 'skip' correctly for page 2", async () => {
+            mockPagination([], 0);
+            await request(testApp).get(`/me/events`).query({ page: 2, limit: 10 });
+            // (2 - 1) * 10 = 10
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({ skip: 10 })
+            );
+        });
+        it("should limit to MAX_PAGE_SIZE (50)", async () => {
+            mockPagination([], 0);
+            // Try to request 100 items
+            await request(testApp).get(`/me/events`).query({ limit: 100 });
+
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({ take: 50 })
+            );
+        });
+        it("should return past events with descending order", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+            mockPagination([], 0);
+            const res = await request(testApp)
+                .get(`/me/events`)
+                .query({ status: "past" });
+        
+            expect(res.status).toBe(200);
+            expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    orderBy: { startsAt: "desc" }
+                })
+            );
+        });
+        it("should handle 'all' status for events", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+            mockPagination([mockEvent()], 1);
+            const res = await request(testApp)
+                .get(`/me/events`)
+                .query({ status: "all" }); //upcoming, past 
+
+            expect(res.status).toBe(200);
+        });
+        it("should return 400 for an invalid status", async () => {
+            const res = await request(testApp).get("/me/events").query({ status: "deleted" });
+        
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("status must be upcoming, past, or all.");
+    });
+    });
+    describe("GET /me/reviews", () => {
+        it("should return paginated reviews", async () => {
+            mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+            mockPagination([mockReview], 1);
+            const res = await request(testApp).get(`/me/reviews`).query({page: 1, limit: 5});
+            expect(res.status).toBe(200);
+            expect(res.body.reviews).toHaveLength(1);
+            
+        });
+    });
+
 });
