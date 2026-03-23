@@ -61,11 +61,12 @@ html, body {
 
 input, textarea {
     padding: 10px;
-    border-radius: 5px;
-    border: 2px solid black;
+    border-radius: 0;
+    border: none;
     font-size: 14px;
     background-color: white;
     color: black;
+    border-bottom: 1px solid #ccc;
 }
 
 .publish-btn {
@@ -84,7 +85,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .select-wrapper select {
     border-radius: 5px;
-    border: 2px solid black;
+    border: 1px solid #ccc;
     width: 100%;
     padding: 10px 4px;
     font-size: 14px;
@@ -149,6 +150,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
 }
 
 .event-info-row h3 {
@@ -180,5 +183,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     gap: 8px;
 }
 
+/* Adjust for portrait/mobile view (responsive design) */
+@media (max-width: 820px) {
+    .create-event-layout {
+        flex-direction: column;
+    }
 
-
+    .event-info {
+        padding-left: 0px;
+    }
+    
+    .event-details {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: flex-start;
+        width: 100%;
+    }
+}
