@@ -91,7 +91,6 @@ const EventCard = ({ card }: { card: CardItem }) => (
     </div>
 );
 
-// Review card component for user reviews
 const ReviewCard = ({ review }: { review: ReviewItem }) => (
     <div style={{
         display: "flex",
@@ -147,6 +146,49 @@ export default function Host() {
         total: event.capacity ?? undefined,
         image: event.imageUrl ?? undefined,
     });
+
+    // Fetch host profile and related data
+    useEffect(() => {
+        const fetchHostData = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/hosts/${hostId}/overview`);
+                const data = await response.json();
+                console.log("Debugging, host Overview Data:", data);
+                setHost(data.host);
+                setStats({
+                    totalEvents: data.stats?.totalEvents ?? 0,
+                    totalAttendees: data.stats?.totalAttendees ?? 0,
+                    avgRating: data.stats?.averageRating ?? 0,
+                    reviewCount: data.stats?.reviewCount ?? 0,
+                    avgFillRate: data.stats?.averageFillRate ?? 0,
+                });
+                setUpcomingEvents(data.upcomingEvents?.map(mapEventToCard) || []);
+                setPastEvents(data.pastEvents?.map(mapEventToCard) || []);
+                setReviews(data.reviews);
+            } catch (err) {
+                console.error("Failed to fetch host:", err);
+                setHost({ id: 0, name: "Name", email: "email@domain.com" });
+                setStats(EMPTY_STATS);
+                setUpcomingEvents([]);
+                setPastEvents([]);
+                setReviews([
+                    { id: 1, userName: "Name", msg: "review", rating: 4 },
+                    { id: 2, userName: "Name", msg: "review", rating: 4 },
+                    { id: 3, userName: "Name", msg: "review", rating: 4 },
+                    { id: 4, userName: "Name", msg: "review", rating: 4 },
+                ]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (hostId) fetchHostData();
+        else {
+            setHost({ id: 0, name: "Name", email: "email@domain.com" });
+            setReviews([{ id: 1, userName: "Name", msg: "review", rating: 4 },{ id: 2, userName: "Name", msg: "review", rating: 4 },{ id: 3, userName: "Name", msg: "review", rating: 4 },{ id: 4, userName: "Name", msg: "review", rating: 4 }]);
+            setIsLoading(false);
+        }
+    }, [hostId]);
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}></div>
