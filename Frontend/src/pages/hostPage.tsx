@@ -196,7 +196,6 @@ export default function Host() {
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
-            {/* Page header with back button */}
             <div style={{
                 backgroundColor: "white",
                 display: "flex",
@@ -219,6 +218,22 @@ export default function Host() {
                 </button>
                 <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
                 <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827" }} />
+            </div>
+
+            {/* Host profile info and statistics */}
+            <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: "1.375rem", fontWeight: "700", color: "#111827" }}>
+                            {host.name || "Anonymous Host"}
+                        </h1>
+                        <p style={{ margin: 0, fontSize: "0.875rem", color: "#9ca3af", marginTop: "2px" }}>{host.email}</p>
+                    </div>
+                </div>
+                <div style={{ display: "flex", gap: "0.625rem" }}>
+                    <StatCard label="Total" value={stats.totalEvents} sub="events" />
+                    <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
+                </div>
             </div>
         </div>
     );
