@@ -235,7 +235,6 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* Tab navigation bar */}
             <div style={{ backgroundColor: "white", padding: "0.875rem 1.25rem 0", marginTop: "0.5rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                     {tabs.map((tab, i) => (
@@ -258,6 +257,36 @@ export default function Host() {
                         </button>
                     ))}
                 </div>
+            </div>
+
+            {/* Three-column responsive grid layout */}
+            <div style={{ padding: "1rem 1.25rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                {selectedTab < 2 ? (
+                    <>
+                        <div>
+                            {currentEvents.slice(0, Math.ceil(currentEvents.length / 2)).map((c, i) => <EventCard key={i} card={c} />)}
+                        </div>
+                        <div>
+                            {currentEvents.slice(Math.ceil(currentEvents.length / 2)).map((c, i) => <EventCard key={i} card={c} />)}
+                        </div>
+                    </>
+                ) : (
+                    <div style={{ gridColumn: "span 2" }}>
+                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
+                    </div>
+                )}
+
+                {selectedTab < 2 && (
+                    <div style={{
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "0.75rem",
+                        padding: "0.875rem",
+                        alignSelf: "start",
+                    }}>
+                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
+                    </div>
+                )}
             </div>
         </div>
     );
