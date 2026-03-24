@@ -147,7 +147,6 @@ export default function Host() {
         image: event.imageUrl ?? undefined,
     });
 
-    // Fetch host profile and related data
     useEffect(() => {
         const fetchHostData = async () => {
             try {
@@ -189,6 +188,12 @@ export default function Host() {
             setIsLoading(false);
         }
     }, [hostId]);
+
+    // Loading and error handling
+    if (isLoading) return <p style={{ padding: "2rem" }}>Loading Host Profile...</p>;
+    if (!host) return <p style={{ padding: "2rem" }}>Host not found.</p>;
+
+    const currentEvents = selectedTab === 0 ? upcomingEvents : pastEvents;
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}></div>
