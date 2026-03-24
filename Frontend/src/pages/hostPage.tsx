@@ -220,7 +220,6 @@ export default function Host() {
                 <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827" }} />
             </div>
 
-            {/* Host profile info and statistics */}
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
                     <div>
@@ -233,6 +232,31 @@ export default function Host() {
                 <div style={{ display: "flex", gap: "0.625rem" }}>
                     <StatCard label="Total" value={stats.totalEvents} sub="events" />
                     <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
+                </div>
+            </div>
+
+            {/* Tab navigation bar */}
+            <div style={{ backgroundColor: "white", padding: "0.875rem 1.25rem 0", marginTop: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {tabs.map((tab, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setSelectedTab(i)}
+                            style={{
+                                padding: "0.4rem 0.875rem",
+                                borderRadius: "999px",
+                                border: "1px solid #e5e7eb",
+                                backgroundColor: selectedTab === i ? "#111827" : "white",
+                                color: selectedTab === i ? "white" : "#374151",
+                                fontWeight: "600",
+                                fontSize: "0.8125rem",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ""}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>
