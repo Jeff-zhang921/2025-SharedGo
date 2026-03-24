@@ -40,7 +40,6 @@ const EMPTY_STATS: HostStats = {
     avgFillRate: 0,
 };
 
-// Star rating component for reviews
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
     <div style={{ display: "flex", gap: "2px" }}>
         {[1, 2, 3, 4, 5].map((s) => (
@@ -50,6 +49,21 @@ const StarRating = ({ rating = 4 }: { rating?: number }) => (
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
         ))}
+    </div>
+);
+
+// Statistics card component for host data
+const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
+    <div style={{
+        flex: 1,
+        padding: "1rem",
+        backgroundColor: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: "0.75rem",
+    }}>
+        <div style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: "500" }}>{label}</div>
+        <div style={{ fontSize: "2rem", fontWeight: "700", color: "#111827", lineHeight: 1.2, marginTop: "0.25rem" }}>{value}</div>
+        {sub && <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "0.25rem" }}>{sub}</div>}
     </div>
 );
 
