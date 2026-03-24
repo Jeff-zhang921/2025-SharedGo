@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
+
 interface HostData {
-    id: number;
-    name: string;
-    email: string;
+    id: number,
+    name: string,
+    email: string
 }
 
 interface CardItem {
@@ -123,7 +124,6 @@ export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
     const [host, setHost] = useState<HostData | null>(null);
     const [selectedTab, setSelectedTab] = useState<number>(0);
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>([]);
@@ -134,7 +134,7 @@ export default function Host() {
 
     const tabs = [
         { label: "Upcoming events", count: upcomingEvents.length },
-        { label: "Past events", count: pastEvents.length },
+        { label: "Past events",     count: pastEvents.length },
         { label: "Review" },
     ];
 
@@ -161,8 +161,16 @@ export default function Host() {
                     reviewCount: data.stats?.reviewCount ?? 0,
                     avgFillRate: data.stats?.averageFillRate ?? 0,
                 });
-                setUpcomingEvents(data.upcomingEvents?.map(mapEventToCard) || []);
-                setPastEvents(data.pastEvents?.map(mapEventToCard) || []);
+                if (data.upcomingEvents?.length) {
+                    setUpcomingEvents(data.upcomingEvents.map(mapEventToCard));
+                } else {
+                    setUpcomingEvents([]);
+                }
+                if (data.pastEvents?.length) {
+                    setPastEvents(data.pastEvents.map(mapEventToCard));
+                } else {
+                    setPastEvents([]);
+                }
                 setReviews(data.reviews);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
@@ -184,7 +192,12 @@ export default function Host() {
         if (hostId) fetchHostData();
         else {
             setHost({ id: 0, name: "Name", email: "email@domain.com" });
-            setReviews([{ id: 1, userName: "Name", msg: "review", rating: 4 },{ id: 2, userName: "Name", msg: "review", rating: 4 },{ id: 3, userName: "Name", msg: "review", rating: 4 },{ id: 4, userName: "Name", msg: "review", rating: 4 }]);
+            setReviews([
+                { id: 1, userName: "Name", msg: "review", rating: 4 },
+                { id: 2, userName: "Name", msg: "review", rating: 4 },
+                { id: 3, userName: "Name", msg: "review", rating: 4 },
+                { id: 4, userName: "Name", msg: "review", rating: 4 },
+            ]);
             setIsLoading(false);
         }
     }, [hostId]);
@@ -192,10 +205,13 @@ export default function Host() {
     if (isLoading) return <p style={{ padding: "2rem" }}>Loading Host Profile...</p>;
     if (!host) return <p style={{ padding: "2rem" }}>Host not found.</p>;
 
+    // ← current event list driven by selected tab
     const currentEvents = selectedTab === 0 ? upcomingEvents : pastEvents;
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+
+            {/* Header */}
             <div style={{
                 backgroundColor: "white",
                 display: "flex",
@@ -207,19 +223,27 @@ export default function Host() {
                 <button
                     onClick={() => {
                         const eventId = searchParams.get("eventId");
-                        if (eventId) navigate(`/eventDetails/${eventId}`);
-                        else navigate(-1);
+                        if (eventId) {
+                            navigate(`/eventDetails/${eventId}`);
+                        } else {
+                            navigate(-1);
+                        }
                     }}
                     style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
                 >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
                         <polyline points="15 18 9 12 15 6" />
                     </svg>
                 </button>
                 <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
-                <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827" }} />
+                <div style={{
+                    width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827",
+                    display: "flex", alignItems: "center", justifyContent: "center"
+                }} />
             </div>
 
+            {/* Profile + Stats */}
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
                     <div>
@@ -235,6 +259,7 @@ export default function Host() {
                 </div>
             </div>
 
+            {/* Tab bar */}
             <div style={{ backgroundColor: "white", padding: "0.875rem 1.25rem 0", marginTop: "0.5rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                     {tabs.map((tab, i) => (
@@ -251,6 +276,7 @@ export default function Host() {
                                 fontSize: "0.8125rem",
                                 cursor: "pointer",
                                 whiteSpace: "nowrap",
+                                transition: "all 0.15s",
                             }}
                         >
                             {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ""}
@@ -259,29 +285,38 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* Three-column responsive grid layout */}
+            {/* ── Three-column content grid ── */}
             <div style={{ padding: "1rem 1.25rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+
                 {selectedTab < 2 ? (
                     <>
+                        {/* Col 1: first half of event list */}
                         <div>
-                            {currentEvents.slice(0, Math.ceil(currentEvents.length / 2)).map((c, i) => <EventCard key={i} card={c} />)}
+                            {currentEvents
+                                .slice(0, Math.ceil(currentEvents.length / 2))
+                                .map((c, i) => <EventCard key={i} card={c} />)}
                         </div>
+                        {/* Col 2: second half of event list */}
                         <div>
-                            {currentEvents.slice(Math.ceil(currentEvents.length / 2)).map((c, i) => <EventCard key={i} card={c} />)}
+                            {currentEvents
+                                .slice(Math.ceil(currentEvents.length / 2))
+                                .map((c, i) => <EventCard key={i} card={c} />)}
                         </div>
                     </>
                 ) : (
+                    /* Review tab: full-width review list */
                     <div style={{ gridColumn: "span 2" }}>
                         {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
                     </div>
                 )}
 
+                {/* Col 3: reviews panel – always visible on events tabs */}
                 {selectedTab < 2 && (
                     <div style={{
                         backgroundColor: "white",
                         border: "1px solid #e5e7eb",
                         borderRadius: "0.75rem",
-                        padding: "0.875rem",
+                        padding: "0.875rem 0.875rem 0.25rem",
                         alignSelf: "start",
                     }}>
                         {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
