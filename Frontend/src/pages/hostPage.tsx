@@ -189,13 +189,37 @@ export default function Host() {
         }
     }, [hostId]);
 
-    // Loading and error handling
     if (isLoading) return <p style={{ padding: "2rem" }}>Loading Host Profile...</p>;
     if (!host) return <p style={{ padding: "2rem" }}>Host not found.</p>;
 
     const currentEvents = selectedTab === 0 ? upcomingEvents : pastEvents;
 
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}></div>
+        <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+            {/* Page header with back button */}
+            <div style={{
+                backgroundColor: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0.875rem 1.25rem",
+                borderBottom: "1px solid #f3f4f6",
+            }}>
+                <button
+                    onClick={() => {
+                        const eventId = searchParams.get("eventId");
+                        if (eventId) navigate(`/eventDetails/${eventId}`);
+                        else navigate(-1);
+                    }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
+                <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827" }} />
+            </div>
+        </div>
     );
 }
