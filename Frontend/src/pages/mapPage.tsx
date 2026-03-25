@@ -93,6 +93,12 @@ const MapPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (map && userLocation) {
+      map.setView(userLocation, 14, { animate: true }); //Move to user with an animation
+    }
+  }, [map, userLocation]); //Runs whenever map instance or user location changes
+
   const MapEventsHandler = () => {
     const map = useMapEvents({
       click: (e) => {
