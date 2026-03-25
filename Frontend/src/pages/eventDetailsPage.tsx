@@ -42,6 +42,8 @@ const EventDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
 
+  const [currentUser, setCurrentUser] = useState<User | null>(null) //Enables us to see who is logged-in to show the Delete Event button to host only
+
   //Code for actually fetching the data from the backend
   useEffect(() => {
     setIsLoading(true);
@@ -53,19 +55,24 @@ const EventDetailsPage = () => {
     const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
 
-    // will need this code once the backend is changed to provide current user id
-    // will need to add a get("/session") in the backend
-    /*const fetchCurrentUser = async () => {
+    // provide current user id
+    // use get("/auth/me") in the backend (to then show Delete Event button to host only)
+    const fetchCurrentUser = async () => {
       try {
-        const res = await fetch(`${backendBaseURL}/session`, {credentials: "include"});
-        if (!res.ok) return;
+        const res = await fetch(`${backendBaseURL}/auth/me`, {credentials: "include"});
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          console.error("Failed to fetch current user:", errData); 
+          return;
+        }
         const data = await res.json();
         setCurrentUser(data.user);
       } catch (err) {
         console.error(err);
       }
-    }
-    fetchCurrentUser();*/
+    };
+    fetchCurrentUser();
+
 
     const fetchEvent = async () => {
       try {
@@ -105,6 +112,11 @@ const EventDetailsPage = () => {
   }
 
   const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are your sure you want to delete this event?"
+    );
+    if (!confirmDelete) return;
+
     const backendBaseURL = import.meta.env.VITE_API_URL; //Change to the correct URL which the backend is running on (3000)
     const backendUrl = `${backendBaseURL}/events/${eventId}`;
     try {
@@ -165,13 +177,11 @@ const EventDetailsPage = () => {
             <h3>LOCATION:</h3>
             <p>{event.location}</p>
           </div>
-
-          <div className="event-info-row">
-            <h3>DESCRIPTION:</h3>
-            
-          </div>
           <div className="event-description">
+            <div className="event-info-row">
+              <h3>DESCRIPTION:</h3>
               <p>{event.description || "No description provided"}</p>
+            </div>
           </div>
         </div>
 
@@ -202,7 +212,7 @@ const EventDetailsPage = () => {
               </div>
             </div>
           </div>
-        
+
           <div className="action-buttons">
             {/* pass hostId so chat page can create/find the thread immediately */}
             <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Join Event</Link>
@@ -212,7 +222,15 @@ const EventDetailsPage = () => {
             {/*{currentUser?.id === event?.host?.id && (*insert line below in here*)*/}
               <button onClick={handleDelete} disabled={isLoading} className="btn-join"> {isLoading ? "Deleting...":"Delete Event"}</button>
             
+            <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
+            {/* If hostId matches event host, then show delete event button */}
+            {currentUser?.id === event?.host?.id && (
+              <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
+                {isLoading ? "Deleting...":"Delete Event"}
+              </button>
+            )}
           </div>
+
         </div>
       </section>
     </div>

@@ -22,6 +22,7 @@
 * [Tech Stack](#teckstack)
 * [CI/CD diagram](#ci/cd-diagram)
 * [Flow Steps](#flow-steps)
+* [User Instructions](#user-instructions)
 * [Team members](#team-members)
 
 ## Documentation
@@ -161,7 +162,33 @@
      5. The event is created but only visible to invited users
      6. Invited users receive notification
      7. Accepted users added to group chat
-        
+
+## User Instructions
+
+To use SharedGo in local development, open `http://localhost:5173` in your browser after starting the frontend and backend services.
+
+### Important
+
+- If the app does not load, verify both services are running and correctly configured by following the [Developer instructions](#developer-instructions).
+
+
+### Individual User Usage
+
+1. Open the app and enter your email on the login page.
+2. Click `Get verification code`, then enter the 6-digit code on the verify page.
+3. After login, allow location access so nearby events can be shown on the map.
+4. Use search and category filters to find events.
+5. Select an event marker, open its details page, and click `Join`.
+6. Use the navigation bar to open chat and profile pages for conversations and your joined-event activity.
+
+### Host Usage
+
+1. Log in through the same email verification flow.
+2. Go to the map page and click `Create Event`.
+3. Fill in event information (title, date/time, location, category, capacity) and publish.
+4. Open host-related pages to review upcoming events, past events, and attendee reviews.
+5. Use chat/conversations to communicate with participants.
+
 ## Developer instructions
 
 - first clone the repository
