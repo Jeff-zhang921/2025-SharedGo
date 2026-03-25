@@ -50,6 +50,7 @@ const validateImage = (file: File | null) => {
   }
   return null;
 };
+
 const composeBody = (text: string, imageUrl: string | null) => {
   // Store text and image URL in one string field for backend compatibility.
   const trimmed = text.trim();
@@ -61,6 +62,7 @@ const composeBody = (text: string, imageUrl: string | null) => {
   }
   return trimmed;
 };
+//reverse composebody
 const parseBody = (rawBody: string) => {
   const body = rawBody.trim();
   // Case 1: image-only payload, e.g. "IMG::https://..."
@@ -88,9 +90,10 @@ export default function BoardPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const parsedEventId = Number(eventId);
   const isValidEventId = Number.isInteger(parsedEventId) && parsedEventId > 0;
-  
+  //tan is use to identify it is general or q&a
   const [tab, setTab] = useState<Tab>("general");
   const [loading, setLoading] = useState(false);
+  //toastMessage if for
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
@@ -231,6 +234,72 @@ export default function BoardPage() {
       return;
     }
     setQuestionImage(file);
+  };
+
+  const handleAnswerImageChange = (
+    questionId: number,
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0] ?? null;
+    const error = validateImage(file);
+    if (error) {
+      event.target.value = "";
+      setAnswerImage((prev) => ({ ...prev, [questionId]: null }));
+      return;
+    }
+    setAnswerImage((prev) => ({ ...prev, [questionId]: file }));
+  };
+
+  const postGeneral = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!isValidEventId) {
+      return;
+    }
+
+    const text = generalDraft.trim();
+    if (!text && !generalImage) {
+      return;
+    }
+
+    try {
+      let imageUrl: string | null = null;
+      if (generalImage) {
+        imageUrl = await uploadImage(generalImage);
+        if (!imageUrl) {
+          return;
+        }
+      }
+
+      const body = composeBody(text, imageUrl);
+      if (!body) {
+        return;
+      }
+      if (body.length > 1000) {
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/board/general/${parsedEventId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ body }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const created = (await response.json()) as GeneralMessage;
+      // Show latest message on top immediately.
+      setGeneralMessages((prev) => [created, ...prev]);
+      setGeneralDraft("");
+      setGeneralImage(null);
+      form.reset();
+      showSuccessToast("Message posted.");
+    } catch {
+      return;
+    }
   };
 
 }
