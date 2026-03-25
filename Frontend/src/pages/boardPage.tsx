@@ -193,6 +193,7 @@ export default function BoardPage() {
     formData.append("file", file);
 
     try {
+      //encapsulate instead of send directly
       const response = await fetch(`${API_URL}/upload/upload`, {
         method: "POST",
         credentials: "include",
@@ -225,6 +226,17 @@ export default function BoardPage() {
     setGeneralImage(file);
   };
 
+
+// ChangeEvent	Typing in inputs, checking boxes, or selecting dropdown options.
+// FormEvent	Specifically for form submissions (onSubmit).
+// MouseEvent	Clicks, double clicks, mouse enters/leaves.
+// KeyboardEvent	Pressing keys (e.g., checking if the user pressed "Enter").
+// FocusEvent	When an element gains or loses focus (onBlur, onFocus).
+// DragEvent	Drag and drop interactions.
+// ClipboardEvent	Copy, paste, and cut actions.
+// TouchEvent	Mobile-specific touch interactions.
+// PointerEvent	Modern unified event for mouse, touch, and pen.
+// UIEvent	Base class for many of the above; used for scrolling.
   const handleQuestionImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     const error = validateImage(file);
@@ -235,7 +247,14 @@ export default function BoardPage() {
     }
     setQuestionImage(file);
   };
-
+//HTMLInputElement	<input> (text, checkbox, file, radio).
+//HTMLTextAreaElement	<textarea>
+// HTMLSelectElement	<select>
+// HTMLButtonElement	<button>
+// HTMLFormElement	<form>
+// HTMLDivElement	<div>
+// HTMLAnchorElement	<a> (Links)
+// HTMLImageElement	<img>
   const handleAnswerImageChange = (
     questionId: number,
     event: ChangeEvent<HTMLInputElement>,
@@ -298,6 +317,61 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Message posted.");
     } catch {
+      return;
+    }
+  };
+
+  const postQuestion = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!isValidEventId) {
+      return;
+    }
+
+    const text = questionDraft.trim();
+    if (!text && !questionImage) {
+      return;
+    }
+
+    try {
+      let imageUrl: string | null = null;
+      if (questionImage) {
+        imageUrl = await uploadImage(questionImage);
+        if (!imageUrl) {
+          return;
+        }
+      }
+
+      const body = composeBody(text, imageUrl);
+      if (!body) {
+        return;
+      }
+      if (body.length > 1000) {
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/board/qna/${parsedEventId}/question`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ body }),
+        },
+      );
+
+      if (!response.ok) {
+        return;
+      }
+      const created = (await response.json()) as Omit<Question, "answers">;
+      // Show latest question on top immediately.
+      setQuestions((prev) => [{ ...created, answers: [] }, ...prev]);
+      setQuestionDraft("");
+      setQuestionImage(null);
+      form.reset();
+      showSuccessToast("Question posted.");
+    } catch {
+      setToastMessage("fail to post question")
       return;
     }
   };
