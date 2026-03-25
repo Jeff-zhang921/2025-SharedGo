@@ -1,5 +1,9 @@
 {
   "devDependencies": {
+    "@types/leaflet-routing-machine": "^3.2.9",
     "@types/multer": "^2.0.0"
+  },
+  "dependencies": {
+    "leaflet-routing-machine": "^3.2.12"
   }
 }
