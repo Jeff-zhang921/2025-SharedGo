@@ -259,13 +259,6 @@ formData.append("file",file)
 
           {/*Live Preview*/}
           <i><b>Live Preview:</b></i>
-          <section className="event-details">
-              <div className="event-image-wrapper">
-                {form?.imageUrl && (
-                  <img src={form.imageUrl} alt={form.title} className="event-image"/>
-                )}
-              </div>
-          </section>
           {/*all event details listed as shown in the design*/}
           <section className="event-details">
             <div className="event-info">
@@ -301,6 +294,14 @@ formData.append("file",file)
                   <p>{form.description || "No description provided"}</p>
               </div>
             </div>
+            <div className="event-image-wrapper">
+              {form?.imageUrl && (
+                <img src={form.imageUrl} alt={form.title} className="event-image"/>
+              )}
+            </div>
+            {form?.externalUrl && (
+              <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
+            )}
           </section>
 
           {/*Publishing Tips*/}
