@@ -306,6 +306,7 @@ export default function BoardPage() {
       });
 
       if (!response.ok) {
+        setToastMessage("fail to post general")
         return;
       }
 
@@ -322,6 +323,7 @@ export default function BoardPage() {
   };
 
   const postQuestion = async (event: FormEvent<HTMLFormElement>) => {
+    //prevent page refresh
     event.preventDefault();
     const form = event.currentTarget;
     if (!isValidEventId) {
@@ -363,9 +365,11 @@ export default function BoardPage() {
       if (!response.ok) {
         return;
       }
+      //everything inside the Question type, except for the answers property
       const created = (await response.json()) as Omit<Question, "answers">;
       // Show latest question on top immediately.
-      setQuestions((prev) => [{ ...created, answers: [] }, ...prev]);
+      //create a new object with created and answer is null, add that to previous
+        setQuestions((prev) => [{ ...created, answers: [] }, ...prev]);
       setQuestionDraft("");
       setQuestionImage(null);
       form.reset();
@@ -376,6 +380,65 @@ export default function BoardPage() {
     }
   };
 
+  const postAnswer = async ( event: FormEvent<HTMLFormElement>, questionId: number,) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!isValidEventId) {
+      return;
+    }
+
+    const text = (answerDraft[questionId] || "").trim();
+    const imageFile = answerImage[questionId] || null;
+
+    if (!text && !imageFile) {
+      return;
+    }
+
+    try {
+      let imageUrl: string | null = null;
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+        if (!imageUrl) {
+          return;
+        }
+      }
+
+      const body = composeBody(text, imageUrl);
+      if (!body) {
+        return;
+      }
+      if (body.length > 1000) {
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/board/qna/${parsedEventId}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ questionId, body }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const created = (await response.json()) as Answer;
+      setQuestions((prev) =>
+        prev.map((question) =>
+          question.id === questionId
+            ? { ...question, answers: [...question.answers, created] } // Append answer under this question
+            : question,
+        ),
+      );
+      setAnswerDraft((prev) => ({ ...prev, [questionId]: "" }));
+      setAnswerImage((prev) => ({ ...prev, [questionId]: null }));
+      form.reset();
+      showSuccessToast("Answer posted.");
+    } catch {
+      return;
+    }
+  };
+  
 }
 
 
