@@ -439,6 +439,21 @@ export default function BoardPage() {
     }
   };
   
+
+  if (!isValidEventId) {
+    return <div className="board-page">Invalid event id.</div>;
+  }
+  const renderBody = (body: string) => {
+    const { text, imageUrl } = parseBody(body);
+    return (
+      <div className="board-content">
+        
+        {text && <p>{text}</p>}
+        {imageUrl && <img src={imageUrl} alt="attachment" className="board-image" />}
+      </div>
+    );
+  };
+
 }
 
 
