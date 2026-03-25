@@ -185,6 +185,54 @@ export default function BoardPage() {
   }, [isValidEventId, parsedEventId, tab]);
 
   
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(`${API_URL}/upload/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as { url?: string };
+      const imageUrl = typeof data.url === "string" ? data.url.trim() : "";
+      if (!imageUrl) {
+        return null;
+      }
+      return imageUrl;
+    } catch {
+      return null;
+    }
+  };
+
+  const handleGeneralImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    const error = validateImage(file);
+    if (error) {
+      event.target.value = "";
+      setGeneralImage(null);
+      return;
+    }
+    setGeneralImage(file);
+  };
+
+  const handleQuestionImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    const error = validateImage(file);
+    if (error) {
+      event.target.value = "";
+      setQuestionImage(null);
+      return;
+    }
+    setQuestionImage(file);
+  };
+
 }
 
 
