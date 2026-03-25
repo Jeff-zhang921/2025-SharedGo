@@ -239,7 +239,7 @@ const EventDetailsPage = () => {
             HOWEVER: I have not worked out how to do that (I believe backend changes are necessary to get the current user id*/}
             {/*{currentUser?.id === event?.host?.id && (*insert line below in here*)*/}
               <button onClick={handleDelete} disabled={isLoading} className="btn-join"> {isLoading ? "Deleting...":"Delete Event"}</button>
-            
+              <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
           </div>
         </div>
       </section>
