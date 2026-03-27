@@ -2,7 +2,7 @@ import './App.css';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import HomePage from './pages/homePage';
 import MapPage from './pages/mapPage';
-import EventDetailsPage from './pages/eventDetailsPage';
+//import EventDetailsPage from './pages/eventDetailsPage';
 import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
@@ -39,7 +39,7 @@ function App() {
       <Route element={<NavBar/>}>
         <Route path="/map" element={<MapPage />} />
         {/* set the path for the event details page, now with id system to route to distinct event details pages */}
-        <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} /> 
+        
         {/* set the paths for the create event page */}
         <Route path="/createEvent" element={<CreateEventPage />} />
         {/* set the path for the host page */}
