@@ -252,15 +252,7 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             <div className="action-buttons">
                 {/* pass hostId so chat page can create/find the thread immediately */}
     
-                <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
-        
-                
-                {/* If hostId matches event host, then show delete event button */}
-                {currentUser?.id === event?.host?.id && (
-                <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
-                    {isLoading ? "Deleting...":"Delete Event"}
-                </button>
-                )}
+                <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>               
                 <div className="top-buttons">
                 <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
                 {/* If hostId matches event host, then show delete event button */}
