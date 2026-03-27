@@ -238,7 +238,6 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             <Link to={`/host/${event.host.id}`}>
                 <img src="/user-icon.png" alt="Host Details" className="profile-img" />
             </Link>
-            <p className="host-details">Host Details</p>
             
             <div className="host-info">
                 <h3>HOSTED BY:</h3>
