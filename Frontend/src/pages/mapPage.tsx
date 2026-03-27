@@ -7,6 +7,7 @@ import { useSearch } from './../searchFile';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import "leaflet-routing-machine";
+import EventSidebar from '../components/EventDetailsSidebar';
 
 interface User {
   id: number;
@@ -51,6 +52,7 @@ const MapPage = () => {
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
   const { search, category, startDate, endDate } = useSearch(); //Gets real time values from the sidebar
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null); //Keep track of which event is selected
 
 
   useEffect(() => {
@@ -64,17 +66,18 @@ const MapPage = () => {
     }
   }, [map, navState]); //Only re-run if the map object itself changes
 
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/events`);
+      const data = await response.json();
+      setDbEvents(data); // Put the events database into 'icons' state
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    }
+  };
+
   useEffect(() => {
     // Fetch events from backend
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/events`);
-        const data = await response.json();
-        setDbEvents(data); // Put the events database into 'icons' state
-      } catch (err) {
-        console.error("Failed to fetch events:", err);
-      }
-    };
     fetchEvents();
   }, []);
 
@@ -189,7 +192,7 @@ const MapPage = () => {
               position={[event.latitude, event.longitude]} 
               icon={createEventIcon(event.title)}
               eventHandlers={{
-                click: () => navigate(`/eventDetails/${event.id}`)
+                click: () => setSelectedEventId(event.id)
               }}
             />
         ))}
@@ -206,6 +209,14 @@ const MapPage = () => {
             </Marker>
           )}
     </MapContainer>
+      <EventSidebar 
+        eventId={selectedEventId} 
+        onClose={() => setSelectedEventId(null)} 
+        onDeleteSuccess={() => {
+          setSelectedEventId(null); //Close the sidebar
+          fetchEvents();
+        }}
+      />
     </div>
   );
 };
