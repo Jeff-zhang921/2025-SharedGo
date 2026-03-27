@@ -144,6 +144,34 @@ const EventDetailsPage = () => {
     }
   };
 
+  const handleGetDirections = () => {
+    //Check browser supports location
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+  
+    //Ask for the user's current position
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const eventLat = event.latitude; //From event data
+        const eventLng = event.longitude;
+  
+        // universal Google Maps directions URL
+        // 'origin' is where the user is, 'destination' is the event
+        const url = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${eventLat},${eventLng}&travelmode=walking`;
+  
+        //Open the link in a new tab
+        window.open(url, "_blank");
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Please enable location permissions to get directions.");
+      }
+    );
+  };
+
   return (
     <div className="event-details-container">
       <div className="title">
@@ -215,12 +243,9 @@ const EventDetailsPage = () => {
 
           <div className="action-buttons">
             {/* pass hostId so chat page can create/find the thread immediately */}
-            <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Join Event</Link>
+  
             <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
-            {/* IDEALLY: if hostId matches event host,, then show delete event button 
-            HOWEVER: I have not worked out how to do that (I believe backend changes are necessary to get the current user id*/}
-            {/*{currentUser?.id === event?.host?.id && (*insert line below in here*)*/}
-              <button onClick={handleDelete} disabled={isLoading} className="btn-join"> {isLoading ? "Deleting...":"Delete Event"}</button>
+     
             
             <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
             {/* If hostId matches event host, then show delete event button */}
@@ -229,6 +254,16 @@ const EventDetailsPage = () => {
                 {isLoading ? "Deleting...":"Delete Event"}
               </button>
             )}
+            <div className="top-buttons">
+              <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
+              {/* If hostId matches event host, then show delete event button */}
+              {currentUser?.id === event?.host?.id && (
+                <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
+                  {isLoading ? "Deleting...":"Delete Event"}
+                </button>
+               )}
+            </div>
+            <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
           </div>
 
         </div>

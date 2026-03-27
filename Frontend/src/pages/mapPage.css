@@ -87,6 +87,16 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+@media (max-width: 768px) { /* Create event button for mobile */
+  .create-event {
+    bottom: 100px;
+    right: 20px;
+    padding: 12px 24px; /* Smaller button for mobile */
+    font-size: 15px;
+    gap: 8px;
+  }
+}
+
 .create-event:hover {
   transform: translateY(-3px); /*Lifts up slightly*/
   background-color: #222;
