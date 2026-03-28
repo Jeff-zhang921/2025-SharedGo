@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from "react-router-dom"
-import './eventDetailsPage.css';
-import { useParams } from 'react-router-dom';
+import './EventDetailsSidebar.css';
 
 interface User {
   id: number;
@@ -34,18 +33,28 @@ interface EventData {
   averageRating: number | null;
 }
 
-const EventDetailsPage = () => {
-  const navigate = useNavigate();
-  const { eventId } = useParams<{ eventId: string }>(); //Use the eventId parameter from the URL
+interface EventSidebarProps {
+    eventId: number | null;
+    onClose: () => void;
+    onDeleteSuccess: () => void;
+}
 
+
+const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) => {
+  const navigate = useNavigate();
   const [event, setEvent]  = useState<EventData | null>(null) //Store actual event data from backend, setting initial value to null
   const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
-
   const [currentUser, setCurrentUser] = useState<User | null>(null) //Enables us to see who is logged-in to show the Delete Event button to host only
 
   //Code for actually fetching the data from the backend
   useEffect(() => {
+    //Dont fetch when no event clicked
+    if (!eventId) {
+        setEvent(null);
+        setIsLoading(false);
+        return;
+    }
     setIsLoading(true);
     setError(null);
     setEvent(null);
@@ -99,18 +108,6 @@ const EventDetailsPage = () => {
     fetchEvent();
   }, [eventId]); //Rerun the fetching when the eventId changes (different page requires different data)
 
-  if (isLoading) { //Message displayed while loading the event details
-    return <div style={{ padding: '20px' }}><p>Loading event details: **{eventId}**...</p></div>; //Padding so msg not squashed in top left
-  }
-
-  if (error) {
-    return <div style={{ padding: '20px', color: 'red' }}><h1>Error</h1><p>{error}</p></div>;
-  }
-
-  if (!event) {
-    return <div style={{ padding: '20px' }}><h1>Event Not Found</h1><p>The requested event does not exist</p></div>;
-  }
-
   const handleDelete = async () => {
     const confirmDelete = window.confirm(
       "Are your sure you want to delete this event?"
@@ -135,7 +132,8 @@ const EventDetailsPage = () => {
       }
 
       alert("Event deleted successfully.");
-      navigate("/map"); //redirect to map page after deleting an event
+      onDeleteSuccess(); //Call prop to refresh map list
+      onClose(); //Close sidebar
     } catch (error) {
       console.error("Delete error:", error);
       alert("Something went wrong.");
@@ -145,6 +143,7 @@ const EventDetailsPage = () => {
   };
 
   const handleGetDirections = () => {
+    if (!event) return;
     //Check browser supports location
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -173,103 +172,105 @@ const EventDetailsPage = () => {
   };
 
   return (
-    <div className="event-details-container">
-      <div className="title">
-        {/*Page Title*/}
-        <h1 className="event-title">Event details</h1>
-      </div>
+    <div className={`event-sidebar ${eventId ? 'open' : ''}`}>
+    
+    {/*Close Button*/}
+    <button className="close-sidebar" onClick={onClose}>✕</button>
 
-      <section className="event-details">
-        {/*all event detail listed as shown in the design*/}
-        <div className="event-info">
-          <div className="event-info-row">
-            <h3>TITLE:</h3><p>{event.title}</p>
-          </div>
+    <div className="sidebar-scroll-container">
+      {isLoading && <p className="sidebar-loading">Loading event details...</p>}
+      {error && <p className="sidebar-error">{error}</p>}
 
-          <div className="event-info-row">
-            <h3>DATE:</h3>
-            <p>{new Date(event.startsAt).toLocaleString()}</p>
-          </div>
+      {/*Only show content if data exists*/}
+      {event && !isLoading && (
+        <div className="event-details-container">
+        <div className="title">
+            <h1 className="event-title">Event details</h1>
+        </div>
 
-          <div className="event-info-row">
-            <h3>CAPACITY:</h3>
-            <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
-          </div>
-
-           <div className="event-info-row">
-            <h3>CATEGORY</h3>
-            <p>{event.category ?? "Other"}</p>
-          </div>
-
-          <div className="event-info-row">
-            <h3>LOCATION:</h3>
-            <p>{event.location}</p>
-          </div>
-          <div className="event-description">
+        <section className="event-details">
+            {/*all event detail listed as shown in the design*/}
+            <div className="event-info">
             <div className="event-info-row">
-              <h3>DESCRIPTION:</h3>
-              <p>{event.description || "No description provided"}</p>
+                <h3>TITLE:</h3><p>{event.title}</p>
             </div>
-          </div>
-        </div>
 
-        
-        <div className='btn-host'>
-          <div className="event-image-wrapper">
-          {event?.imageUrl && (
-            <img src={event.imageUrl} alt={event.title} className="event-image"/>
-          )}
-          {event?.externalUrl && (
-          <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
-            Visit Event Website</a>
-          )}
-          </div>
-
-          {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}
-          <Link to={`/host/${event.host.id}`}>
-            <img src="/user-icon.png" alt="Host Details" className="profile-img" />
-          </Link>
-          <p className="host-details">Host Details</p>
-          
-          <div className="host-info">
-            <h3>HOSTED BY:</h3>
-            <div className="host-details">
-              <div className="host-text">
-                <p><strong>{event.host.name}</strong></p>
-                <p>{event.host.email}</p>
-              </div>
+            <div className="event-info-row">
+                <h3>DATE:</h3>
+                <p>{new Date(event.startsAt).toLocaleString()}</p>
             </div>
-          </div>
 
-          <div className="action-buttons">
-            {/* pass hostId so chat page can create/find the thread immediately */}
-  
-            <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
-     
+            <div className="event-info-row">
+                <h3>CAPACITY:</h3>
+                <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
+            </div>
+
+            <div className="event-info-row">
+                <h3>CATEGORY</h3>
+                <p>{event.category ?? "Other"}</p>
+            </div>
+
+            <div className="event-info-row">
+                <h3>LOCATION:</h3>
+                <p>{event.location}</p>
+            </div>
+            <div className="event-description">
+                <div className="event-info-row">
+                <h3>DESCRIPTION:</h3>
+                <p>{event.description || "No description provided"}</p>
+                </div>
+            </div>
+            </div>
+
             
-            <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
-            {/* If hostId matches event host, then show delete event button */}
-            {currentUser?.id === event?.host?.id && (
-              <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
-                {isLoading ? "Deleting...":"Delete Event"}
-              </button>
+            <div className='btn-host'>
+            <div className="event-image-wrapper">
+            {event?.imageUrl && (
+                <img src={event.imageUrl} alt={event.title} className="event-image"/>
             )}
-            <div className="top-buttons">
-              <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
-              {/* If hostId matches event host, then show delete event button */}
-              {currentUser?.id === event?.host?.id && (
-                <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
-                  {isLoading ? "Deleting...":"Delete Event"}
-                </button>
-               )}
+            {event?.externalUrl && (
+            <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
+                Visit Event Website</a>
+            )}
             </div>
-            <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
-          </div>
 
+            {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}
+            <Link to={`/host/${event.host.id}`}>
+                <img src="/user-icon.png" alt="Host Details" className="profile-img" />
+            </Link>
+            
+            <div className="host-info">
+                <h3>HOSTED BY:</h3>
+                <div className="host-details">
+                <div className="host-text">
+                    <p><strong>{event.host.name}</strong></p>
+                    <p>{event.host.email}</p>
+                </div>
+                </div>
+            </div>
+
+            <div className="action-buttons">
+                {/* pass hostId so chat page can create/find the thread immediately */}
+    
+                <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>               
+                <div className="top-buttons">
+                <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
+                {/* If hostId matches event host, then show delete event button */}
+                {currentUser?.id === event?.host?.id && (
+                    <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
+                    {isLoading ? "Deleting...":"Delete Event"}
+                    </button>
+                )}
+                </div>
+                <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
+            </div>
+            </div>
+        </section>
         </div>
-      </section>
-    </div>
-  )
+  )}
+  </div>
+  </div>
+  );
 };
 
-export default EventDetailsPage;
+export default EventSidebar;
