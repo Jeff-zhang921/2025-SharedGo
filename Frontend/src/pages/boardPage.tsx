@@ -453,6 +453,77 @@ export default function BoardPage() {
       </div>
     );
   };
+   return (
+    <div >
+      {showToast && <div >{toastMessage}</div>}
+      <header>
+        <button type="button" onClick={() => navigate(-1)}>
+          Back
+        </button>
+        <h1>Event Board</h1>
+      </header>
+
+      <div >
+        <button
+          type="button"
+          className={tab === "general" ? "active" : ""}
+          onClick={() => setTab("general")}
+        >
+          General
+        </button>
+        <button
+          type="button"
+          className={tab === "question" ? "active" : ""}
+          onClick={() => setTab("question")}
+        >
+          Question
+        </button>
+      </div>
+
+      {tab === "general" && (
+        <section>
+          <form onSubmit={postGeneral}>
+            <div >
+              <label htmlFor="general-photo-input" >
+                Photo
+              </label>
+              <input
+                id="general-photo-input"
+                type="file"
+                accept="image/*"
+                className="photo-input"
+                onChange={handleGeneralImageChange}
+              />
+              <textarea
+               
+                value={generalDraft}
+                onChange={(event) => setGeneralDraft(event.target.value)}
+                placeholder="Write a announcement..."
+              />
+            <button type="submit">
+              Post
+            </button>
+            </div>
+            {generalImage && <span >{generalImage.name}</span>}
+
+          </form>
+
+          {loading && <p>Loading...</p>}
+          {!loading && generalMessages.length === 0 && <p>No messages yet.</p>}
+
+          <div >
+            {generalMessages.map((item) => (
+              <article  key={item.id}>
+                <p >{formatTime(item.createdAt)}</p>
+                {renderBody(item.body)}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+    </div>
+  );
 
 }
 
