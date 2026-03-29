@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import "./boardPage.css";
+ import "./boardPage.css";
 
 type Tab = "general" | "question";
 
@@ -453,17 +453,20 @@ export default function BoardPage() {
       </div>
     );
   };
+
+
+
    return (
-    <div >
-      {showToast && <div >{toastMessage}</div>}
-      <header>
-        <button type="button" onClick={() => navigate(-1)}>
+    <div className="board-page">
+      {showToast && <div className="board-toast">{toastMessage}</div>}
+      <header  className="board-top">
+        <button type="button" className="board-back" onClick={() => navigate(-1)}>
           Back
         </button>
         <h1>Event Board</h1>
       </header>
 
-      <div >
+      <div className="board-tabs">
         <button
           type="button"
           className={tab === "general" ? "active" : ""}
@@ -482,9 +485,9 @@ export default function BoardPage() {
 
       {tab === "general" && (
         <section>
-          <form onSubmit={postGeneral}>
-            <div >
-              <label htmlFor="general-photo-input" >
+          <form className="board-form" onSubmit={postGeneral}>
+            <div className="board-input-row">
+              <label htmlFor="general-photo-input"  className="photo-button">
                 Photo
               </label>
               <input
@@ -495,7 +498,7 @@ export default function BoardPage() {
                 onChange={handleGeneralImageChange}
               />
               <textarea
-               
+                className="board-textarea"
                 value={generalDraft}
                 onChange={(event) => setGeneralDraft(event.target.value)}
                 placeholder="Write a announcement..."
@@ -504,17 +507,17 @@ export default function BoardPage() {
               Post
             </button>
             </div>
-            {generalImage && <span >{generalImage.name}</span>}
+            {generalImage && <span className="file-name">{generalImage.name}</span>}
 
           </form>
 
           {loading && <p>Loading...</p>}
           {!loading && generalMessages.length === 0 && <p>No messages yet.</p>}
 
-          <div >
+          <div className="board-list">
             {generalMessages.map((item) => (
-              <article  key={item.id}>
-                <p >{formatTime(item.createdAt)}</p>
+              <article  className="board-card" key={item.id}>
+                <p className="board-time">{formatTime(item.createdAt)}</p>
                 {renderBody(item.body)}
               </article>
             ))}

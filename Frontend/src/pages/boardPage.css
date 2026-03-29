@@ -1,0 +1,81 @@
+.board-page {
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  color: #111;
+  text-align: left;
+}
+
+.board-toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 3000;
+  background: #111;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+}
+
+.board-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.board-top h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.board-back {
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.board-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.board-tabs button {
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.board-tabs button.active {
+  background: #111;
+  color: #fff;
+}
+
+.board-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.board-input-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.board-textarea {
+  flex: 1;
+  border: 1px solid #270202;
+  min-height: 60px;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
