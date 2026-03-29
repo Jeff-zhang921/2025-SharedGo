@@ -521,7 +521,95 @@ export default function BoardPage() {
           </div>
         </section>
       )}
+      
+      {tab === "question" && (
+        <section>
+          <form onSubmit={postQuestion}>
+            <div >
+              <label htmlFor="question-photo-input" >
+                Photo
+              </label>
+              <input
+                id="question-photo-input"
+                type="file"
+                accept="image/*"
+                className="photo-input"
+                onChange={handleQuestionImageChange}
+              />
+              <textarea
+                className="board-textarea"
+                value={questionDraft}
+                onChange={(event) => setQuestionDraft(event.target.value)}
+                placeholder="Ask a question..."
+              />
+            <button type="submit">
+              Ask
+            </button>
+            </div>
+            {questionImage && <span>{questionImage.name}</span>}
+          </form>
 
+          {loading && <p>Loading...</p>}
+          {!loading && questions.length === 0 && <p>No questions yet.</p>}
+
+          <div>
+            {questions.map((question) => (
+              <article key={question.id}>
+                <p >{formatTime(question.createdAt)}</p>
+                {renderBody(question.body)}
+
+                <div >
+                  {question.answers.map((answer) => (
+                    <div key={answer.id}>
+                      <p >{formatTime(answer.createdAt)}</p>
+                      {renderBody(answer.body)}
+                    </div>
+                  ))}
+                </div>
+
+                <form
+                  className="answer-form"
+                  onSubmit={(event) => postAnswer(event, question.id)}
+                >
+                  <div>
+                    <label
+                      htmlFor={`answer-photo-${question.id}`}
+                      className="photo-button"
+                    >
+                      Photo
+                    </label>
+                    <input
+                      id={`answer-photo-${question.id}`}
+                      type="file"
+                      accept="image/*"
+                      className="photo-input"
+                      onChange={(event) => handleAnswerImageChange(question.id, event)}
+                    />
+                    <input
+                      type="text"
+                      className="answer-text"
+                      value={answerDraft[question.id] || ""}
+                      onChange={(event) =>
+                        setAnswerDraft((prev) => ({
+                          ...prev,
+                          [question.id]: event.target.value,
+                        }))
+                      }
+                      placeholder="Write an answer..."
+                    />
+                    <button type="submit">
+                      Reply
+                    </button>
+                  </div>
+                  {answerImage[question.id] && (
+                    <span >{answerImage[question.id]?.name}</span>
+                  )}
+                </form>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 
