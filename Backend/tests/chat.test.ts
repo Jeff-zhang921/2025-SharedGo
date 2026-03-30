@@ -89,5 +89,83 @@ describe("Chat route", () => {
             expect(res.body.threadId).toBe(102);
         });
     });
-
+    describe("GET /threads", () => {
+        it("should return list of threads for logged-in user", async () => {
+            mockPrisma.chatThread.findMany.mockResolvedValue([
+                {
+                    id: 101,
+                    hostId: 1,
+                    guestId: 2,
+                    Messages: []
+                }
+            ]);
+            const res = await request(testApp)
+                .get("/chat/threads");
+            expect(res.status).toBe(200);
+            expect(res.body[0].id).toBe(101);
+        });
+        it("should return messages if user is authorized", async () => {
+            mockPrisma.chatThread.findUnique.mockResolvedValue({
+                id: 50,
+                hostId: 1, 
+                guestId: 2
+            });
+            mockPrisma.chatMessage.findMany.mockResolvedValue([
+                {
+                    id: 1,
+                    body: "Hello!"
+                }
+            ]);
+            const res = await request(testApp)
+                .get("/chat/threads/50/messages");
+            expect(res.status).toBe(200);
+            expect(res.body[0].body).toBe("Hello!");
+        });
+         it("should return 400 if threadId is not valid integer", async () => {
+            let threadId = ["abc", "-1" ,"0", "1.5"];
+            const res = await request(testApp)
+                .get(`/chat/threads/${threadId}/messages`);
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("Valid threadId is required");
+        });
+        it("should return 404 if thread doesn't exist", async () => {
+            mockPrisma.chatThread.findUnique.mockResolvedValue(null);
+            const res = await request(testApp)
+                .get("/chat/threads/999/messages");
+            expect(res.status).toBe(404);
+            expect(res.body.message).toBe("Thread not found");
+        });
+         it("should return 403 if user is not part of the thread", async() => {
+            mockPrisma.chatThread.findUnique.mockResolvedValue({
+                id: 50,
+                hostId: 2,
+                guestId: 3
+            });
+            const res = await request(testApp)
+                .get("/chat/threads/50/messages");
+            expect(res.status).toBe(403);
+            expect(res.body.message).toBe("Forbidden");
+        });
+    });
+    describe("GET /users" , () => {
+        it("should return 401 if user is not logged in", async () => {
+            loggedOut= true
+            const res = await request(testApp).get("/chat/users");
+            expect(res.status).toBe(401);
+            expect(res.body.message).toBe("Unauthorized");
+        });
+        it("should filter users, case insensitive", async () => {
+            const query = "alice";
+            mockPrisma.user.findMany.mockResolvedValue([
+                {
+                    id: 2,
+                    name: "Alice",
+                    email: "alice@example.com"
+                }
+            ]);
+            const res = await request(testApp)
+                .get(`/chat/users?query=${query}`);
+            expect(res.status).toBe(200);
+        });
+    });
 })
