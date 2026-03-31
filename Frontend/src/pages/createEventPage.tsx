@@ -233,7 +233,7 @@ formData.append("file",file)
             </label>
 
             <label>
-              <span>Description</span>
+              <span>DESCRIPTION</span>
               <textarea name="description" placeholder="No description provided" onChange={onChange}/>
             </label>
           </section>
@@ -245,7 +245,7 @@ formData.append("file",file)
         <form className="event-form" onSubmit={onSubmit}>
           <section className="form-section">
             <div className="upload-field">
-              <span>Photo</span>
+              <span>+ Add image</span>
               
               <input
                 id="event-photo-upload"
@@ -277,7 +277,7 @@ formData.append("file",file)
               </div>
 
               <div className="event-info-row">
-                <h3>CATEGORY</h3>
+                <h3>CATEGORY:</h3>
                 <p>{form.category ?? "Other"}</p>
               </div>
 
@@ -288,10 +288,9 @@ formData.append("file",file)
 
               <div className="event-info-row">
                 <h3>DESCRIPTION:</h3>
-                
-              </div>
-              <div className="event-description">
-                  <p>{form.description || "No description provided"}</p>
+                <div className="event-description">
+                    <p>{form.description || "No description provided"}</p>
+                </div>
               </div>
             </div>
             <div className="event-image-wrapper">

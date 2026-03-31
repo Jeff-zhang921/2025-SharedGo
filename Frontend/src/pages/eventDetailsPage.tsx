@@ -169,7 +169,7 @@ const EventDetailsPage = () => {
           </div>
 
            <div className="event-info-row">
-            <h3>CATEGORY</h3>
+            <h3>CATEGORY:</h3>
             <p>{event.category ?? "Other"}</p>
           </div>
 
