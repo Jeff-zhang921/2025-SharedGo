@@ -124,3 +124,28 @@ html, body, #root {
   padding: 5px 10px;
   outline: none;
 }
+
+.date-range-group {
+  display: flex;
+  gap: 12px;
+  padding-left: 15px;
+  border-left: 1px solid #eee;
+}
+
+.date-input-wrapper {
+  display: flex;
+  flex-direction: column; /*label above the input*/
+  gap: 4px;
+}
+
+.date-input-wrapper label { /* labels 'from' and 'to */
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.date-input {
+  font-size: 12px;
+  padding: 5px 8px;
+}

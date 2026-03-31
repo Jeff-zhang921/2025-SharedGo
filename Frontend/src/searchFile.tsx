@@ -7,16 +7,25 @@ interface SearchType {
   setSearch: (query: string) => void;
   category: string;
   setCategory: (category: string) => void;
+//Fields to track the date filter
+  startDate: string;
+  setStartDate: (date: string) => void;
+  endDate: string;
+  setEndDate: (date: string) => void;
 }
 
 const SearchContext = createContext<SearchType | undefined>(undefined);
 
+const getTodayDate = () => new Date().toISOString().split('T')[0]; //Helper to get the current date
+
 export const SearchProvider = ({ children }: { children: ReactNode }) => { //Defines a component that takes children (the entire app) as a prop
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [startDate, setStartDate] = useState(getTodayDate()); //Starts at current date by default (doesn't show old events by default)
+  const [endDate, setEndDate] = useState("");
 
   return (
-    <SearchContext.Provider value={{ search, setSearch, category, setCategory }}> { /* The value contains the data */ }
+    <SearchContext.Provider value={{ search, setSearch, category, setCategory, startDate, endDate, setStartDate, setEndDate }}> { /* The value contains the data */ }
       {children}
     </SearchContext.Provider>
   );

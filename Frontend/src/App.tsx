@@ -2,7 +2,7 @@ import './App.css';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import HomePage from './pages/homePage';
 import MapPage from './pages/mapPage';
-import EventDetailsPage from './pages/eventDetailsPage';
+//import EventDetailsPage from './pages/eventDetailsPage';
 import CreateEventPage from './pages/createEventPage';
 import ChatPage from './pages/chatPage';
 import HostPage from './pages/hostPage'
@@ -10,6 +10,7 @@ import HostProfile from './pages/profilePage';
 import LoginPage from './pages/loginPage'
 import VerifyPage from './pages/verifyPage'
 import ConversationsPage from './pages/ConversationPage';
+import BoardPage from './pages/boardPage';
 import Navigation from "./components/Navigation";
 
 function NavBar() {
@@ -38,11 +39,13 @@ function App() {
       <Route element={<NavBar/>}>
         <Route path="/map" element={<MapPage />} />
         {/* set the path for the event details page, now with id system to route to distinct event details pages */}
-        <Route path="/eventDetails/:eventId" element={<EventDetailsPage />} /> 
+        
         {/* set the paths for the create event page */}
         <Route path="/createEvent" element={<CreateEventPage />} />
         {/* set the path for the host page */}
         <Route path="/host/:hostId" element={<HostPage />} />
+        <Route path="/board/:eventId" element={<BoardPage />} />
+        {/* set the path for the profile page */}
         {/* set the path for the profile, conversations and chat pages */}
         <Route path="/profile" element={<HostProfile />} />
         <Route path="/conversations" element={<ConversationsPage />} />
