@@ -118,21 +118,16 @@ html, body {
     padding-bottom: 100px; 
 }
 
-.top-buttons {
-    gap: 10px; /* Space between Join and Delete */
-    width: 100%;
-}
-
 .top-buttons:hover {
     transform: scale(1.08);
 }
 
 .btn-join {
     flex: 1; /* Makes buttons grow equally */
-    padding: 12px 0;
+    padding: 12px 32px;
     color: white;
     background-color: black;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
@@ -140,39 +135,18 @@ html, body {
 }
 
 .btn-directions {
-    padding: 12px 24px;
+    padding: 12px 32px;
     font-size: 16px;
     color: white;
-    background-color: #4285F4;
+    background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
     border-radius: 6px;
     display: inline-block;
     width: auto;
     font-weight: bold;
 }
-
-.btn-direction:hover {
-    background-color: #333;
-}
-
-.btn-direction {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background-color: #4285F4; /* Google Blue */
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
-  }
   
   .btn-directions:hover {
-    background-color: #357ae8;
+    background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
   }
   
   .btn-directions:active {

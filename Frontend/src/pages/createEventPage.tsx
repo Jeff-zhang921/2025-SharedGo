@@ -236,17 +236,10 @@ formData.append("file",file)
               <span>DESCRIPTION</span>
               <textarea name="description" placeholder="No description provided" onChange={onChange}/>
             </label>
-          </section>
-        </form>
-      </div>
 
-      {/*Image and Website link inputs*/}
-      <div className="create-event-container">
-        <form className="event-form" onSubmit={onSubmit}>
-          <section className="form-section">
+            {/*Image and Website link inputs*/}
             <div className="upload-field">
               <span>+ Add image</span>
-              
               <input
                 id="event-photo-upload"
                 className="photo-upload-input"
@@ -255,11 +248,20 @@ formData.append("file",file)
                 onChange={handleSendFile}
               />
             </div>
-          </section>
 
+            {/*event website link pls*/}
+          </section>
+        </form>
+      </div>
+
+      
+      <div className="create-event-container">
           {/*Live Preview*/}
-          <i><b>Live Preview:</b></i>
+          <div className="preview-title">
+            <i><b>Live Preview:</b></i>
+          </div>
           {/*all event details listed as shown in the design*/}
+          <h1 className="event-title">Event details</h1>
           <section className="event-details">
             <div className="event-info">
               <div className="event-info-row">
@@ -278,7 +280,7 @@ formData.append("file",file)
 
               <div className="event-info-row">
                 <h3>CATEGORY:</h3>
-                <p>{form.category ?? "Other"}</p>
+                <p>{form.category}</p>
               </div>
 
               <div className="event-info-row">
@@ -316,7 +318,7 @@ formData.append("file",file)
           
           {/*Publish Button*/}
           <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
-        </form>
+
       </div>
     </div>
   );

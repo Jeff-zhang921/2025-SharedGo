@@ -46,7 +46,7 @@ html, body, #root {
     padding-top: 15px;
     gap: 40px;
     flex-direction: column;
-    z-index: 2000 !important; /* higher than map */
+    z-index: 4000 !important; /* higher than map  and event details sidebar*/
     overflow: visible !important; /* lets the search bar pop out */
 }
 
@@ -79,22 +79,22 @@ html, body, #root {
 }
 
 @media (max-width: 768px) {
-    .navbar {
-        position: fixed;
-        top: auto;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 50px;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        background: white;
-    }
+  .navbar {
+      position: fixed;
+      top: auto;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 50px;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background: white;
+  }
 
-    .page-content {
-      padding-left: 0px;
-    }
+  .page-content {
+    padding-left: 0px;
+  }
 }
 
 .search-nav-item {
