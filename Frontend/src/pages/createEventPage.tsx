@@ -182,21 +182,6 @@ formData.append("file",file)
           </header>
 
           <section className="form-section">
-            <label>
-              <span>TITLE</span>
-              <input name="title" placeholder="Title" onChange={onChange} required/>
-            </label>
-
-            <label>
-              <span>DATE</span>
-              <input name="startsAt" type="datetime-local" onChange={onChange} required/>
-            </label>
-            
-            <label>
-              <span>CAPACITY</span>
-              <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
-            </label>
-
             <label className= "select-field">
               <span>CATEGORY</span>
               <div className="select-wrapper">
@@ -215,6 +200,21 @@ formData.append("file",file)
                   <option value="Other">Other</option>
                 </select>
               </div>
+            </label>
+
+            <label>
+              <span>TITLE</span>
+              <input name="title" placeholder="Title" onChange={onChange} required/>
+            </label>
+
+            <label>
+              <span>DATE</span>
+              <input name="startsAt" type="datetime-local" onChange={onChange} required/>
+            </label>
+            
+            <label>
+              <span>CAPACITY</span>
+              <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
             </label>
 
             <label>
@@ -248,8 +248,18 @@ formData.append("file",file)
                 onChange={handleSendFile}
               />
             </div>
-
-            {/*event website link pls*/}
+            
+            <div className="upload-field">
+              <span>Add event website link:</span>
+              <input
+                name="externalUrl"
+                className="photo-upload-input"
+                type="url"
+                placeholder="https://example.com"
+                value={form.externalUrl}
+                onChange={onChange}
+              />
+            </div>
           </section>
         </form>
       </div>
@@ -263,6 +273,9 @@ formData.append("file",file)
           {/*all event details listed as shown in the design*/}
           <h1 className="event-title">Event details</h1>
           <section className="event-details">
+            <div className="category-badge">
+              {form.category ?? "Other"}
+            </div>
             <div className="event-info">
               <div className="event-info-row">
                 <h3>TITLE:</h3><p>{form.title}</p>
@@ -279,27 +292,22 @@ formData.append("file",file)
               </div>
 
               <div className="event-info-row">
-                <h3>CATEGORY:</h3>
-                <p>{form.category}</p>
-              </div>
-
-              <div className="event-info-row">
                 <h3>LOCATION:</h3>
                 <p>{form.location}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>DESCRIPTION:</h3>
-                <div className="event-description">
-                    <p>{form.description || "No description provided"}</p>
-                </div>
+                <p>{form.description || "No description provided"}</p>
               </div>
             </div>
+
             <div className="event-image-wrapper">
               {form?.imageUrl && (
                 <img src={form.imageUrl} alt={form.title} className="event-image"/>
               )}
             </div>
+
             {form?.externalUrl && (
               <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
             )}
@@ -313,7 +321,9 @@ formData.append("file",file)
               <li>Add an image so the event stands out on the map.</li>
               <li>Pick a bright photo so people can spot your event quickly.</li>
             </ul>
-            <Link to="/">Need to sign in?</Link>
+            <div className="signin">
+              <Link className="signin-btn" to="/">Need to sign in?</Link>
+            </div>
           </div>
           
           {/*Publish Button*/}

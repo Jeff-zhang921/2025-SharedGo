@@ -2,6 +2,7 @@ import Button from "./Button";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom"; //to check current page
 import { useSearch } from "./../searchFile"; //Import the hook
+import './Navigation.css';
 
 type Props = {
     userId?: string | number;
@@ -80,8 +81,13 @@ export default function Navigation() {
                 </div>
             )}
             
-            <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+            {/*No home button when on map page*/}
+            {!isMapPage && (
+                <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+            )}
+
             <Button link="/conversations" imgSrc="/chat.svg" text="chat" size={30}/>
+
             <Button link="/profile" imgSrc="/user.svg" text="profile" size={30}/>
         </aside>
     );

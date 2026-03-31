@@ -145,12 +145,8 @@ html, body {
     font-weight: bold;
 }
   
-  .btn-directions:hover {
-    background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
-  }
-  
   .btn-directions:active {
-    transform: scale(0.98); /* Slight "click" feel */
+    transform: scale(1.08); /* Slight "click" feel */
   }
 
 .btn-host {
@@ -221,4 +217,15 @@ html, body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
+}
+
+.category-badge {
+    display: inline-block;
+    background: black;
+    color: white;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
 }

@@ -84,7 +84,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .publish-btn {
-    width: 100%;
+    width: 75%;
     padding: 14px;
     background: black;
     color: white;
@@ -188,7 +188,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .upload-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
     background: #eaeaea;
     padding: 4px;
     border-radius: 8px;
@@ -207,11 +206,38 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .preview-title {
-    color: white;
-    background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
+    color: #5C2BE2; /*Shared-GO logo blue/purple*/
     border-radius: 6px;
     padding: 6px 12px;
 }
+
+.signin-btn {
+    color: white;
+    background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.signin-btn:hover {
+    color: white;
+    background-color: #6d3cd3;
+}
+
+.signin:hover {
+    transform: scale(1.08);
+}
+
+.category-badge {
+    display: inline-block;
+    background: black;
+    color: white;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
 
 /* Adjust for portrait/mobile view (responsive design) */
 @media (max-width: 768px) {
@@ -251,6 +277,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
     .upload-field {
         margin-top: 0px;
-        margin-bottom: 75px;
+        margin-bottom: 5px;
     }
 }

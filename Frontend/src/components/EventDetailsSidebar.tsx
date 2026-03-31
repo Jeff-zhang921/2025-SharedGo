@@ -189,6 +189,9 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
         </div>
 
         <section className="event-details">
+          <div className="category-badge">
+            {event.category ?? "Other"}
+          </div>
           {/*all event detail listed as shown in the design*/}
           <div className="event-info">
             <div className="event-info-row">
@@ -203,11 +206,6 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             <div className="event-info-row">
                 <h3>CAPACITY:</h3>
                 <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
-            </div>
-
-            <div className="event-info-row">
-                <h3>CATEGORY:</h3>
-                <p>{event.category ?? "Other"}</p>
             </div>
 
             <div className="event-info-row">
