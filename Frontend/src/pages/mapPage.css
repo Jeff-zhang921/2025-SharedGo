@@ -89,7 +89,8 @@
 
 @media (max-width: 768px) { /* Create event button for mobile */
   .create-event {
-    bottom: 100px;
+    top: 20px;
+    bottom: auto;
     right: 20px;
     padding: 12px 24px; /* Smaller button for mobile */
     font-size: 15px;
