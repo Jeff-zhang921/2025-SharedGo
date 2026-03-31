@@ -112,14 +112,19 @@ html, body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 10px; /* Spacing between top and bottom button */
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: 20px;
+    /* This extra padding allows to scroll past the last button so it's not cut off */
+    padding-bottom: 100px; 
 }
 
 .top-buttons {
-    display: flex;
     gap: 10px; /* Space between Join and Delete */
     width: 100%;
+}
+
+.top-buttons:hover {
+    transform: scale(1.08);
 }
 
 .btn-join {
@@ -200,47 +205,8 @@ html, body {
     border-radius: 8px;
 }
 
-
-/* Adjust for portrait/mobile view (responsive design) */
-@media (max-width: 820px) {
-    .event-details {
-        flex-direction: column !important;
-        gap: 0px !important;
-    }
-
-    .btn-host {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .event-info {
-        padding-left: 0;
-        width: 100%;
-    }
-
-    .event-image-wrapper {
-        width: 100%;
-        padding-top: 0px;
-        padding-left: 0;
-        margin-bottom: 20px;
-    }
-
-    .host-info {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .action-buttons {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-        padding-bottom: 50px;
-    }
+.profile-image-wrapper:hover {
+    transform: scale(1.08)
 }
 
 .event-sidebar * {
@@ -281,14 +247,4 @@ html, body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
-}
-
-.action-buttons {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 12px;
-    margin-top: 20px;
-    /* This extra padding allows to scroll past the last button so it's not cut off */
-    padding-bottom: 100px; 
 }
