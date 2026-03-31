@@ -226,10 +226,12 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
               {event?.imageUrl && (
                   <img src={event.imageUrl} alt={event.title} className="event-image"/>
               )}
-              {event?.externalUrl && (
-              <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
-                  Visit Event Website</a>
-              )}
+              <div className="web-link">
+                {event?.externalUrl && (
+                <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
+                    Visit Event Website</a>
+                )}
+              </div>
             </div>
 
             {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}

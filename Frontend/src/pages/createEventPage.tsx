@@ -266,6 +266,7 @@ formData.append("file",file)
 
       
       <div className="create-event-container">
+        <form className="event-form" onSubmit={onSubmit}>
           {/*Live Preview*/}
           <div className="preview-title">
             <i><b>Live Preview:</b></i>
@@ -306,11 +307,13 @@ formData.append("file",file)
               {form?.imageUrl && (
                 <img src={form.imageUrl} alt={form.title} className="event-image"/>
               )}
-            </div>
 
-            {form?.externalUrl && (
-              <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
-            )}
+              <div className="web-link">
+                {form?.externalUrl && (
+                  <a className="web-link" href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
+                )}
+              </div>
+            </div>
           </section>
 
           {/*Publishing Tips*/}
@@ -325,10 +328,9 @@ formData.append("file",file)
               <Link className="signin-btn" to="/">Need to sign in?</Link>
             </div>
           </div>
-          
           {/*Publish Button*/}
           <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
-
+        </form>
       </div>
     </div>
   );

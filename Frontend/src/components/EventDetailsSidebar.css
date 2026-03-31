@@ -229,3 +229,12 @@ html, body {
     text-transform: uppercase;
     font-weight: bold;
 }
+
+.web-link {
+    color: #5C2BE2
+}
+
+.web-link:hover {
+    color: #6d3cf3;
+    transform: scale(1.08);
+}

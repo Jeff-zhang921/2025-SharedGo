@@ -2,7 +2,6 @@ import Button from "./Button";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom"; //to check current page
 import { useSearch } from "./../searchFile"; //Import the hook
-import './Navigation.css';
 
 type Props = {
     userId?: string | number;

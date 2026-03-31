@@ -157,13 +157,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-left: 60px;
+    padding-left: 0px;
 }
 
 .event-info-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0px;
     padding: 8px 0;
     border-bottom: 1px solid #ccc;
 }
@@ -183,6 +183,15 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     max-height: 350px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+.web-link {
+    color: #5C2BE2
+}
+
+.web-link:hover {
+    color: #6d3cf3;
+    transform: scale(1.08);
 }
 
 .upload-field {

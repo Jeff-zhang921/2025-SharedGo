@@ -78,25 +78,6 @@ html, body, #root {
   padding-left: 70px;
 }
 
-@media (max-width: 768px) {
-  .navbar {
-      position: fixed;
-      top: auto;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 50px;
-      flex-direction: row;
-      justify-content: space-around;
-      align-items: center;
-      background: white;
-  }
-
-  .page-content {
-    padding-left: 0px;
-  }
-}
-
 .search-nav-item {
   position: relative;
   display: flex;
@@ -148,4 +129,38 @@ html, body, #root {
 .date-input {
   font-size: 12px;
   padding: 5px 8px;
+}
+
+.nav-filter-select {
+    background-color: white;
+    color: black;
+}
+
+
+@media (max-width: 768px) {
+  .navbar {
+    position: fixed;
+    top: auto;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background: white;
+  }
+
+  .nav-search-container {
+      bottom: 60px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+  }
+
+  .page-content {
+    padding-left: 0px;
+  }
 }
