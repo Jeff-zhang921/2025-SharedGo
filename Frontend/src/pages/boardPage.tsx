@@ -561,10 +561,10 @@ export default function BoardPage() {
                 <p className="board-time">{formatTime(question.createdAt)}</p>
                 {renderBody(question.body)}
 
-                <div >
+                <div className="answer-list">
                   {question.answers.map((answer) => (
-                    <div key={answer.id}>
-                      <p >{formatTime(answer.createdAt)}</p>
+                    <div className="answer-item" key={answer.id}>
+                      <p className="board-time">{formatTime(answer.createdAt)}</p>
                       {renderBody(answer.body)}
                     </div>
                   ))}
@@ -574,7 +574,7 @@ export default function BoardPage() {
                   className="answer-form"
                   onSubmit={(event) => postAnswer(event, question.id)}
                 >
-                  <div>
+                  <div className="answer-input-row">
                     <label
                       htmlFor={`answer-photo-${question.id}`}
                       className="photo-button"
@@ -605,7 +605,7 @@ export default function BoardPage() {
                     </button>
                   </div>
                   {answerImage[question.id] && (
-                    <span >{answerImage[question.id]?.name}</span>
+                    <span  className="file-name">{answerImage[question.id]?.name}</span>
                   )}
                 </form>
               </article>
