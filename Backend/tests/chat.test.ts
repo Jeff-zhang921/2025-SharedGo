@@ -122,7 +122,7 @@ describe("Chat route", () => {
             expect(res.body[0].body).toBe("Hello!");
         });
          it("should return 400 if threadId is not valid integer", async () => {
-            let threadId = ["abc", "-1" ,"0", "1.5"];
+            const threadId = ["abc", "-1" ,"0", "1.5"];
             const res = await request(testApp)
                 .get(`/chat/threads/${threadId}/messages`);
             expect(res.status).toBe(400);
