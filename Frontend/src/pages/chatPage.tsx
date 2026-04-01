@@ -45,11 +45,8 @@ const ChatPage = () => {
   const [threadId,setThreadId]=useState<number|null>(null)
   const [message,setMessages]=useState<ChatMessage[]>([])
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-
-  //<> is the generic: this box is empty right now (null), but eventually, it is going to hold an object with an id, an email, and a name. Please get the memory ready for that
   const [me, setMe] = useState<{ id: number; email: string; name: string | null } | null>(null);
   const autoThreadRef=useRef(false)
-//useEffect: After you finish drawing the screen, run this specific piece of code.
 const [messageBody,setMessageBody]=useState("")
 
 

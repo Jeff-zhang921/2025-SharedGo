@@ -527,9 +527,9 @@ export default function BoardPage() {
       
       {tab === "question" && (
         <section>
-          <form onSubmit={postQuestion}>
-            <div >
-              <label htmlFor="question-photo-input" >
+          <form className="board-form" onSubmit={postQuestion}>
+            <div  className="board-input-row">
+              <label htmlFor="question-photo-input" className="photo-button">
                 Photo
               </label>
               <input
@@ -549,16 +549,16 @@ export default function BoardPage() {
               Ask
             </button>
             </div>
-            {questionImage && <span>{questionImage.name}</span>}
+            {questionImage && <span className="file-name">{questionImage.name}</span>}
           </form>
 
           {loading && <p>Loading...</p>}
           {!loading && questions.length === 0 && <p>No questions yet.</p>}
 
-          <div>
+          <div className="board-list">
             {questions.map((question) => (
-              <article key={question.id}>
-                <p >{formatTime(question.createdAt)}</p>
+              <article className="board-card" key={question.id}>
+                <p className="board-time">{formatTime(question.createdAt)}</p>
                 {renderBody(question.body)}
 
                 <div >

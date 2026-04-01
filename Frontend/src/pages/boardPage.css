@@ -79,3 +79,71 @@
   padding: 10px;
   box-sizing: border-box;
 }
+
+.answer-form button {
+  border: none;
+  background: #111;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.board-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.board-card p {
+  margin: 0 0 6px;
+  word-break: break-word;
+}
+
+.board-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.board-time {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.board-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.file-name {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.photo-input {
+  display: none;
+}
+
+.photo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #111;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
