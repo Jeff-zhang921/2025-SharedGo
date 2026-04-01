@@ -51,6 +51,18 @@ const validateImage = (file: File | null) => {
   return null;
 };
 
+const readErrorMessage = async (response: Response, fallback: string) => {
+  try {
+    const data = (await response.json()) as { message?: string };
+    if (typeof data.message === "string" && data.message.trim()) {
+      return data.message.trim();
+    }
+  } catch {
+    // Ignore malformed error bodies and use the fallback text instead.
+  }
+  return fallback;
+};
+
 const composeBody = (text: string, imageUrl: string | null) => {
   // Store text and image URL in one string field for backend compatibility.
   const trimmed = text.trim();
@@ -93,6 +105,7 @@ export default function BoardPage() {
   //tan is use to identify it is general or q&a
   const [tab, setTab] = useState<Tab>("general");
   const [loading, setLoading] = useState(false);
+  const [boardError, setBoardError] = useState("");
   //toastMessage if for
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -110,6 +123,11 @@ export default function BoardPage() {
   const [answerImage, setAnswerImage] = useState<Record<number, File | null>>({});
 
   const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
+  const showErrorToast = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
   };
@@ -135,6 +153,7 @@ export default function BoardPage() {
 
     const loadBoard = async () => {
       setLoading(true);
+      setBoardError("");
 
       const endpoint =
         tab === "general"
@@ -144,6 +163,12 @@ export default function BoardPage() {
       try {
         const response = await fetch(endpoint, { credentials: "include" });
         if (!response.ok) {
+          const message = await readErrorMessage(
+            response,
+            `Failed to load ${tab === "general" ? "general board" : "Q&A board"}.`,
+          );
+          setBoardError(message);
+          showErrorToast(message);
           if (tab === "general") {
             setGeneralMessages([]);
           } else {
@@ -174,6 +199,9 @@ export default function BoardPage() {
         );
         setQuestions(newestFirst);
       } catch {
+        const message = `Failed to load ${tab === "general" ? "general board" : "Q&A board"}.`;
+        setBoardError(message);
+        showErrorToast(message);
         if (tab === "general") {
           setGeneralMessages([]);
         } else {
@@ -286,15 +314,18 @@ export default function BoardPage() {
       if (generalImage) {
         imageUrl = await uploadImage(generalImage);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Message body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Message body must be less than 1000 characters.");
         return;
       }
 
@@ -306,7 +337,7 @@ export default function BoardPage() {
       });
 
       if (!response.ok) {
-        setToastMessage("fail to post general")
+        showErrorToast(await readErrorMessage(response, "Failed to post general message."));
         return;
       }
 
@@ -318,6 +349,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Message posted.");
     } catch {
+      showErrorToast("Failed to post general message.");
       return;
     }
   };
@@ -340,15 +372,18 @@ export default function BoardPage() {
       if (questionImage) {
         imageUrl = await uploadImage(questionImage);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Question body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Question body must be less than 1000 characters.");
         return;
       }
 
@@ -363,6 +398,7 @@ export default function BoardPage() {
       );
 
       if (!response.ok) {
+        showErrorToast(await readErrorMessage(response, "Failed to post question."));
         return;
       }
       //everything inside the Question type, except for the answers property
@@ -375,7 +411,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Question posted.");
     } catch {
-      setToastMessage("fail to post question")
+      showErrorToast("Failed to post question.");
       return;
     }
   };
@@ -399,15 +435,18 @@ export default function BoardPage() {
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Answer body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Answer body must be less than 1000 characters.");
         return;
       }
 
@@ -419,6 +458,7 @@ export default function BoardPage() {
       });
 
       if (!response.ok) {
+        showErrorToast(await readErrorMessage(response, "Failed to post answer."));
         return;
       }
 
@@ -435,6 +475,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Answer posted.");
     } catch {
+      showErrorToast("Failed to post answer.");
       return;
     }
   };
@@ -465,6 +506,8 @@ export default function BoardPage() {
         </button>
         <h1>Event Board</h1>
       </header>
+
+      {boardError && <p className="board-error">{boardError}</p>}
 
       <div className="board-tabs">
         <button

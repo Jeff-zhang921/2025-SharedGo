@@ -31,6 +31,12 @@
   font-size: 1.4rem;
 }
 
+.board-error {
+  margin: 0 0 12px;
+  color: #b42318;
+  font-size: 0.95rem;
+}
+
 .board-back {
   border: 1px solid #ccc;
   background: #fff;
