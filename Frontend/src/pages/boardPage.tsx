@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import "./boardPage.css";
+ import "./boardPage.css";
 
 type Tab = "general" | "question";
 
@@ -51,6 +51,18 @@ const validateImage = (file: File | null) => {
   return null;
 };
 
+const readErrorMessage = async (response: Response, fallback: string) => {
+  try {
+    const data = (await response.json()) as { message?: string };
+    if (typeof data.message === "string" && data.message.trim()) {
+      return data.message.trim();
+    }
+  } catch {
+    // Ignore malformed error bodies and use the fallback text instead.
+  }
+  return fallback;
+};
+
 const composeBody = (text: string, imageUrl: string | null) => {
   // Store text and image URL in one string field for backend compatibility.
   const trimmed = text.trim();
@@ -93,6 +105,7 @@ export default function BoardPage() {
   //tan is use to identify it is general or q&a
   const [tab, setTab] = useState<Tab>("general");
   const [loading, setLoading] = useState(false);
+  const [boardError, setBoardError] = useState("");
   //toastMessage if for
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -110,6 +123,11 @@ export default function BoardPage() {
   const [answerImage, setAnswerImage] = useState<Record<number, File | null>>({});
 
   const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
+  const showErrorToast = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
   };
@@ -135,6 +153,7 @@ export default function BoardPage() {
 
     const loadBoard = async () => {
       setLoading(true);
+      setBoardError("");
 
       const endpoint =
         tab === "general"
@@ -144,6 +163,12 @@ export default function BoardPage() {
       try {
         const response = await fetch(endpoint, { credentials: "include" });
         if (!response.ok) {
+          const message = await readErrorMessage(
+            response,
+            `Failed to load ${tab === "general" ? "general board" : "Q&A board"}.`,
+          );
+          setBoardError(message);
+          showErrorToast(message);
           if (tab === "general") {
             setGeneralMessages([]);
           } else {
@@ -174,6 +199,9 @@ export default function BoardPage() {
         );
         setQuestions(newestFirst);
       } catch {
+        const message = `Failed to load ${tab === "general" ? "general board" : "Q&A board"}.`;
+        setBoardError(message);
+        showErrorToast(message);
         if (tab === "general") {
           setGeneralMessages([]);
         } else {
@@ -286,15 +314,18 @@ export default function BoardPage() {
       if (generalImage) {
         imageUrl = await uploadImage(generalImage);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Message body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Message body must be less than 1000 characters.");
         return;
       }
 
@@ -306,7 +337,7 @@ export default function BoardPage() {
       });
 
       if (!response.ok) {
-        setToastMessage("fail to post general")
+        showErrorToast(await readErrorMessage(response, "Failed to post general message."));
         return;
       }
 
@@ -318,6 +349,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Message posted.");
     } catch {
+      showErrorToast("Failed to post general message.");
       return;
     }
   };
@@ -340,15 +372,18 @@ export default function BoardPage() {
       if (questionImage) {
         imageUrl = await uploadImage(questionImage);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Question body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Question body must be less than 1000 characters.");
         return;
       }
 
@@ -363,6 +398,7 @@ export default function BoardPage() {
       );
 
       if (!response.ok) {
+        showErrorToast(await readErrorMessage(response, "Failed to post question."));
         return;
       }
       //everything inside the Question type, except for the answers property
@@ -375,7 +411,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Question posted.");
     } catch {
-      setToastMessage("fail to post question")
+      showErrorToast("Failed to post question.");
       return;
     }
   };
@@ -399,15 +435,18 @@ export default function BoardPage() {
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
         if (!imageUrl) {
+          showErrorToast("Image upload failed.");
           return;
         }
       }
 
       const body = composeBody(text, imageUrl);
       if (!body) {
+        showErrorToast("Answer body is required.");
         return;
       }
       if (body.length > 1000) {
+        showErrorToast("Answer body must be less than 1000 characters.");
         return;
       }
 
@@ -419,6 +458,7 @@ export default function BoardPage() {
       });
 
       if (!response.ok) {
+        showErrorToast(await readErrorMessage(response, "Failed to post answer."));
         return;
       }
 
@@ -435,6 +475,7 @@ export default function BoardPage() {
       form.reset();
       showSuccessToast("Answer posted.");
     } catch {
+      showErrorToast("Failed to post answer.");
       return;
     }
   };
@@ -453,6 +494,170 @@ export default function BoardPage() {
       </div>
     );
   };
+
+
+
+   return (
+    <div className="board-page">
+      {showToast && <div className="board-toast">{toastMessage}</div>}
+      <header  className="board-top">
+        <button type="button" className="board-back" onClick={() => navigate(-1)}>
+          Back
+        </button>
+        <h1>Event Board</h1>
+      </header>
+
+      {boardError && <p className="board-error">{boardError}</p>}
+
+      <div className="board-tabs">
+        <button
+          type="button"
+          className={tab === "general" ? "active" : ""}
+          onClick={() => setTab("general")}
+        >
+          General
+        </button>
+        <button
+          type="button"
+          className={tab === "question" ? "active" : ""}
+          onClick={() => setTab("question")}
+        >
+          Question
+        </button>
+      </div>
+
+      {tab === "general" && (
+        <section>
+          <form className="board-form" onSubmit={postGeneral}>
+            <div className="board-input-row">
+              <label htmlFor="general-photo-input"  className="photo-button">
+                Photo
+              </label>
+              <input
+                id="general-photo-input"
+                type="file"
+                accept="image/*"
+                className="photo-input"
+                onChange={handleGeneralImageChange}
+              />
+              <textarea
+                className="board-textarea"
+                value={generalDraft}
+                onChange={(event) => setGeneralDraft(event.target.value)}
+                placeholder="Write a announcement..."
+              />
+            <button type="submit">
+              Post
+            </button>
+            </div>
+            {generalImage && <span className="file-name">{generalImage.name}</span>}
+
+          </form>
+
+          {loading && <p>Loading...</p>}
+          {!loading && generalMessages.length === 0 && <p>No messages yet.</p>}
+
+          <div className="board-list">
+            {generalMessages.map((item) => (
+              <article  className="board-card" key={item.id}>
+                <p className="board-time">{formatTime(item.createdAt)}</p>
+                {renderBody(item.body)}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+      
+      {tab === "question" && (
+        <section>
+          <form className="board-form" onSubmit={postQuestion}>
+            <div  className="board-input-row">
+              <label htmlFor="question-photo-input" className="photo-button">
+                Photo
+              </label>
+              <input
+                id="question-photo-input"
+                type="file"
+                accept="image/*"
+                className="photo-input"
+                onChange={handleQuestionImageChange}
+              />
+              <textarea
+                className="board-textarea"
+                value={questionDraft}
+                onChange={(event) => setQuestionDraft(event.target.value)}
+                placeholder="Ask a question..."
+              />
+            <button type="submit">
+              Ask
+            </button>
+            </div>
+            {questionImage && <span className="file-name">{questionImage.name}</span>}
+          </form>
+
+          {loading && <p>Loading...</p>}
+          {!loading && questions.length === 0 && <p>No questions yet.</p>}
+
+          <div className="board-list">
+            {questions.map((question) => (
+              <article className="board-card" key={question.id}>
+                <p className="board-time">{formatTime(question.createdAt)}</p>
+                {renderBody(question.body)}
+
+                <div className="answer-list">
+                  {question.answers.map((answer) => (
+                    <div className="answer-item" key={answer.id}>
+                      <p className="board-time">{formatTime(answer.createdAt)}</p>
+                      {renderBody(answer.body)}
+                    </div>
+                  ))}
+                </div>
+
+                <form
+                  className="answer-form"
+                  onSubmit={(event) => postAnswer(event, question.id)}
+                >
+                  <div className="answer-input-row">
+                    <label
+                      htmlFor={`answer-photo-${question.id}`}
+                      className="photo-button"
+                    >
+                      Photo
+                    </label>
+                    <input
+                      id={`answer-photo-${question.id}`}
+                      type="file"
+                      accept="image/*"
+                      className="photo-input"
+                      onChange={(event) => handleAnswerImageChange(question.id, event)}
+                    />
+                    <input
+                      type="text"
+                      className="answer-text"
+                      value={answerDraft[question.id] || ""}
+                      onChange={(event) =>
+                        setAnswerDraft((prev) => ({
+                          ...prev,
+                          [question.id]: event.target.value,
+                        }))
+                      }
+                      placeholder="Write an answer..."
+                    />
+                    <button type="submit">
+                      Reply
+                    </button>
+                  </div>
+                  {answerImage[question.id] && (
+                    <span  className="file-name">{answerImage[question.id]?.name}</span>
+                  )}
+                </form>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
 
 }
 
