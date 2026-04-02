@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 
 interface HostData {
@@ -33,31 +33,13 @@ interface HostStats {
     avgFillRate: number;
 }
 
-const MOCK_STATS: HostStats = {
-    totalEvents: 125,
-    totalAttendees: 500,
-    avgRating: 4.1,
-    reviewCount: 140,
-    avgFillRate: 85,
+const EMPTY_STATS: HostStats = {
+    totalEvents: 0,
+    totalAttendees: 0,
+    avgRating: 0,
+    reviewCount: 0,
+    avgFillRate: 0,
 };
-
-const MOCK_UPCOMING_EVENTS: CardItem[] = Array.from({ length: 3 }, () => ({
-    title: "Title",
-    date: "Date",
-    location: "location",
-    filled: 25,
-    total: 100,
-    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
-}));
-
-const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
-    title: "Title",
-    date: "Date",
-    location: "location",
-    filled: 25,
-    total: 100,
-    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
-}));
 
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
     <div style={{ display: "flex", gap: "2px" }}>
@@ -140,19 +122,30 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => (
 
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [host, setHost] = useState<HostData | null>(null);
     const [selectedTab, setSelectedTab] = useState<number>(0);
-    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
-    const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
+    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>([]);
+    const [pastEvents, setPastEvents] = useState<CardItem[]>([]);
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [stats] = useState<HostStats>(MOCK_STATS);
+    const [stats, setStats] = useState<HostStats>(EMPTY_STATS);
 
     const tabs = [
         { label: "Upcoming events", count: upcomingEvents.length },
         { label: "Past events",     count: pastEvents.length },
         { label: "Review" },
     ];
+
+    const mapEventToCard = (event: any): CardItem => ({
+        title: event.title ?? "Title",
+        date: event.startsAt ? new Date(event.startsAt).toLocaleString() : "Date",
+        location: event.location ?? "location",
+        filled: event.attendeeCount ?? 0,
+        total: event.capacity ?? undefined,
+        image: event.imageUrl ?? undefined,
+    });
 
     useEffect(() => {
         const fetchHostData = async () => {
@@ -161,11 +154,30 @@ export default function Host() {
                 const data = await response.json();
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);
-                if (data.upcomingEvents?.length) setUpcomingEvents(data.upcomingEvents);
+                setStats({
+                    totalEvents: data.stats?.totalEvents ?? 0,
+                    totalAttendees: data.stats?.totalAttendees ?? 0,
+                    avgRating: data.stats?.averageRating ?? 0,
+                    reviewCount: data.stats?.reviewCount ?? 0,
+                    avgFillRate: data.stats?.averageFillRate ?? 0,
+                });
+                if (data.upcomingEvents?.length) {
+                    setUpcomingEvents(data.upcomingEvents.map(mapEventToCard));
+                } else {
+                    setUpcomingEvents([]);
+                }
+                if (data.pastEvents?.length) {
+                    setPastEvents(data.pastEvents.map(mapEventToCard));
+                } else {
+                    setPastEvents([]);
+                }
                 setReviews(data.reviews);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
                 setHost({ id: 0, name: "Name", email: "email@domain.com" });
+                setStats(EMPTY_STATS);
+                setUpcomingEvents([]);
+                setPastEvents([]);
                 setReviews([
                     { id: 1, userName: "Name", msg: "review", rating: 4 },
                     { id: 2, userName: "Name", msg: "review", rating: 4 },
@@ -208,7 +220,17 @@ export default function Host() {
                 padding: "0.875rem 1.25rem",
                 borderBottom: "1px solid #f3f4f6",
             }}>
-                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                <button
+                    onClick={() => {
+                        const eventId = searchParams.get("eventId");
+                        if (eventId) {
+                            navigate(`/eventDetails/${eventId}`);
+                        } else {
+                            navigate(-1);
+                        }
+                    }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
                         <polyline points="15 18 9 12 15 6" />
@@ -224,12 +246,6 @@ export default function Host() {
             {/* Profile + Stats */}
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-                    <img
-                        src="/user-icon.png"
-                        alt="Host"
-                        onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"; }}
-                        style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}
-                    />
                     <div>
                         <h1 style={{ margin: 0, fontSize: "1.375rem", fontWeight: "700", color: "#111827" }}>
                             {host.name || "Anonymous Host"}
@@ -240,8 +256,6 @@ export default function Host() {
                 <div style={{ display: "flex", gap: "0.625rem" }}>
                     <StatCard label="Total" value={stats.totalEvents} sub="events" />
                     <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
-                    <StatCard label="Avg.rating" value={stats.avgRating} sub={`(${stats.reviewCount} reviews)`} />
-                    <StatCard label="Avg. fill rate" value={`${stats.avgFillRate}%`} />
                 </div>
             </div>
 
