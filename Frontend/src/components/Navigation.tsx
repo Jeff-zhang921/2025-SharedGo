@@ -80,8 +80,13 @@ export default function Navigation() {
                 </div>
             )}
             
-            <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+            {/*No home button when on map page*/}
+            {!isMapPage && (
+                <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+            )}
+
             <Button link="/conversations" imgSrc="/chat.svg" text="chat" size={30}/>
+
             <Button link="/profile" imgSrc="/user.svg" text="profile" size={30}/>
         </aside>
     );

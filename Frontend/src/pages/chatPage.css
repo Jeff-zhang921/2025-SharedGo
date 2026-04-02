@@ -13,7 +13,7 @@ What it does: It pushes other boxes away. */
   --text: #111111;
   --muted: #858080;
   --accent: #000000;
-  --bubble-me: #933fd8;
+  --bubble-me: #5C2BE2; /*Shared-GO logo blue/purple*/
   --bubble-them: #b8b5b59f;
 
   /* ensure chati s at least as tall as screen */

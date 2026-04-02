@@ -189,8 +189,11 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
         </div>
 
         <section className="event-details">
-            {/*all event detail listed as shown in the design*/}
-            <div className="event-info">
+          <div className="category-badge">
+            {event.category ?? "Other"}
+          </div>
+          {/*all event detail listed as shown in the design*/}
+          <div className="event-info">
             <div className="event-info-row">
                 <h3>TITLE:</h3><p>{event.title}</p>
             </div>
@@ -203,11 +206,6 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             <div className="event-info-row">
                 <h3>CAPACITY:</h3>
                 <p>{event.capacity === null ? 'Unlimited' : event.capacity}</p>
-            </div>
-
-            <div className="event-info-row">
-                <h3>CATEGORY</h3>
-                <p>{event.category ?? "Other"}</p>
             </div>
 
             <div className="event-info-row">
@@ -225,19 +223,23 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             
             <div className='btn-host'>
             <div className="event-image-wrapper">
-            {event?.imageUrl && (
-                <img src={event.imageUrl} alt={event.title} className="event-image"/>
-            )}
-            {event?.externalUrl && (
-            <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
-                Visit Event Website</a>
-            )}
+              {event?.imageUrl && (
+                  <img src={event.imageUrl} alt={event.title} className="event-image"/>
+              )}
+              <div className="web-link">
+                {event?.externalUrl && (
+                <a href={event.externalUrl} target="_blank" rel="noopener noreferrer">
+                    Visit Event Website</a>
+                )}
+              </div>
             </div>
 
             {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}
-            <Link to={`/host/${event.host.id}`}>
-                <img src="/user-icon.png" alt="Host Details" className="profile-img" />
-            </Link>
+            <div className="profile-image-wrapper">
+              <Link to={`/host/${event.host.id}`}>
+                  <img src="/user-icon.png" alt="Host Details" className="profile-img" />
+              </Link>
+            </div>
             
             <div className="host-info">
                 <h3>HOSTED BY:</h3>
@@ -250,21 +252,30 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             </div>
 
             <div className="action-buttons">
-                {/* pass hostId so chat page can create/find the thread immediately */}
-    
-                <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>               
-                <div className="top-buttons">
-                <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
-                {/* If hostId matches event host, then show delete event button */}
+              <div className="top-buttons">
+                <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
+              </div>
+
+              <div className="top-buttons">
+                {/* If hostId matches event host, then DON'T show "chat with host" button */}
+                { currentUser?.id !== event?.host?.id && (
+                  <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
+                )}
+
+                {/* If hostId matches event host, then show "delete event" button */}
                 {currentUser?.id === event?.host?.id && (
                     <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
                     {isLoading ? "Deleting...":"Delete Event"}
                     </button>
                 )}
-                </div>
+              </div>
+
+              <div className="top-buttons">
                 <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
+              </div>
             </div>
-            </div>
+
+          </div>
         </section>
         </div>
   )}

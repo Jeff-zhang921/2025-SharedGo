@@ -182,21 +182,6 @@ formData.append("file",file)
           </header>
 
           <section className="form-section">
-            <label>
-              <span>TITLE</span>
-              <input name="title" placeholder="Title" onChange={onChange} required/>
-            </label>
-
-            <label>
-              <span>DATE</span>
-              <input name="startsAt" type="datetime-local" onChange={onChange} required/>
-            </label>
-            
-            <label>
-              <span>CAPACITY</span>
-              <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
-            </label>
-
             <label className= "select-field">
               <span>CATEGORY</span>
               <div className="select-wrapper">
@@ -218,6 +203,21 @@ formData.append("file",file)
             </label>
 
             <label>
+              <span>TITLE</span>
+              <input name="title" placeholder="Title" onChange={onChange} required/>
+            </label>
+
+            <label>
+              <span>DATE</span>
+              <input name="startsAt" type="datetime-local" onChange={onChange} required/>
+            </label>
+            
+            <label>
+              <span>CAPACITY</span>
+              <input name="capacity" type="number" placeholder="Unlimited" onChange={onChange}/>
+            </label>
+
+            <label>
               <span>LOCATION</span>
               <input name="location" placeholder="Add location" onChange={onChange}/>
             </label>
@@ -233,20 +233,13 @@ formData.append("file",file)
             </label>
 
             <label>
-              <span>Description</span>
+              <span>DESCRIPTION</span>
               <textarea name="description" placeholder="No description provided" onChange={onChange}/>
             </label>
-          </section>
-        </form>
-      </div>
 
-      {/*Image and Website link inputs*/}
-      <div className="create-event-container">
-        <form className="event-form" onSubmit={onSubmit}>
-          <section className="form-section">
+            {/*Image and Website link inputs*/}
             <div className="upload-field">
-              <span>Photo</span>
-              
+              <span>+ Add image</span>
               <input
                 id="event-photo-upload"
                 className="photo-upload-input"
@@ -255,12 +248,35 @@ formData.append("file",file)
                 onChange={handleSendFile}
               />
             </div>
+            
+            <div className="upload-field">
+              <span>Add event website link:</span>
+              <input
+                name="externalUrl"
+                className="photo-upload-input"
+                type="url"
+                placeholder="https://example.com"
+                value={form.externalUrl}
+                onChange={onChange}
+              />
+            </div>
           </section>
+        </form>
+      </div>
 
+      
+      <div className="create-event-container">
+        <form className="event-form" onSubmit={onSubmit}>
           {/*Live Preview*/}
-          <i><b>Live Preview:</b></i>
+          <div className="preview-title">
+            <i><b>Live Preview:</b></i>
+          </div>
           {/*all event details listed as shown in the design*/}
+          <h1 className="event-title">Event details</h1>
           <section className="event-details">
+            <div className="category-badge">
+              {form.category ?? "Other"}
+            </div>
             <div className="event-info">
               <div className="event-info-row">
                 <h3>TITLE:</h3><p>{form.title}</p>
@@ -277,31 +293,27 @@ formData.append("file",file)
               </div>
 
               <div className="event-info-row">
-                <h3>CATEGORY</h3>
-                <p>{form.category ?? "Other"}</p>
-              </div>
-
-              <div className="event-info-row">
                 <h3>LOCATION:</h3>
                 <p>{form.location}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>DESCRIPTION:</h3>
-                
-              </div>
-              <div className="event-description">
-                  <p>{form.description || "No description provided"}</p>
+                <p>{form.description || "No description provided"}</p>
               </div>
             </div>
+
             <div className="event-image-wrapper">
               {form?.imageUrl && (
                 <img src={form.imageUrl} alt={form.title} className="event-image"/>
               )}
+
+              <div className="web-link">
+                {form?.externalUrl && (
+                  <a className="web-link" href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
+                )}
+              </div>
             </div>
-            {form?.externalUrl && (
-              <a href={form.externalUrl} target="_blank" rel="noopener noreferrer">Visit Event Website</a>
-            )}
           </section>
 
           {/*Publishing Tips*/}
@@ -312,9 +324,10 @@ formData.append("file",file)
               <li>Add an image so the event stands out on the map.</li>
               <li>Pick a bright photo so people can spot your event quickly.</li>
             </ul>
-            <Link to="/">Need to sign in?</Link>
+            <div className="signin">
+              <Link className="signin-btn" to="/">Need to sign in?</Link>
+            </div>
           </div>
-          
           {/*Publish Button*/}
           <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
         </form>
