@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./profilePage.css";
 
 // Define the interface for returning data from the API
 interface User {
@@ -134,13 +135,7 @@ export default function ProfilePage() {
   // Loading/Error State Rendering
   if (loading) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: '#f9fafb' 
-      }}>
+      <div className="loading">
         <p>Loading profile data...</p>
       </div>
     );
@@ -148,15 +143,8 @@ export default function ProfilePage() {
 
   if (error) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: '#f9fafb',
-        padding: '1.25rem'
-      }}>
-        <p style={{ color: '#ef4444' }}>Error: {error}</p>
+      <div className="error">
+        <p>Error: {error}</p>
       </div>
     );
   }
@@ -166,224 +154,86 @@ export default function ProfilePage() {
   const user = profileData?.user || fallbackUser;
   const stats = profileData?.stats || { upcomingCount: 0, pastCount: 0 };
 
+  const statsItems = [
+    { label: "upcoming events", value: stats.upcomingCount },
+    { label: "past events", value: stats.pastCount },
+    { label: "140 reviews", value: "4.1" },
+    { label: "average attendance", value: "85" },
+  ];
+  const cardItems = [
+    { label: "upcoming events", value: stats.upcomingCount },
+    { label: "past events", value: stats.pastCount },
+    { label: "140 reviews", value: "4.1" },
+    { label: "average attendance", value: "85" },
+  ];
+
   return (
-    <div style={{ 
-      height: '100vh', 
-      backgroundColor: '#f9fafb', 
-      fontFamily: 'sans-serif',
-      overflowY: 'auto',
-      boxSizing: 'border-box',
-      paddingBottom: '60px' //Leave space for the bottom navigation
-    }}>
+    <div className="profile-page">
       {/* Header Navigation Bar */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '1rem 1.25rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid #e5e7eb'
-      }}>
+      <div className="header">
+        {/*hard-coded back-button*/}
         <div style={{ cursor: 'pointer' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M5 12l7 7M5 12l7-7" />
           </svg>
         </div>
-        <div style={{ fontWeight: '600', fontSize: '1rem' }}>My profile</div>
-        <div></div>
+        <div className="title">My profile</div>
       </div>
 
       {/* Host Profile Information Section */}
-      <div style={{
-        backgroundColor: 'white',
-        padding: '1.5rem 1.25rem',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <div style={{ marginRight: '1.5rem' }}>
-          <img
-            src="/user-avatar.png"
-            alt="Host Profile"
-            style={{ 
-              width: '80px', 
-              height: '80px', 
-              borderRadius: '50%', 
-              objectFit: 'cover',
-              border: '1px solid #e5e7eb'
-            }}
-          />
+      <div className="profile-info">
+        <div className="avatar-margin">
+          <img src="/user-avatar.png" className="avatar" />
         </div>
         
-        <div style={{ flex: 1 }}>
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: '1.25rem', 
-            fontWeight: '600', 
-            color: '#111827' 
-          }}>
+        <div className="user-details">
+          <h1 className="user-name">
             {user.name}
           </h1>
-          <p style={{ 
-            margin: '0.25rem 0 0.5rem 0', 
-            fontSize: '0.875rem', 
-            color: '#6b7280' 
-          }}>
+          <p className="user-email">
             {user.email}
           </p>
-          <button style={{
-            padding: '0.25rem 0.75rem',
-            fontSize: '0.75rem',
-            backgroundColor: '#f3f4f6',
-            border: '1px solid #e5e7eb',
-            borderRadius: '0.375rem',
-            cursor: 'pointer',
-            color: '#374151'
-          }}>
+          <button className="edit-profile">
             Edit Profile
           </button>
-          <button
-            onClick={() => navigate("/conversations")}
-            style={{
-              marginLeft: '0.5rem',
-              padding: '0.25rem 0.75rem',
-              fontSize: '0.75rem',
-              backgroundColor: '#111827',
-              border: '1px solid #111827',
-              borderRadius: '0.375rem',
-              color: '#ffffff'
-            }}
-          >
+          <button onClick={() => navigate("/conversations")} className="conversations">
             Conversations
           </button>
         </div>
       </div>
 
       {/* User/Host Role Tags */}
-      <div style={{
-        padding: '0 1.25rem',
-        backgroundColor: 'white',
-        display: 'flex',
-        gap: '0.75rem',
-        paddingBottom: '1rem'
-      }}>
-        <span style={{
-          color: '#10b981',
-          fontWeight: '500',
-          fontSize: '0.875rem'
-        }}>User</span>
-        <span style={{
-          backgroundColor: 'black',
-          color: 'white',
-          padding: '0.25rem 0.75rem',
-          borderRadius: '9999px',
-          fontSize: '0.875rem',
-          fontWeight: '500'
-        }}>Host</span>
+      <div className="role-tags">
+        <span className="role-tags-user">User</span>
+        <span className="role-tags-host">Host</span>
       </div>
-
+      
       {/* Host Statistics Cards */}
-      <div style={{
-        padding: '1rem 1.25rem',
-        backgroundColor: 'white',
-        marginTop: '0.5rem',
-        display: 'flex',
-        gap: '1rem',
-        flexWrap: 'wrap'
-      }}>
-        {/* Upcoming Events Stat */}
-        <div style={{ flex: 1, minWidth: '80px' }}>
-          <div style={{
-            fontSize: '1.75rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>{stats.upcomingCount}</div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            marginTop: '0.25rem'
-          }}>upcoming events</div>
-        </div>
-        
-        {/* Past Events Stat */}
-        <div style={{ flex: 1, minWidth: '80px' }}>
-          <div style={{
-            fontSize: '1.75rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>{stats.pastCount}</div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            marginTop: '0.25rem'
-          }}>past events</div>
-        </div>
-        
-        {/* Retain the original average rating placeholder (which can be extended from the API later) */}
-        <div style={{ flex: 1, minWidth: '80px' }}>
-          <div style={{
-            fontSize: '1.75rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>4.1</div>
-          <div style={{
-            fontSize: '0.75rem',
-            color: '#6b7280',
-            marginTop: '0.25rem'
-          }}>(140 reviews)</div>
-        </div>
-        
-        {/* Maintain the original average attendance rate placeholders (which can be expanded from the API later) */}
-        <div style={{ flex: 1, minWidth: '80px' }}>
-          <div style={{
-            fontSize: '1.75rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>85</div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            marginTop: '0.25rem'
-          }}>avg attendance</div>
-        </div>
+      <div className="stats">
+        {statsItems.map((item, index) => (
+          <div key={index} className="stats-div">
+            <div className="stats-count">{item.value}</div>
+            <div className="stats-title">{item.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* Tab Navigation */}
-      <div style={{
-        padding: '1rem 1.25rem 0',
-        display: 'flex',
-        gap: '0.5rem'
-      }}>
+      <div className="tabs">
         {tagsArr.map((tag, index) => (
           <button
             key={index}
             onClick={() => setSelectedTag(index)}
-            style={{
-              padding: '0.5rem 1.25rem',
-              borderRadius: '9999px',
-              border: 'none',
-              backgroundColor: selectedTag === index ? 'black' : '#f3f4f6',
-              color: selectedTag === index ? 'white' : '#111827',
-              fontWeight: '600',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-              flex: 1,
-              maxWidth: '120px'
-            }}
+            className={selectedTag === index ? "active" : ""}
           >
             {tag}
           </button>
         ))}
       </div>
 
-      {/* Upcoming Events Section */}
+      {/* Upcoming Events Section */}   
       {selectedTag === 0 && (
-        <div style={{
-          padding: '1rem 1.25rem',
-          backgroundColor: 'white',
-          marginTop: '0.5rem',
-          borderRadius: '0.5rem',
-          margin: '0.5rem 1.25rem'
-        }}>
+        <div className="card-list">
           {upcomingEventCards.length === 0 ? (
             <p style={{ color: '#6b7280', textAlign: 'center', padding: '2rem 0' }}>No upcoming events found</p>
           ) : (
@@ -419,7 +269,7 @@ export default function ProfilePage() {
                     fontSize: '0.875rem',
                     color: '#6b7280'
                   }}>{card.date}</p>
-                  <button style={{
+                  <button onClick={() => navigate("/map", { state: { selectedEventId: card.id } })} style={{
                     padding: '0.25rem 0.75rem',
                     fontSize: '0.75rem',
                     backgroundColor: '#f3f4f6',
@@ -428,14 +278,15 @@ export default function ProfilePage() {
                     cursor: 'pointer',
                     color: '#374151'
                   }}>
-                    Edit event
+                    View event details
                   </button>
                 </div>
               </div>
             ))
           )}
 
-          <button style={{
+          <button onClick={() => navigate("/createEvent")}
+          style={{
             width: '100%',
             padding: '0.75rem',
             marginTop: '1rem',
