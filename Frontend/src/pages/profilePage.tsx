@@ -157,8 +157,8 @@ export default function ProfilePage() {
   const statsItems = [
     { label: "upcoming events", value: stats.upcomingCount },
     { label: "past events", value: stats.pastCount },
-    { label: "140 reviews", value: "4.1" },
-    { label: "avg attendance", value: "85" },
+    { label: "0 reviews", value: "n/a" },
+    { label: "avg attendance", value: "n/a" },
   ];
 
 
@@ -227,18 +227,22 @@ export default function ProfilePage() {
             <p className="user-email">
               {user.email}
             </p>
+            {/*
             <button className="edit-profile">
               Edit Profile
             </button>
             <button onClick={() => navigate("/conversations")} className="conversations">
               Conversations
             </button>
+            */}
           </div>
         </div>
 
         {/* User/Host Role Tags */}
         <div className="role-tags">
+          {/*
           <span className="role-tags-user">User</span>
+          */}
           <span className="role-tags-host">Host</span>
         </div>
         
