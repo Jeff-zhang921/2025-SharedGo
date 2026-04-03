@@ -55,7 +55,7 @@ html, body, #root {
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: black;
+    color: #5C2BE2;
 }
 
 .navbar img:hover{
@@ -74,9 +74,10 @@ html, body, #root {
   padding: 2em;
 }
 
+/*
 .page-content {
   padding-left: 70px;
-}
+}*/
 
 .search-nav-item {
   position: relative;

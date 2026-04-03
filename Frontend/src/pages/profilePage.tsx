@@ -158,7 +158,7 @@ export default function ProfilePage() {
     { label: "upcoming events", value: stats.upcomingCount },
     { label: "past events", value: stats.pastCount },
     { label: "140 reviews", value: "4.1" },
-    { label: "average attendance", value: "85" },
+    { label: "avg attendance", value: "85" },
   ];
 
 
@@ -204,103 +204,112 @@ export default function ProfilePage() {
 };
   /* END of REFACTOR */
 
-  return (
-    <div className="profile-page">
-      {/* Header Navigation Bar */}
-      <div className="header">
-        {/*hard-coded back-button*/}
-        <div style={{ cursor: 'pointer' }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M5 12l7 7M5 12l7-7" />
-          </svg>
-        </div>
-        <div className="title">My profile</div>
-      </div>
 
-      {/* Host Profile Information Section */}
-      <div className="profile-info">
-        <div className="avatar-margin">
-          <img src="/user-avatar.png" className="avatar" />
+
+  return (
+    <div className="profile-page-wrapper">
+      <div className="profile-page">
+        {/* Header Navigation Bar */}
+        <div className="header">
+          <div className="title">My profile</div>
+        </div>
+
+        {/* Host Profile Information Section */}
+        <div className="profile-info">
+          <div className="avatar-margin">
+            <img src="/user-icon.png" className="avatar"/>
+          </div>
+          
+          <div className="user-details">
+            <h1 className="user-name">
+              {user.name}
+            </h1>
+            <p className="user-email">
+              {user.email}
+            </p>
+            <button className="edit-profile">
+              Edit Profile
+            </button>
+            <button onClick={() => navigate("/conversations")} className="conversations">
+              Conversations
+            </button>
+          </div>
+        </div>
+
+        {/* User/Host Role Tags */}
+        <div className="role-tags">
+          <span className="role-tags-user">User</span>
+          <span className="role-tags-host">Host</span>
         </div>
         
-        <div className="user-details">
-          <h1 className="user-name">
-            {user.name}
-          </h1>
-          <p className="user-email">
-            {user.email}
-          </p>
-          <button className="edit-profile">
-            Edit Profile
-          </button>
-          <button onClick={() => navigate("/conversations")} className="conversations">
-            Conversations
-          </button>
+        {/* Host Statistics Cards */}
+        <div className="stats">
+          {statsItems.map((item, index) => (
+            <div key={index} className="stats-div">
+              <div className="stats-count">{item.value}</div>
+              <div className="stats-title">{item.label}</div>
+            </div>
+          ))}
         </div>
-      </div>
 
-      {/* User/Host Role Tags */}
-      <div className="role-tags">
-        <span className="role-tags-user">User</span>
-        <span className="role-tags-host">Host</span>
-      </div>
-      
-      {/* Host Statistics Cards */}
-      <div className="stats">
-        {statsItems.map((item, index) => (
-          <div key={index} className="stats-div">
-            <div className="stats-count">{item.value}</div>
-            <div className="stats-title">{item.label}</div>
+        {/* Tab Navigation */}
+        <div className="tabs">
+          {tagsArr.map((tag, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedTag(index)}
+              className={selectedTag === index ? "active" : ""}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        {/* Upcoming Events Section */}
+        {selectedTag === 0 && (
+          <div className="card-list">
+            <EventList
+              cards={upcomingEventCards}
+              emptyMessage="No upcoming events found"
+              onButtonClick={(id) =>
+                navigate("/map", { state: { selectedEventId: id } })
+              }
+              buttonLabel="View event details"
+            />
+
+            <button
+              onClick={() => navigate("/createEvent")}
+              className="create-event-btn"
+            >
+              + Create new event
+            </button>
           </div>
-        ))}
+        )}
+
+        {/* Past Events Section */}
+        {selectedTag === 1 && (
+          <div className="card-list">
+            <EventList
+              cards={pastEventCards}
+              emptyMessage="No past events found"
+              onButtonClick={(id) =>
+                navigate("/map", { state: { selectedEventId: id } })
+              }
+              buttonLabel="View event details"
+            />
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        {selectedTag === 2 && (
+          <div className="card-list">
+            <EventList
+              cards={[]}
+              emptyMessage="No reviews found"
+            />
+          </div>
+        )}
       </div>
-
-      {/* Tab Navigation */}
-      <div className="tabs">
-        {tagsArr.map((tag, index) => (
-          <button
-            key={index}
-            onClick={() => setSelectedTag(index)}
-            className={selectedTag === index ? "active" : ""}
-          >
-            {tag}
-          </button>
-        ))}
-      </div>
-
-      {/* Upcoming Events Section */}
-      {/* Refactor IMPLEMENTATION */}
-      {selectedTag === 0 && (
-        <div className="card-list">
-          <EventList
-            cards={upcomingEventCards}
-            emptyMessage="No upcoming events found"
-            onButtonClick={(id) =>
-              navigate("/map", { state: { selectedEventId: id } })
-            }
-            buttonLabel="View event details"
-          />
-
-          <button
-            onClick={() => navigate("/createEvent")}
-            className="create-event-btn"
-          >
-            + Create new event
-          </button>
-        </div>
-      )}
-
-      {/* Past Events Section */}
-      {/* Refactor IMPLEMENTATION */}
-      {selectedTag === 1 && (
-        <div className="card-list">
-          <EventList
-            cards={pastEventCards}
-            emptyMessage="No past events found"
-            buttonLabel="View details"
-          />
-        </div>
-      )}
     </div>
   );
 }
