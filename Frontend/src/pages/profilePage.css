@@ -1,10 +1,15 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
 .profile-page {
     height: 100vh;
     background-color: #eee;
     font-family: sans-serif;
     overflow-y: auto;
     box-sizing: border-box;
-    padding-bottom: 60px; /*Leave space for the bottom navigation*/
 }
 
 .loading {
@@ -56,7 +61,7 @@
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #eee;
 }
 
 .user-details {
@@ -67,7 +72,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: black;
 }
 
 .user-email {
@@ -80,7 +85,7 @@
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
     background-color: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #ddd;
     border-radius: 0.375rem;
     cursor: pointer;
     color: #374151;
@@ -90,10 +95,10 @@
     margin-left: 0.5rem;
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
-    background-color: #111827;
-    border: 1px solid #111827;
+    background-color: black;
+    border: 1px solid black;
     border-radius: 0.375rem;
-    color: #ffffff;
+    color: white;
 }
 
 .role-tags {
@@ -105,9 +110,10 @@
 }
 
 .role-tags-user {
-    color: #10b981;
-    font-weight: 500;
+    color: #5C2BE2;
+    font-weight: bold;
     font-size: 0.875rem;
+    margin-top: 4px;
 }
 
 .role-tags-host {
@@ -136,12 +142,12 @@
 .stats-count {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #111827;
+    color: black;
 }
 
 .stats-title {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: gray;
     margin-top: 0.25rem;
 }
 
@@ -155,8 +161,8 @@
     padding: 0.5rem 1.25rem;
     border-radius: 9999px;
     border: none;
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: white;
+    color: black;
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -181,7 +187,7 @@
     display: flex;
     align-items: center;
     padding: 1rem 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #eee;
 }
 
 .event-card-img {
@@ -200,20 +206,20 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: #111827;
+    color: black;
 }
 
 .event-card-content p {
     margin: 0.25rem 0 0.5rem 0;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: gray;
 }
 
 .event-card-btn {
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
     background-color: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #ddd;
     border-radius: 0.375rem;
     cursor: pointer;
     color: #374151;
@@ -224,7 +230,7 @@
     padding: 0.75rem;
     margin-top: 1rem;
     background-color: #f9fafb;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed #ddd;
     border-radius: 0.5rem;
     cursor: pointer;
     color: #374151;
@@ -232,7 +238,7 @@
 }
 
 .empty-text {
-    color: #6b7280;
+    color: gray;
     text-align: center;
     padding: 2rem 0;
 }
