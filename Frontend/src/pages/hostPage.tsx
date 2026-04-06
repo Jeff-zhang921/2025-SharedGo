@@ -3,9 +3,19 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 
 interface HostData {
-    id: number,
-    name: string,
-    email: string
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface HostOverviewEvent {
+    id: number;
+    title: string;
+    startsAt: string;
+    location: string;
+    attendeeCount: number;
+    capacity: number | null;
+    imageUrl?: string | null;
 }
 
 interface CardItem {
@@ -33,12 +43,63 @@ interface HostStats {
     avgFillRate: number;
 }
 
+interface HostOverviewResponse {
+    host: HostData;
+    stats?: {
+        totalEvents?: number;
+        totalAttendees?: number;
+        averageRating?: number;
+        reviewCount?: number;
+        averageFillRate?: number;
+    };
+    upcomingEvents?: HostOverviewEvent[];
+    pastEvents?: HostOverviewEvent[];
+    reviews?: ReviewItem[];
+}
+
+interface EventDetailsResponse {
+    imageUrl?: string | null;
+}
+
 const EMPTY_STATS: HostStats = {
     totalEvents: 0,
     totalAttendees: 0,
     avgRating: 0,
     reviewCount: 0,
     avgFillRate: 0,
+};
+
+const API_BASE = import.meta.env.VITE_API_URL;
+
+const mapEventToCard = (event: HostOverviewEvent): CardItem => ({
+    title: event.title ?? "Title",
+    date: event.startsAt ? new Date(event.startsAt).toLocaleString() : "Date",
+    location: event.location ?? "location",
+    filled: event.attendeeCount ?? 0,
+    total: event.capacity ?? undefined,
+    image: event.imageUrl ?? undefined,
+});
+
+const fetchEventImage = async (eventId: number): Promise<string | undefined> => {
+    try {
+        const response = await fetch(`${API_BASE}/events/${eventId}`);
+        if (!response.ok) return undefined;
+        const detail = (await response.json()) as EventDetailsResponse;
+        return detail.imageUrl ?? undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const attachImagesFromEventDetails = async (events: HostOverviewEvent[]): Promise<HostOverviewEvent[]> => {
+    const withImages = await Promise.all(
+        events.map(async (event) => {
+            const imageUrl = await fetchEventImage(event.id);
+            if (!imageUrl) return event;
+            return { ...event, imageUrl };
+        }),
+    );
+    return withImages;
 };
 
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
@@ -138,20 +199,11 @@ export default function Host() {
         { label: "Review" },
     ];
 
-    const mapEventToCard = (event: any): CardItem => ({
-        title: event.title ?? "Title",
-        date: event.startsAt ? new Date(event.startsAt).toLocaleString() : "Date",
-        location: event.location ?? "location",
-        filled: event.attendeeCount ?? 0,
-        total: event.capacity ?? undefined,
-        image: event.imageUrl ?? undefined,
-    });
-
     useEffect(() => {
         const fetchHostData = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/hosts/${hostId}/overview`);
-                const data = await response.json();
+                const response = await fetch(`${API_BASE}/hosts/${hostId}/overview`);
+                const data = (await response.json()) as HostOverviewResponse;
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);
                 setStats({
@@ -161,17 +213,18 @@ export default function Host() {
                     reviewCount: data.stats?.reviewCount ?? 0,
                     avgFillRate: data.stats?.averageFillRate ?? 0,
                 });
-                if (data.upcomingEvents?.length) {
-                    setUpcomingEvents(data.upcomingEvents.map(mapEventToCard));
-                } else {
-                    setUpcomingEvents([]);
-                }
-                if (data.pastEvents?.length) {
-                    setPastEvents(data.pastEvents.map(mapEventToCard));
-                } else {
-                    setPastEvents([]);
-                }
-                setReviews(data.reviews);
+
+                const rawUpcoming: HostOverviewEvent[] = Array.isArray(data.upcomingEvents) ? data.upcomingEvents : [];
+                const rawPast: HostOverviewEvent[] = Array.isArray(data.pastEvents) ? data.pastEvents : [];
+
+                const [upcomingWithDetails, pastWithDetails] = await Promise.all([
+                    attachImagesFromEventDetails(rawUpcoming),
+                    attachImagesFromEventDetails(rawPast),
+                ]);
+
+                setUpcomingEvents(upcomingWithDetails.map(mapEventToCard));
+                setPastEvents(pastWithDetails.map(mapEventToCard));
+                setReviews(Array.isArray(data.reviews) ? data.reviews : []);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
                 setHost({ id: 0, name: "Name", email: "email@domain.com" });
