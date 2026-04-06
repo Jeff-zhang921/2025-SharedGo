@@ -134,5 +134,110 @@ describe("Board route", () => {
             expect(res.body.message).toBe("Message body must be less than 1000 characters");
         });
     });
+    describe("GET /qna/:eventId", () => {
+        it("should allow a participant to view Q&A", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue({ eventId: 1 });
+            mockPrisma.question.findMany.mockResolvedValue([]);
+
+            const res = await request(testApp).get("/board/qna/1");
+            expect(res.status).toBe(200);
+        });
+        it("should deny access if user is neither host nor participant", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue(null);
+            const res = await request(testApp).get("/board/qna/1");
+            expect(res.status).toBe(403);
+        });
+        it("should return 404 if event not found", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue(null);
+            const res = await request(testApp).get("/board/qna/1");
+            expect(res.status).toBe(404);
+        });
+    });
+    describe("POST /qna/:eventId/questions", () => {
+        it("should allow a participant to post a question", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue({ eventId: 1 });
+            mockPrisma.question.create.mockResolvedValue({ id: 1, body: "Test question" });
+            const res = await request(testApp)
+                .post("/board/qna/1/question")
+                .send({ body: "Test question" });
+            expect(res.status).toBe(201);
+            expect(mockPrisma.question.create).toHaveBeenCalled();
+        });
+        it("should return 403 if non-participant tries to post a question", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue(null);
+            const res = await request(testApp)
+                .post("/board/qna/1/question")
+                .send({ body: "Test question" });
+            expect(res.status).toBe(403);
+        });
+        it("should return 400 if answer is longer than 1000 character", async () => {
+            const res = await request(testApp)
+                .post("/board/qna/1/question")
+                .send({ questionId: 1, body: "a".repeat(1001) });
+            expect(res.status).toBe(400);
+        });
+        it("should return 500 if database fails during POST question", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ hostId: 1 });
+            mockPrisma.question.create.mockRejectedValue(new Error("Insert failed"));
+
+            const res = await request(testApp)
+                .post("/board/qna/1/question")
+                .send({ body: "Valid question" });
+
+            expect(res.status).toBe(500);
+            expect(res.body.message).toBe("Failed to post question to Q&A board");
+        });
+    });
+    describe("POST /qna/:eventId/answer", () => {
+        it("should allow only host and participant to post an answer", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue({ eventId: 1 });
+            mockPrisma.question.findUnique.mockResolvedValue({ id: 1, eventId: 1 });
+            mockPrisma.answer.create.mockResolvedValue({ id: 1, body: "Test answer" });
+            const res = await request(testApp)
+                .post("/board/qna/1/answer")
+                .send({ questionId: 1, body: "Test answer" });
+
+            expect(res.status).toBe(201);
+            expect(mockPrisma.answer.create).toHaveBeenCalled();
+        });
+        it("should return 403 if non-participant tries to post an answer", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 2 });
+            mockPrisma.eventParticipant.findUnique.mockResolvedValue(null);
+            const res = await request(testApp)
+                .post("/board/qna/1/answer")
+                .send({ questionId: 1, body: "Test answer" });
+
+            expect(res.status).toBe(403);
+            expect(res.body.message).toBe("Only the event host and participants can post answers to the Q&A board");
+        });
+        it("should return 404 if question belongs to another event", async () => {
+            mockPrisma.event.findUnique.mockResolvedValue({ id: 1, hostId: 1 });
+            // Mock a question that exists, but has eventId: 999
+            mockPrisma.question.findUnique.mockResolvedValue({ id: 5, eventId: 999 });
+
+            const res = await request(testApp)
+                .post("/board/qna/1/answer")
+                .send({ questionId: 5, body: "test" });
+
+            expect(res.status).toBe(404);
+        });
+        it("should return 400 if answer is too long", async () => {
+            const res = await request(testApp)
+                .post("/board/qna/1/answer")
+                .send({ questionId: 1, body: "a".repeat(1001) });
+            expect(res.status).toBe(400);
+        });
+        it("should return 400 if answer body is empty", async () => {
+            const res = await request(testApp)
+                .post("/board/qna/1/answer")
+                .send({ questionId: 1, body: "  " });
+            expect(res.status).toBe(400);
+        });
+    });
 });
 
