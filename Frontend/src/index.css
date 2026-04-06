@@ -24,8 +24,7 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Keep the body as a normal block so route layouts can own the full viewport height. */
   min-width: 320px;
   min-height: 100vh;
 }

@@ -16,11 +16,14 @@ What it does: It pushes other boxes away. */
   --bubble-me: #5C2BE2; /*Shared-GO logo blue/purple*/
   --bubble-them: #b8b5b59f;
 
+  /* Prefer viewport units that follow mobile browser UI changes before falling back to vh. */
   /* ensure chati s at least as tall as screen */
   min-height: 100vh;
+  min-height: 100svh;
   min-height: 100dvh;
   /* Locks the height to exactly the screen size. */
   height: 100vh;
+  height: 100svh;
   height: 100dvh;
   width: 100%;
   /* Tells the shell to use a "Grid" layout (good for dividing space). */
@@ -33,7 +36,7 @@ What it does: It pushes other boxes away. */
   /* : Stops the whole page from scrolling */
   overflow: hidden;
       /* box sizing says if add the padding the border won't add, it will make content smaller to fit */
-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 
@@ -231,6 +234,23 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
     max-width: 980px;
     margin: 0 auto;
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Reserve room for the fixed mobile nav so the composer stays above it. */
+  .chat-shell {
+    min-height: calc(100vh - var(--mobile-nav-height, 56px));
+    min-height: calc(100svh - var(--mobile-nav-height, 56px));
+    min-height: calc(100dvh - var(--mobile-nav-height, 56px));
+    height: calc(100vh - var(--mobile-nav-height, 56px));
+    height: calc(100svh - var(--mobile-nav-height, 56px));
+    height: calc(100dvh - var(--mobile-nav-height, 56px));
+  }
+
+  .chat-bar {
+    /* Preserve the top bar hit area on devices with a notch. */
+    padding-top: calc(10px + env(safe-area-inset-top));
   }
 }
 
