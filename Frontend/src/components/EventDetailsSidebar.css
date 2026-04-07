@@ -157,7 +157,8 @@ html, body {
     font-weight: bold;
 }
   
-  .btn-directions:active {
+  .btn-directions:active,
+  .btn-join:active {
     transform: scale(1.03); /* Slight "click" feel */
   }
 
@@ -171,6 +172,8 @@ html, body {
 
 .btn-join:hover {
     background-color: #333;
+    color: #5C2BE2;    /* Standardise hovering text colour */
+    opacity: 1;
 }
 
 .event-image-wrapper {
@@ -218,8 +221,8 @@ html, body {
 
 .close-sidebar {
     position: absolute; /* Pins it relative to the sidebar */
-    top: 15px;
-    left: 15px;
+    top: 30px;
+    left: 30px;
     width: 35px;
     height: 35px;
     cursor: pointer;
