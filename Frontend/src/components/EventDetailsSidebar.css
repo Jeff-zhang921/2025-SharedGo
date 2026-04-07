@@ -111,12 +111,25 @@ html, body {
 .action-buttons {
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 100%;
     gap: 12px;
     margin-top: 20px;
     /* This extra padding allows to scroll past the last button so it's not cut off */
-    padding-bottom: 180px; 
+    padding-bottom: 160px; 
 }
+
+/* Uniform buttons */
+.btn-join, 
+.btn-directions { 
+    width: 100%;
+    max-width: 340px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .top-buttons:hover {
     transform: scale(1.08);
@@ -141,12 +154,11 @@ html, body {
     background-color: #5C2BE2; /*Shared-GO logo blue/purple*/
     border-radius: 6px;
     display: inline-block;
-    width: auto;
     font-weight: bold;
 }
   
   .btn-directions:active {
-    transform: scale(1.08); /* Slight "click" feel */
+    transform: scale(1.03); /* Slight "click" feel */
   }
 
 .btn-host {
@@ -154,7 +166,6 @@ html, body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    padding-right: 0;
     gap: 20px;
 }
 

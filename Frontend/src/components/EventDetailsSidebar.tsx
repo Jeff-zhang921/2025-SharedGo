@@ -252,27 +252,19 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             </div>
 
             <div className="action-buttons">
-              <div className="top-buttons">
                 <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
-              </div>
-
-              <div className="top-buttons">
                 {/* If hostId matches event host, then DON'T show "chat with host" button */}
                 { currentUser?.id !== event?.host?.id && (
                   <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
                 )}
-
                 {/* If hostId matches event host, then show "delete event" button */}
                 {currentUser?.id === event?.host?.id && (
                     <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
                     {isLoading ? "Deleting...":"Delete Event"}
                     </button>
                 )}
-              </div>
-
-              <div className="top-buttons">
                 <button onClick={handleGetDirections} className="btn-directions">Get Directions</button>
-              </div>
+
             </div>
 
           </div>
