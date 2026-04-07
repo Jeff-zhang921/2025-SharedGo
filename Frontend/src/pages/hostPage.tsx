@@ -290,10 +290,7 @@ export default function Host() {
                     </svg>
                 </button>
                 <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
-                <div style={{
-                    width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827",
-                    display: "flex", alignItems: "center", justifyContent: "center"
-                }} />
+                <div style={{ width: "20px" }} /> {/* Spacer for 'Host', replaces circle icon */}
             </div>
 
             {/* Profile + Stats */}
@@ -363,8 +360,8 @@ export default function Host() {
                     </div>
                 )}
 
-                {/* Col 3: reviews panel – always visible on events tabs */}
-                {selectedTab < 2 && (
+                {/* Col 3: reviews panel – always visible on events tabs, only show review tab if there is a review */}
+                {selectedTab < 2 && reviews.length > 0 && (
                     <div style={{
                         backgroundColor: "white",
                         border: "1px solid #e5e7eb",

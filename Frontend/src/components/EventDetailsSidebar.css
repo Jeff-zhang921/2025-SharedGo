@@ -115,7 +115,7 @@ html, body {
     gap: 12px;
     margin-top: 20px;
     /* This extra padding allows to scroll past the last button so it's not cut off */
-    padding-bottom: 100px; 
+    padding-bottom: 180px; 
 }
 
 .top-buttons:hover {
