@@ -182,6 +182,11 @@ formData.append("file",file)
           </header>
 
           <section className="form-section">
+            <label>
+              <span>TITLE</span>
+              <input name="title" placeholder="Title" onChange={onChange} required/>
+            </label>
+
             <label className= "select-field">
               <span>CATEGORY</span>
               <div className="select-wrapper">
@@ -200,11 +205,6 @@ formData.append("file",file)
                   <option value="Other">Other</option>
                 </select>
               </div>
-            </label>
-
-            <label>
-              <span>TITLE</span>
-              <input name="title" placeholder="Title" onChange={onChange} required/>
             </label>
 
             <label>

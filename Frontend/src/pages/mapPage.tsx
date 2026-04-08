@@ -47,12 +47,12 @@ const MapPage = () => {
   const [tempMarker, setTempMarker] = useState<{lat: number, lng: number} | null>(null);
   const [map, setMap] = useState<L.Map | null>(null); //State to hold the map instance
   const location = useLocation();
-  const navState = location.state as { centerTo?: [number, number]; zoomTo?: number } | null; //recieve coords from create event page
+  const navState = location.state as { centerTo?: [number, number]; zoomTo?: number; selectedEventId?: number} | null; //recieve coords from create event page
   const hasMovedRef = useRef(false); //Prevents map moving more than once
   const [zoomLevel, setZoomLevel] = useState(13) //13 default zoom
   const { search, category, startDate, endDate } = useSearch(); //Gets real time values from the sidebar
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<number | null>(null); //Keep track of which event is selected
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(navState?.selectedEventId || null); //Keep track of which event is selected
 
 
   useEffect(() => {

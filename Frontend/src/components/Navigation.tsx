@@ -2,6 +2,7 @@ import Button from "./Button";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom"; //to check current page
 import { useSearch } from "./../searchFile"; //Import the hook
+import { SearchIcon, HomeIcon, ChatIcon, ProfileIcon } from "./navbarIcons"
 
 type Props = {
     userId?: string | number;
@@ -23,7 +24,7 @@ export default function Navigation() {
                         className="nav-action-btn" 
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
                     >
-                        <img src="/search.svg" alt="search" style={{ width: '30px', height: '30px' }} />
+                        <SearchIcon size={30}/>
                     </button>
 
                     {/* Search Bar */}
@@ -82,12 +83,12 @@ export default function Navigation() {
             
             {/*No home button when on map page*/}
             {!isMapPage && (
-                <Button link="/map" imgSrc="/home.svg" text="home" size={30}/>
+                <Button link="/map" text="home" icon={<HomeIcon/>} size={30}/>
             )}
 
-            <Button link="/conversations" imgSrc="/chat.svg" text="chat" size={30}/>
+            <Button link="/conversations" text="chat" icon={<ChatIcon/>} size={30}/>
 
-            <Button link="/profile" imgSrc="/user.svg" text="profile" size={30}/>
+            <Button link="/profile" text="profile" icon={<ProfileIcon/>} size={30}/>
         </aside>
     );
 }

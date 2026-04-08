@@ -57,10 +57,10 @@ html, body, #root {
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: black;
+    color: #5C2BE2;
 }
 
-.navbar img:hover{
+.navbar svg:hover{
     transform: scale(1.2);
     transition: 0.2s;
 }
