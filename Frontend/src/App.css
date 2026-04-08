@@ -1,4 +1,6 @@
 #root {
+  /* Share the mobile bottom-nav height with page layouts that need full-height calculations. */
+  --mobile-nav-height: 0px;
   max-width: 2000px;
   margin: 0;
   padding: 0;
@@ -138,17 +140,25 @@ html, body, #root {
 
 
 @media (max-width: 768px) {
+  #root {
+    --mobile-nav-height: calc(56px + env(safe-area-inset-bottom));
+  }
+
   .navbar {
     position: fixed;
     top: auto;
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 50px;
+    height: var(--mobile-nav-height);
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     background: white;
+    /* Keep the bottom nav height stable even on devices with a safe-area inset. */
+    padding-top: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
   }
 
   .nav-search-container {

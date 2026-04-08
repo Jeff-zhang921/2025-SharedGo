@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 
 interface HostData {
-    id: number,
-    name: string,
-    email: string
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface HostOverviewEvent {
+    id: number;
+    title: string;
+    startsAt: string;
+    location: string;
+    attendeeCount: number;
+    capacity: number | null;
+    imageUrl?: string | null;
 }
 
 interface CardItem {
@@ -33,31 +43,64 @@ interface HostStats {
     avgFillRate: number;
 }
 
-const MOCK_STATS: HostStats = {
-    totalEvents: 125,
-    totalAttendees: 500,
-    avgRating: 4.1,
-    reviewCount: 140,
-    avgFillRate: 85,
+interface HostOverviewResponse {
+    host: HostData;
+    stats?: {
+        totalEvents?: number;
+        totalAttendees?: number;
+        averageRating?: number;
+        reviewCount?: number;
+        averageFillRate?: number;
+    };
+    upcomingEvents?: HostOverviewEvent[];
+    pastEvents?: HostOverviewEvent[];
+    reviews?: ReviewItem[];
+}
+
+interface EventDetailsResponse {
+    imageUrl?: string | null;
+}
+
+const EMPTY_STATS: HostStats = {
+    totalEvents: 0,
+    totalAttendees: 0,
+    avgRating: 0,
+    reviewCount: 0,
+    avgFillRate: 0,
 };
 
-const MOCK_UPCOMING_EVENTS: CardItem[] = Array.from({ length: 3 }, () => ({
-    title: "Title",
-    date: "Date",
-    location: "location",
-    filled: 25,
-    total: 100,
-    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
-}));
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const MOCK_PAST_EVENTS: CardItem[] = Array.from({ length: 8 }, () => ({
-    title: "Title",
-    date: "Date",
-    location: "location",
-    filled: 25,
-    total: 100,
-    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80",
-}));
+const mapEventToCard = (event: HostOverviewEvent): CardItem => ({
+    title: event.title ?? "Title",
+    date: event.startsAt ? new Date(event.startsAt).toLocaleString() : "Date",
+    location: event.location ?? "location",
+    filled: event.attendeeCount ?? 0,
+    total: event.capacity ?? undefined,
+    image: event.imageUrl ?? undefined,
+});
+
+const fetchEventImage = async (eventId: number): Promise<string | undefined> => {
+    try {
+        const response = await fetch(`${API_BASE}/events/${eventId}`);
+        if (!response.ok) return undefined;
+        const detail = (await response.json()) as EventDetailsResponse;
+        return detail.imageUrl ?? undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const attachImagesFromEventDetails = async (events: HostOverviewEvent[]): Promise<HostOverviewEvent[]> => {
+    const withImages = await Promise.all(
+        events.map(async (event) => {
+            const imageUrl = await fetchEventImage(event.id);
+            if (!imageUrl) return event;
+            return { ...event, imageUrl };
+        }),
+    );
+    return withImages;
+};
 
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
     <div style={{ display: "flex", gap: "2px" }}>
@@ -140,13 +183,15 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => (
 
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [host, setHost] = useState<HostData | null>(null);
     const [selectedTab, setSelectedTab] = useState<number>(0);
-    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>(MOCK_UPCOMING_EVENTS);
-    const [pastEvents] = useState<CardItem[]>(MOCK_PAST_EVENTS);
+    const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>([]);
+    const [pastEvents, setPastEvents] = useState<CardItem[]>([]);
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [stats] = useState<HostStats>(MOCK_STATS);
+    const [stats, setStats] = useState<HostStats>(EMPTY_STATS);
 
     const tabs = [
         { label: "Upcoming events", count: upcomingEvents.length },
@@ -157,15 +202,35 @@ export default function Host() {
     useEffect(() => {
         const fetchHostData = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/hosts/${hostId}/overview`);
-                const data = await response.json();
+                const response = await fetch(`${API_BASE}/hosts/${hostId}/overview`);
+                const data = (await response.json()) as HostOverviewResponse;
                 console.log("Debugging, host Overview Data:", data);
                 setHost(data.host);
-                if (data.upcomingEvents?.length) setUpcomingEvents(data.upcomingEvents);
-                setReviews(data.reviews);
+                setStats({
+                    totalEvents: data.stats?.totalEvents ?? 0,
+                    totalAttendees: data.stats?.totalAttendees ?? 0,
+                    avgRating: data.stats?.averageRating ?? 0,
+                    reviewCount: data.stats?.reviewCount ?? 0,
+                    avgFillRate: data.stats?.averageFillRate ?? 0,
+                });
+
+                const rawUpcoming: HostOverviewEvent[] = Array.isArray(data.upcomingEvents) ? data.upcomingEvents : [];
+                const rawPast: HostOverviewEvent[] = Array.isArray(data.pastEvents) ? data.pastEvents : [];
+
+                const [upcomingWithDetails, pastWithDetails] = await Promise.all([
+                    attachImagesFromEventDetails(rawUpcoming),
+                    attachImagesFromEventDetails(rawPast),
+                ]);
+
+                setUpcomingEvents(upcomingWithDetails.map(mapEventToCard));
+                setPastEvents(pastWithDetails.map(mapEventToCard));
+                setReviews(Array.isArray(data.reviews) ? data.reviews : []);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
                 setHost({ id: 0, name: "Name", email: "email@domain.com" });
+                setStats(EMPTY_STATS);
+                setUpcomingEvents([]);
+                setPastEvents([]);
                 setReviews([
                     { id: 1, userName: "Name", msg: "review", rating: 4 },
                     { id: 2, userName: "Name", msg: "review", rating: 4 },
@@ -208,28 +273,29 @@ export default function Host() {
                 padding: "0.875rem 1.25rem",
                 borderBottom: "1px solid #f3f4f6",
             }}>
-                <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                <button
+                    onClick={() => {
+                        const eventId = searchParams.get("eventId");
+                        if (eventId) {
+                            navigate(`/eventDetails/${eventId}`);
+                        } else {
+                            navigate(-1);
+                        }
+                    }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="#111827" strokeWidth="2.5" strokeLinecap="round">
                         <polyline points="15 18 9 12 15 6" />
                     </svg>
                 </button>
                 <div style={{ fontWeight: "700", fontSize: "0.9375rem", letterSpacing: "0.08em" }}>HOST</div>
-                <div style={{
-                    width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#111827",
-                    display: "flex", alignItems: "center", justifyContent: "center"
-                }} />
+                <div style={{ width: "20px" }} /> {/* Spacer for 'Host', replaces circle icon */}
             </div>
 
             {/* Profile + Stats */}
             <div style={{ backgroundColor: "white", padding: "1.5rem 1.25rem 1.25rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-                    <img
-                        src="/user-icon.png"
-                        alt="Host"
-                        onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"; }}
-                        style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", border: "2px solid #e5e7eb" }}
-                    />
                     <div>
                         <h1 style={{ margin: 0, fontSize: "1.375rem", fontWeight: "700", color: "#111827" }}>
                             {host.name || "Anonymous Host"}
@@ -240,8 +306,6 @@ export default function Host() {
                 <div style={{ display: "flex", gap: "0.625rem" }}>
                     <StatCard label="Total" value={stats.totalEvents} sub="events" />
                     <StatCard label="Total" value={stats.totalAttendees} sub="attendees" />
-                    <StatCard label="Avg.rating" value={stats.avgRating} sub={`(${stats.reviewCount} reviews)`} />
-                    <StatCard label="Avg. fill rate" value={`${stats.avgFillRate}%`} />
                 </div>
             </div>
 
@@ -296,8 +360,8 @@ export default function Host() {
                     </div>
                 )}
 
-                {/* Col 3: reviews panel – always visible on events tabs */}
-                {selectedTab < 2 && (
+                {/* Col 3: reviews panel – always visible on events tabs, only show review tab if there is a review */}
+                {selectedTab < 2 && reviews.length > 0 && (
                     <div style={{
                         backgroundColor: "white",
                         border: "1px solid #e5e7eb",
