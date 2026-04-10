@@ -224,7 +224,69 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
     }
   };
 
-  const hasJoined = !!(currentUser && event?.attendees.some((attendee) => attendee.email === currentUser.email));
+  const handleLeave = async () => {
+    if (!eventId) return;
+    if (!currentUser) {
+      alert("Please log in to leave this event.");
+      return;
+    }
+
+    const backendBaseURL = import.meta.env.VITE_API_URL;
+    const backendUrl = `${backendBaseURL}/events/${eventId}/join`;
+
+    try {
+      setIsJoining(true);
+
+      const response = await fetch(backendUrl, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: currentUser.email,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        alert(data.message || "Failed to leave event.");
+        return;
+      }
+
+      setEvent((previousEvent) => {
+        if (!previousEvent) return previousEvent;
+
+        const nextAttendees = previousEvent.attendees.filter(
+          (attendee) => attendee.email.toLowerCase() !== currentUser.email.toLowerCase(),
+        );
+        const didRemoveAttendee = nextAttendees.length !== previousEvent.attendees.length;
+
+        return {
+          ...previousEvent,
+          attendeeCount: didRemoveAttendee
+            ? Math.max(previousEvent.attendeeCount - 1, 0)
+            : previousEvent.attendeeCount,
+          attendees: nextAttendees,
+        };
+      });
+
+      alert(data.message || "Left the event successfully.");
+    } catch (leaveError) {
+      console.error("Leave error:", leaveError);
+      alert("Something went wrong.");
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const hasJoined = !!(
+    currentUser
+    && event?.attendees.some(
+      (attendee) => attendee.email.toLowerCase() === currentUser.email.toLowerCase(),
+    )
+  );
   const isHost = currentUser?.id === event?.host?.id;
 
   return (
@@ -290,13 +352,6 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
               </div>
             </div>
 
-            {/*Links to /host/id eg. localhost:5173/host/1 which is a page that does not currently exist!*/}
-            <div className="profile-image-wrapper">
-              <Link to={`/host/${event.host.id}`}>
-                  <img src="/user-icon.png" alt="Host Details" className="profile-img" />
-              </Link>
-            </div>
-            
             <div className="host-info">
                 <h3>HOSTED BY:</h3>
                 <div className="host-details">
@@ -309,8 +364,8 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
 
             <div className="action-buttons">
                 {!isHost && (
-                  <button onClick={handleJoin} disabled={isJoining || hasJoined} className="btn-join">
-                    {hasJoined ? "Joined" : isJoining ? "Joining..." : "Join Event"}
+                  <button onClick={hasJoined ? handleLeave : handleJoin} disabled={isJoining} className="btn-join">
+                    {isJoining ? (hasJoined ? "Leaving..." : "Joining...") : hasJoined ? "Leave Event" : "Join Event"}
                   </button>
                 )}
                 <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
