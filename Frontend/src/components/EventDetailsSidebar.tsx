@@ -46,6 +46,7 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
   const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
   const [currentUser, setCurrentUser] = useState<User | null>(null) //Enables us to see who is logged-in to show the Delete Event button to host only
+  const [isJoining, setIsJoining] = useState(false)
 
   //Code for actually fetching the data from the backend
   useEffect(() => {
@@ -171,6 +172,61 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
     );
   };
 
+  const handleJoin = async () => {
+    if (!eventId) return;
+    if (!currentUser) {
+      alert("Please log in to join this event.");
+      return;
+    }
+
+    const backendBaseURL = import.meta.env.VITE_API_URL;
+    const backendUrl = `${backendBaseURL}/events/${eventId}/join`;
+
+    try {
+      setIsJoining(true);
+
+      const response = await fetch(backendUrl, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: currentUser.email,
+          name: currentUser.name,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        alert(data.message || "Failed to join event.");
+        return;
+      }
+
+      if (response.status === 201 && data.attendee) {
+        setEvent((previousEvent) => {
+          if (!previousEvent) return previousEvent;
+          return {
+            ...previousEvent,
+            attendeeCount: previousEvent.attendeeCount + 1,
+            attendees: [...previousEvent.attendees, data.attendee],
+          };
+        });
+      }
+
+      alert(data.message || "Joined the event successfully.");
+    } catch (joinError) {
+      console.error("Join error:", joinError);
+      alert("Something went wrong.");
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const hasJoined = !!(currentUser && event?.attendees.some((attendee) => attendee.email === currentUser.email));
+  const isHost = currentUser?.id === event?.host?.id;
+
   return (
     <div className={`event-sidebar ${eventId ? 'open' : ''}`}>
     
@@ -252,13 +308,18 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             </div>
 
             <div className="action-buttons">
+                {!isHost && (
+                  <button onClick={handleJoin} disabled={isJoining || hasJoined} className="btn-join">
+                    {hasJoined ? "Joined" : isJoining ? "Joining..." : "Join Event"}
+                  </button>
+                )}
                 <Link to={`/board/${event.id}`} className="btn-join">Event Board</Link>
                 {/* If hostId matches event host, then DON'T show "chat with host" button */}
-                { currentUser?.id !== event?.host?.id && (
+                { !isHost && (
                   <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
                 )}
                 {/* If hostId matches event host, then show "delete event" button */}
-                {currentUser?.id === event?.host?.id && (
+                {isHost && (
                     <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
                     {isLoading ? "Deleting...":"Delete Event"}
                     </button>

@@ -36,6 +36,7 @@ export function initSocket(server: HttpServer) {
 //browser will send a cookie to socket.io which is the same cookie send to express to verify. socket.io go to session store to verify so user don't need to login
 //but you can't use the express session middleware in socket.io since they are different 
 //io.use 是 Socket.io 的中间件（Middleware）。它的作用是在连接正式建立之前，拦截住这个请求。
+//the first params is the socket that frontend send
   io.use((socket, next) => {
     //{}is i do not expect you to send back any response to user or browser
     //this attach content in session store to socket.request.
@@ -114,6 +115,7 @@ socket.on("thread:join", async (payload) => {
       //join the room
       //use socket.join join the room 
       //user id is not use to pick user directly, it use as validate access
+      //进群听课
       socket.join(`thread:${threadid}`);
     }
 
@@ -150,6 +152,8 @@ socket.on("message:send", async (data) => {
   })
   //io as the intercom system for the whole building(sending to all), and socket as the individual's radio.
   //io.to It looks up the key "thread:123" in its Map. It finds the list of IDs: ["Socket_A", "Socket_B"]. and send the msg
+  // socket.to() 的语义是“发给房间里除了我以外的所有人”。
+  // 如果你想让**所有人（包括自己）**都收到，必须用 io.to("room_A").emit(...)。
   io.to(`thread:${threadid}`) .emit("message:new",{
     id:message.id,
     threadId:message.threadId,
