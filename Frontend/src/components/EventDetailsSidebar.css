@@ -16,9 +16,13 @@ html, body {
 }
 
 .title {
-    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     width: 100%;
     margin-bottom: 20px;
+    padding-right: 56px;
 }
 
 .event-info {
@@ -43,6 +47,7 @@ html, body {
     margin: 0;
     font-size: 14px;
     color: #000;
+    text-align: left;
     text-transform: uppercase;
     width: 120px;
     flex-shrink: 0;
@@ -71,30 +76,36 @@ html, body {
 }
 
 .event-title {
-    font-size: 25px;
-    margin-bottom: 20px;
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
     font-weight: bold;
+    text-align: left;
 }
 
 .host-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 15px;
+    align-items: flex-start;
+    gap: 8px;
     width: 100%;
-    margin-top: 20px;
-    padding-top: 0px;
+    margin-top: 0;
+    padding: 14px 16px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fafafa;
 }
 
 .host-info h3 {
     margin: 0;
-    font-size: 14px;
-    width: 120px;
-    flex-shrink: 0;
+    font-size: 12px;
+    width: auto;
+    color: #6b7280;
+    letter-spacing: 0.06em;
 }
 
 .host-details {
-    align-items: center;
+    width: 100%;
 }
 
 .host-text {
@@ -171,7 +182,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 20px;
+    gap: 16px;
 }
 
 .btn-join:hover {
@@ -199,8 +210,10 @@ html, body {
 }
 
 .event-image-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
-    margin-bottom: 10px;
     padding-left: 0px;
 }
 
@@ -253,6 +266,17 @@ html, body {
     font-size: 18px;
 }
 
+.web-link a {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #f6f1ff;
+    color: #5C2BE2;
+    font-weight: 600;
+    text-decoration: none;
+}
+
 .category-badge {
     display: inline-block;
     background: black;
@@ -270,5 +294,39 @@ html, body {
 
 .web-link:hover {
     color: #6d3cf3;
-    transform: scale(1.08);
+}
+
+@media (max-width: 480px) {
+    .title {
+        margin-bottom: 16px;
+        padding-right: 52px;
+    }
+
+    .event-title {
+        font-size: 24px;
+    }
+
+    .close-sidebar {
+        top: 20px;
+        left: auto;
+        right: 20px;
+    }
+
+    .event-info-row {
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 6px;
+        padding-bottom: 12px;
+    }
+
+    .event-info-row h3 {
+        width: auto;
+        font-size: 12px;
+        color: #6b7280;
+        letter-spacing: 0.06em;
+    }
+
+    .event-info-row p {
+        width: 100%;
+    }
 }

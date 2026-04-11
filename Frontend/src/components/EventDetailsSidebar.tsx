@@ -303,19 +303,15 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
       {event && !isLoading && (
         <div className="event-details-container">
         <div className="title">
-            <h1 className="event-title">Event details</h1>
+            <div className="category-badge">
+              {event.category ?? "Other"}
+            </div>
+            <h1 className="event-title">{event.title}</h1>
         </div>
 
         <section className="event-details">
-          <div className="category-badge">
-            {event.category ?? "Other"}
-          </div>
           {/*all event detail listed as shown in the design*/}
           <div className="event-info">
-            <div className="event-info-row">
-                <h3>TITLE:</h3><p>{event.title}</p>
-            </div>
-
             <div className="event-info-row">
                 <h3>DATE:</h3>
                 <p>{new Date(event.startsAt).toLocaleString()}</p>
