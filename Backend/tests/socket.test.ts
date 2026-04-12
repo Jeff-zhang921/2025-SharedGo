@@ -36,7 +36,7 @@ jest.mock("../src/session", () => ({
       },
       save: (cb?: (err?: unknown) => void) => cb?.(),
       destroy: (cb?: (err?: unknown) => void) => cb?.(),
-    } as Partial<Session> as Session;
+    } as unknown as Session;
     next();
   },
 }));
