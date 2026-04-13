@@ -2,8 +2,12 @@ import React from "react";
 
 // Search Icon
 export const SearchIcon = ({size=24, color="#5C2BE2" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{color}}>
-    <path d="M10 2a8 8 0 016.32 12.9l4.39 4.38a1 1 0 01-1.42 1.42l-4.38-4.39A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" width={size} height={size} viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" style={{color}}>
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" 
+    />
   </svg>
 );
 

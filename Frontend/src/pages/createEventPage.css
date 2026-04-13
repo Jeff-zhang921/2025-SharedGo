@@ -240,11 +240,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     display: inline-block;
     background: black;
     color: white;
+    margin-top: 10px;
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 20px;
     text-transform: uppercase;
     font-weight: bold;
+}
+
+.category-badge:empty {
+   background: white;
 }
 
 

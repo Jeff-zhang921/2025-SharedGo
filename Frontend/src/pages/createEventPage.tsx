@@ -279,22 +279,22 @@ formData.append("file",file)
             </div>
             <div className="event-info">
               <div className="event-info-row">
-                <h3>TITLE:</h3><p>{form.title}</p>
+                <h3>TITLE:</h3><p>{form.title || "No title provided"}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>DATE:</h3>
-                <p>{new Date(form.startsAt).toLocaleString()}</p>
+                <p>{form.startsAt ? new Date(form.startsAt).toLocaleString() : "TBC"}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>CAPACITY:</h3>
-                <p>{form.capacity === null ? 'Unlimited' : form.capacity}</p>
+                <p>{form.capacity === "" || form.capacity === null ? 'Unlimited' : form.capacity}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>LOCATION:</h3>
-                <p>{form.location}</p>
+                <p>{form.location || "No location provided"}</p>
               </div>
 
               <div className="event-info-row">
