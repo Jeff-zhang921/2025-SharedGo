@@ -491,7 +491,60 @@ router.post("/:id/join", requireSession, async (req, res) => {
 
 
 
-// Allow attendees to leave or update a review for an event (and host).
+// Allow attendees to leave an event they previously joined.
+router.delete("/:id/join", requireSession, async (req, res) => {
+  const idText = req.params.id;
+  const eventId = Number(idText);
+
+  if (!Number.isInteger(eventId)) {
+    res.status(400).json({ message: "Event id must be a number." });
+    return;
+  }
+
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+
+  if (email.length === 0) {
+    res.status(400).json({ message: "Email is required to leave the event." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      participants: {
+        include: { user: true },
+      },
+    },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  const participant = event.participants.find((participantRecord: { user: { email: string }; userId: number }) => {
+    return participantRecord.user.email.toLowerCase() === email.toLowerCase();
+  });
+
+  if (!participant) {
+    res.status(200).json({ message: "You have not joined this event." });
+    return;
+  }
+
+  await prisma.eventParticipant.delete({
+    where: {
+      eventId_userId: {
+        eventId: event.id,
+        userId: participant.userId,
+      },
+    },
+  });
+
+  res.json({ message: "Left the event successfully." });
+});
+
+
+// Allow attendees to create or update a review for an event (and host).
 router.post("/:id/reviews", requireSession, async (req, res) => {
   const idText = req.params.id;
   const eventId = Number(idText);
