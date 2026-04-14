@@ -91,6 +91,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 12px;
     font-size: 16px;
     font-weight: bold;
+    margin-top: 40px;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
@@ -175,7 +176,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .event-info-row p {
     margin: 0;
-    text-align: left;
+    text-align: center;
 }
 
 .event-image {
@@ -191,16 +192,20 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .web-link:hover {
     color: #6d3cf3;
-    transform: scale(1.08);
+    transform: scale(1.03);
 }
 
-.upload-field {
+.image-upload, .website-link-box {
     display: flex;
     flex-direction: column;
     background: #eaeaea;
     padding: 4px;
     border-radius: 8px;
     font-weight: 500;
+}
+
+.website-link-box {
+    margin-top: 20px;
 }
 
 .photo-upload-input:hover {
@@ -211,7 +216,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .publish-btn:hover {
     background-color: #222;
     transform: translateY(-1px);
-    transform: scale(1.08)
+    transform: scale(1.03);
 }
 
 .preview-title {
@@ -240,11 +245,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     display: inline-block;
     background: black;
     color: white;
+    margin-top: 10px;
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 20px;
     text-transform: uppercase;
     font-weight: bold;
+}
+
+.category-badge:empty {
+   background: white;
 }
 
 

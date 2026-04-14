@@ -238,28 +238,29 @@ formData.append("file",file)
             </label>
 
             {/*Image and Website link inputs*/}
-            <div className="upload-field">
-              <span>+ Add image</span>
-              <input
-                id="event-photo-upload"
-                className="photo-upload-input"
-                type="file"
-                accept="image/*"
-                onChange={handleSendFile}
-              />
-            </div>
+              <div className="image-upload">
+                <span>+ Add image</span>
+                <input
+                  id="event-photo-upload"
+                  className="photo-upload-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSendFile}
+                />
+              </div>
             
-            <div className="upload-field">
-              <span>Add event website link:</span>
-              <input
-                name="externalUrl"
-                className="photo-upload-input"
-                type="url"
-                placeholder="https://example.com"
-                value={form.externalUrl}
-                onChange={onChange}
-              />
-            </div>
+            
+              <div className="website-link-box">
+                <span>Add event website link:</span>
+                <input
+                  name="externalUrl"
+                  className="photo-upload-input"
+                  type="url"
+                  placeholder="https://example.com"
+                  value={form.externalUrl}
+                  onChange={onChange}
+                />
+              </div>
           </section>
         </form>
       </div>
@@ -279,22 +280,22 @@ formData.append("file",file)
             </div>
             <div className="event-info">
               <div className="event-info-row">
-                <h3>TITLE:</h3><p>{form.title}</p>
+                <h3>TITLE:</h3><p>{form.title || "No title provided"}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>DATE:</h3>
-                <p>{new Date(form.startsAt).toLocaleString()}</p>
+                <p>{form.startsAt ? new Date(form.startsAt).toLocaleString() : "TBC"}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>CAPACITY:</h3>
-                <p>{form.capacity === null ? 'Unlimited' : form.capacity}</p>
+                <p>{form.capacity === "" || form.capacity === null ? 'Unlimited' : form.capacity}</p>
               </div>
 
               <div className="event-info-row">
                 <h3>LOCATION:</h3>
-                <p>{form.location}</p>
+                <p>{form.location || "No location provided"}</p>
               </div>
 
               <div className="event-info-row">
@@ -320,9 +321,9 @@ formData.append("file",file)
           <div className="tips">
             <h3>Publishing Tips</h3>
             <ul>
-              <li>Use a clear and descriptive event title.</li>
-              <li>Add an image so the event stands out on the map.</li>
-              <li>Pick a bright photo so people can spot your event quickly.</li>
+              <li>Use a clear and concise event title.</li>
+              <li>Add an image so the event stands out.</li>
+              <li>Use a detailed description so users know what to expect.</li>
             </ul>
             <div className="signin">
               <Link className="signin-btn" to="/">Need to sign in?</Link>

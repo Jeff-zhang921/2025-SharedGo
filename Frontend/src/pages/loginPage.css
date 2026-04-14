@@ -112,3 +112,11 @@
   background: none;
   
 }
+
+/* Adjust for portrait/mobile view (responsive design) */
+/* SharedGo Logo made smaller on phone (not bleeding off edges) */
+@media (max-width: 768px) {
+    .AppTitle {
+        width: 350px;
+    }
+}

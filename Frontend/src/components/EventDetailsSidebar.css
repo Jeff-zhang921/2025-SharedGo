@@ -127,7 +127,7 @@ html, body {
     gap: 12px;
     margin-top: 20px;
     /* This extra padding allows to scroll past the last button so it's not cut off */
-    padding-bottom: 160px; 
+    padding-bottom: 30px; 
 }
 
 /* Uniform buttons */
@@ -254,7 +254,8 @@ html, body {
 
 .close-sidebar {
     position: absolute; /* Pins it relative to the sidebar */
-    top: 30px;
+    /* Adjust positioning of 'x' button */
+    top: 10px;
     left: 30px;
     width: 35px;
     height: 35px;
@@ -328,5 +329,11 @@ html, body {
 
     .event-info-row p {
         width: 100%;
+    }
+
+
+    /* Extra padding for mobile view to allow scrolling all the way */
+    .action-buttons {
+        padding-bottom: 80px;
     }
 }
