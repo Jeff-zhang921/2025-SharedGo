@@ -34,6 +34,7 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/verify" element={<VerifyPage />} />
       <Route path="/home" element={<HomePage />} />
+      <Route path="/chat" element={<ChatPage />} />
 
       {/*NAVBAR IMPLEMENTED (gap left/bottom if landscape/portrait)*/}
       <Route element={<NavBar/>}>
@@ -49,7 +50,6 @@ function App() {
         {/* set the path for the profile, conversations and chat pages */}
         <Route path="/profile" element={<HostProfile />} />
         <Route path="/conversations" element={<ConversationsPage />} />
-        <Route path="/chat" element={<ChatPage />} />
       </Route>
     </Routes>
   );

@@ -113,7 +113,7 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
 
 .chat-input {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 8px;
   border-radius: 12px;
   /* space inside the bar */
@@ -155,6 +155,8 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   border-radius: 12px;
   padding: 14px 16px;
   color: var(--text);
+  min-width: 0;
+  width: 100%;
 }
 
 .send-button {
@@ -164,6 +166,7 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
   border-radius: 10px;
   padding: 0 22px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .bubble-me {
@@ -238,19 +241,18 @@ If the element only has .status-pill, it stays gray. As soon as your JavaScript 
 }
 
 @media (max-width: 768px) {
-  /* Reserve room for the fixed mobile nav so the composer stays above it. */
-  .chat-shell {
-    min-height: calc(100vh - var(--mobile-nav-height, 56px));
-    min-height: calc(100svh - var(--mobile-nav-height, 56px));
-    min-height: calc(100dvh - var(--mobile-nav-height, 56px));
-    height: calc(100vh - var(--mobile-nav-height, 56px));
-    height: calc(100svh - var(--mobile-nav-height, 56px));
-    height: calc(100dvh - var(--mobile-nav-height, 56px));
-  }
-
   .chat-bar {
     /* Preserve the top bar hit area on devices with a notch. */
     padding-top: calc(10px + env(safe-area-inset-top));
+  }
+
+  .chat-input {
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .photo-button,
+  .send-button {
+    padding-inline: 14px;
   }
 }
 
