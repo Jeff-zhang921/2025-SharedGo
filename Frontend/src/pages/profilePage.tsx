@@ -84,8 +84,12 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   // Tab navigation status
-  const [tagsArr] = useState<string[]>(["Upcoming", "Past events", "Reviews"]);
+  const [tagsArr] = useState<string[]>(["Upcoming", "Past events"]);
   const [selectedTag, setSelectedTag] = useState<number>(0);
+
+  // User/Host toggle status
+  const [toggleArr] = useState<string[]>(["User", "Host"]);
+  const [selectedToggle, setSelectedToggle] = useState<number>(0);
 
   // Static comment data (which can be retrieved from the API later)
   const reviewList: ReviewItem[] = [
@@ -117,19 +121,31 @@ export default function ProfilePage() {
     fetchProfileData();
   }, []);
 
+  const filteredUpcomingEvents = profileData?.upcomingEvents.filter(event =>
+    selectedToggle === 0
+      ? event.isAttendee
+      : event.isHost
+  ) || [];
+
+  const filteredPastEvents = profileData?.pastEvents.filter(event =>
+    selectedToggle === 0
+      ? event.isAttendee
+      : event.isHost
+  ) || [];
+
   // Adapt API data to card format
-  const upcomingEventCards: CardItem[] = profileData?.upcomingEvents.map(event => ({
+  const upcomingEventCards: CardItem[] = filteredUpcomingEvents.map(event => ({
     id: event.id,
     title: event.title,
     date: formatEventDate(event.startsAt),
-    image: event.imageUrl || "/watermelon.png"
+    image: event.imageUrl || ""
   })) || [];
 
-  const pastEventCards: CardItem[] = profileData?.pastEvents.map(event => ({
+  const pastEventCards: CardItem[] = filteredPastEvents.map(event => ({
     id: event.id,
     title: event.title,
     date: formatEventDate(event.startsAt),
-    image: event.imageUrl || "/watermelon.png"
+    image: event.imageUrl || ""
   })) || [];
 
   // Loading/Error State Rendering
@@ -156,9 +172,9 @@ export default function ProfilePage() {
 
   const statsItems = [
     { label: "upcoming events", value: stats.upcomingCount },
-    { label: "past events", value: stats.pastCount },
-    { label: "0 reviews", value: "n/a" },
-    { label: "avg attendance", value: "n/a" },
+    { label: "past events", value: stats.pastCount }
+    // { label: "0 reviews", value: "n/a" },
+    // { label: "avg attendance", value: "n/a" },
   ];
 
 
@@ -216,9 +232,9 @@ export default function ProfilePage() {
 
         {/* Host Profile Information Section */}
         <div className="profile-info">
-          <div className="avatar-margin">
+          {/* <div className="avatar-margin">
             <img src="/user-icon.png" className="avatar"/>
-          </div>
+          </div> */}
           
           <div className="user-details">
             <h1 className="user-name">
@@ -240,10 +256,18 @@ export default function ProfilePage() {
 
         {/* User/Host Role Tags */}
         <div className="role-tags">
-          {/*
-          <span className="role-tags-user">User</span>
-          */}
-          <span className="role-tags-host">Host</span>
+          {/* User Navigation */}
+        <div className="tabs">
+          {toggleArr.map((tag, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedToggle(index)}
+              className={selectedToggle === index ? "active" : ""}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
         </div>
         
         {/* Host Statistics Cards */}
@@ -281,12 +305,23 @@ export default function ProfilePage() {
               buttonLabel="View event details"
             />
 
-            <button
-              onClick={() => navigate("/createEvent")}
-              className="create-event-btn"
-            >
-              + Create new event
-            </button>
+            {selectedToggle === 1 ? (
+              // HOST VIEW
+              <button
+                onClick={() => navigate("/createEvent")}
+                className="create-event-btn"
+              >
+                + Create new event
+              </button>
+            ) : (
+              // USER VIEW
+              <button
+                onClick={() => navigate("/map")}
+                className="create-event-btn"
+              >
+                Find an event &rarr;
+              </button>
+            )}
           </div>
         )}
 
@@ -305,14 +340,14 @@ export default function ProfilePage() {
         )}
 
         {/* Reviews Section */}
-        {selectedTag === 2 && (
+        {/* {selectedTag === 2 && (
           <div className="card-list">
             <EventList
               cards={[]}
               emptyMessage="No reviews found"
             />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
