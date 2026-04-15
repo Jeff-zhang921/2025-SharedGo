@@ -21,6 +21,7 @@ const mockPrisma = {
   eventParticipant: {
     create: jest.fn(),
     deleteMany: jest.fn(),
+    delete: jest.fn(),
   },
   review: {
     upsert: jest.fn(),
@@ -322,7 +323,43 @@ describe("Event API", () => {
       expect(res.body).toHaveProperty("message", "You have already joined this event.");
     });
   });
-  
+
+  describe("DELETE /events/id/join", () => {
+    it("should leave an event", async () => {
+      mockPrisma.event.findUnique.mockResolvedValue(createEvent({
+        participants: [{
+          userId: 2,
+          user: {
+            email: "user@example.com"
+          }
+        }],
+      }));
+      mockPrisma.eventParticipant.delete.mockResolvedValue({ 
+        userId: 2,
+        eventId: 123,
+      });
+      const res = await request(testApp)
+        .delete(`/events/123/join`)
+        .send({
+          email: "user@example.com",
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe("Left the event successfully.");
+    });
+    it("should return 200 if the user tries to leave but wasn't a participant", async () => {
+      mockPrisma.event.findUnique.mockResolvedValue(createEvent({
+        participants: [] // Empty list
+      }));
+
+      const res = await request(testApp)
+        .delete("/events/123/join")
+        .send({ email: "stranger@example.com" });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe("You have not joined this event.");
+    });
+  });
   describe("POST /events/id/reviews", () => {
     it("should not allow if user is not a participant", async () => {
       mockPrisma.event.findUnique.mockResolvedValue(createEvent({
