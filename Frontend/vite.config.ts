@@ -8,12 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      pwaAssets: { disabled: true },
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'My PWA App',
-        short_name: 'MyPWA',
-        description: 'A basic progressive web app built with Vite + React + TypeScript',
-        theme_color: '#ffffff',
+        name: 'SharedGo',
+        short_name: 'SharedGo',
+        description: 'SharedGo is a real-time activity map for discovering, joining, and hosting events.',
+        theme_color: '#000000',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
