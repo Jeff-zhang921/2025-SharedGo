@@ -50,7 +50,6 @@ const CreateEventPage = () => {
     averageRating: null,
   });
   const [loading, setLoading] = useState(false);
-  const isUploadSuccess = status === "Image uploaded";
 
   // handle changes on input
   const onChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>) => {
@@ -71,6 +70,7 @@ const CreateEventPage = () => {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+    setStatus("");
     
 
     try {
@@ -90,12 +90,13 @@ const CreateEventPage = () => {
         }),
       });
 
-      const text = await res.text();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        console.error("Create event failed:", text);
-        throw new Error(text || "Failed to create event");
+        console.error("Create event failed:", data);
+        setStatus(typeof data.message === "string" ? data.message : "Failed to create event");
+        return;
       }
-      const createdEvent = JSON.parse(text);
+      setStatus("");
 
       // Redirect to event details page
       navigate(`/map`, {
@@ -107,6 +108,7 @@ const CreateEventPage = () => {
       //navigate(`/eventDetails/${createdEvent.event.id}`);
     } catch (err: any) {
       console.error(err);
+      setStatus("Failed to create event");
     } finally {
       setLoading(false);
     }
@@ -330,6 +332,7 @@ formData.append("file",file)
             </div>
           </div>
           {/*Publish Button*/}
+          {status && <p>{status}</p>}
           <button className="publish-btn" type="submit" disabled={loading}>{loading ? "Publishing...":"Publish"}</button>
         </form>
       </div>

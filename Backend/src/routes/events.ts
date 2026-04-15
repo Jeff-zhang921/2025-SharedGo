@@ -103,6 +103,18 @@ router.post("/create", requireSession, async (req, res) => {
     return;
   }
 
+  const combinedText = `${title} ${location} ${description ?? ""}`.toLowerCase();
+  const blockedTerms = [
+    "drug","narcotics","cannabis", "marijuana", "cocaine","heroin", "methamphetamine","fentanyl","ecstasy","mdma","lsd","psychedelic","weed","pot","grass","420","snow", "blow","ice", "crystal", "meth", "molly", "shrooms", "magic mushrooms", "loud", "plug", "dealer", "buy weed", "terrorism", "terrorist", "isis", "isil", "al-qaeda", "al qaeda", "taliban", "jihad", "white supremacy", "neo-nazi", "neo nazi", "kkk", "bomb making", "how to make a bomb", "ied", "explosives", "molotov cocktail", "ricin", "sarin gas", "beheading", "execution video", "mass shooting", "manifesto", "buy gun no background check", "untraceable ghost gun", "3d printed gun", "nigger", "nigga", "chink", "gook", "spic", "wetback", "kike", "raghead","faggot", "fag","tranny", "dyke", "kill all", "eradicate","exterminate", "gas the", "suicide", "kill myself","kms", "end my life", "hang myself", "overdose","painless death", "cut myself", "self-harm", "cutting","bleeding", "scam", "ponzi", "pyramid scheme","phishing", "money laundering", "stolen credit card", "fullz","cvv dumps", "fake id", "fake passport", "counterfeit money","how to hack", "ddos attack", "botnet", "malware","ransomware", "spyware",
+  ];
+
+  if (blockedTerms.some((term) => combinedText.includes(term))) {
+    res.status(400).json({
+      message: "Under UK law and UK GDPR safeguards, SharedGo cannot publish event listings containing restricted content.",
+    });
+    return;
+  }
+
   if (latitudeRaw === undefined || longitudeRaw === undefined) {
     res.status(400).json({ message: "Latitude and longitude are required." });
     return;
