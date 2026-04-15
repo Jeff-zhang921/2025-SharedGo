@@ -14,7 +14,7 @@ html, body {
     box-sizing: border-box;
 }
 
-.loading .error{
+.loading {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,24 +22,17 @@ html, body {
     background-color: #eee;
 }
 
-.error {
-    padding: 1.25rem;
-    color: red;
-}
-
-
 .header {
     background-color: white;
-    padding: 1rem 1.25rem;
+    padding: 0.5rem 1.25rem 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
 }
 
 .title {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 2rem;
 }
 
 .profile-info {
@@ -155,6 +148,20 @@ html, body {
     gap: 0.5rem;
 }
 
+.toggle-tabs button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: none;
+    background-color: white;
+    color: #5C2BE2;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    flex: 1;
+    max-width: 150px;
+    border: 1px solid #ddd;
+}
+
 .tabs button {
     padding: 0.5rem 1.25rem;
     border-radius: 9999px;
@@ -165,7 +172,12 @@ html, body {
     font-size: 0.875rem;
     cursor: pointer;
     flex: 1;
-    max-width: 120px;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+.toggle-tabs .active {
+    background: black;
+    color: white;
 }
 
 .tabs .active {
@@ -241,6 +253,11 @@ html, body {
     padding: 2rem 0;
 }
 
+.events-header {
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+}
 
 @media (min-width: 769px) {
     .navbar {
@@ -254,6 +271,12 @@ html, body {
     .profile-page {
         margin-left: 10px;
         margin-bottom: 60px;
-        width: calc(100% - 20px);
+        width: calc(100% - 40px);
+        padding-bottom: 70px;
+    }
+
+    .title {
+        font-weight: 600;
+        font-size: 1.6rem;
     }
 }

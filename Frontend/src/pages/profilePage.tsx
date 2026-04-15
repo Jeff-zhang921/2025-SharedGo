@@ -84,11 +84,11 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   // Tab navigation status
-  const [tagsArr] = useState<string[]>(["Upcoming", "Past events"]);
+  const [tagsArr] = useState<string[]>(["Upcoming events", "Past events"]);
   const [selectedTag, setSelectedTag] = useState<number>(0);
 
   // User/Host toggle status
-  const [toggleArr] = useState<string[]>(["User", "Host"]);
+  const [toggleArr] = useState<string[]>(["Events joined", "Events created"]);
   const [selectedToggle, setSelectedToggle] = useState<number>(0);
 
   // Static comment data (which can be retrieved from the API later)
@@ -159,9 +159,7 @@ export default function ProfilePage() {
 
   if (error) {
     return (
-      <div className="error">
-        <p>Error: {error}</p>
-      </div>
+        navigate("/")
     );
   }
 
@@ -170,15 +168,15 @@ export default function ProfilePage() {
   const user = profileData?.user || fallbackUser;
   const stats = profileData?.stats || { upcomingCount: 0, pastCount: 0 };
 
-  const statsItems = [
-    { label: "upcoming events", value: stats.upcomingCount },
-    { label: "past events", value: stats.pastCount }
-    // { label: "0 reviews", value: "n/a" },
-    // { label: "avg attendance", value: "n/a" },
-  ];
+  const upcomingJoinedCount =
+  profileData?.upcomingEvents.filter(e => e.isAttendee).length || 0;
+  const pastJoinedCount =
+    profileData?.pastEvents.filter(e => e.isAttendee).length || 0;
+  const upcomingCreatedCount =
+    profileData?.upcomingEvents.filter(e => e.isHost).length || 0;
+  const pastCreatedCount =
+    profileData?.pastEvents.filter(e => e.isHost).length || 0;
 
-
-  /* EVENT CARDS REFACTORING */
   const EventList = ({
       cards, emptyMessage, onButtonClick, buttonLabel
     }: {
@@ -190,35 +188,35 @@ export default function ProfilePage() {
       if (cards.length === 0) {
         return <p className="empty-text">{emptyMessage}</p>;
       }
-    return (
-    <>
-      {cards.map((card) => (
-        <div key={card.id} className="event-card">
-          <img
-            src={card.image || "/default-event.png"}
-            alt={card.title}
-            className="event-card-img"
-          />
+      return (
+      <>
+        {cards.map((card) => (
+          <div key={card.id} className="event-card">
+            <img
+              src={card.image || "/home.svg"}
+              alt={card.title}
+              className="event-card-img"
+            />
 
-          <div className="event-card-content">
-            <h3>{card.title}</h3>
-            <p>{card.date}</p>
+            <div className="event-card-content">
+              <h3>{card.title}</h3>
+              <p>{card.date}</p>
 
-            {onButtonClick && (
-              <button
-                onClick={() => onButtonClick(card.id)}
-                className="event-card-btn"
-              >
-                {buttonLabel}
-              </button>
-            )}
+              {onButtonClick && (
+                <button
+                  onClick={() => onButtonClick(card.id)}
+                  className="event-card-btn"
+                >
+                  {buttonLabel}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
-    </>
-  );
-};
-  /* END of REFACTOR */
+        ))}
+      </>
+    );
+  };
+
 
 
 
@@ -228,36 +226,13 @@ export default function ProfilePage() {
         {/* Header Navigation Bar */}
         <div className="header">
           <div className="title">My profile</div>
-        </div>
-
-        {/* Host Profile Information Section */}
-        <div className="profile-info">
-          {/* <div className="avatar-margin">
-            <img src="/user-icon.png" className="avatar"/>
-          </div> */}
-          
-          <div className="user-details">
-            <h1 className="user-name">
-              {user.name}
-            </h1>
-            <p className="user-email">
-              {user.email}
-            </p>
-            {/*
-            <button className="edit-profile">
-              Edit Profile
-            </button>
-            <button onClick={() => navigate("/conversations")} className="conversations">
-              Conversations
-            </button>
-            */}
-          </div>
+              <p className="user-email">{user.email}</p>
         </div>
 
         {/* User/Host Role Tags */}
         <div className="role-tags">
           {/* User Navigation */}
-        <div className="tabs">
+        <div className="toggle-tabs">
           {toggleArr.map((tag, index) => (
             <button
               key={index}
@@ -269,28 +244,31 @@ export default function ProfilePage() {
           ))}
         </div>
         </div>
-        
-        {/* Host Statistics Cards */}
-        <div className="stats">
-          {statsItems.map((item, index) => (
-            <div key={index} className="stats-div">
-              <div className="stats-count">{item.value}</div>
-              <div className="stats-title">{item.label}</div>
-            </div>
-          ))}
-        </div>
 
         {/* Tab Navigation */}
         <div className="tabs">
-          {tagsArr.map((tag, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedTag(index)}
-              className={selectedTag === index ? "active" : ""}
-            >
-              {tag}
-            </button>
-          ))}
+          {tagsArr.map((tag, index) => {
+            const isUpcoming = index === 0;
+
+            const count =
+              selectedToggle === 0
+                ? isUpcoming
+                  ? upcomingJoinedCount
+                  : pastJoinedCount
+                : isUpcoming
+                ? upcomingCreatedCount
+                : pastCreatedCount;
+
+            return (
+              <button
+                key={index}
+                onClick={() => setSelectedTag(index)}
+                className={selectedTag === index ? "active" : ""}
+              >
+                {tag} ({count})
+              </button>
+            );
+          })}
         </div>
 
         {/* Upcoming Events Section */}
