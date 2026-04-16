@@ -297,6 +297,17 @@ html, body {
     color: #6d3cf3;
 }
 
+.host-profile-link {
+    text-decoration: none; /* Removes the underline */
+    color: inherit;        /* Keeps the text black */
+    display: block;        
+    transition: opacity 0.2s;
+}
+
+.host-profile-link:hover {
+    text-decoration: underline;
+}
+
 @media (max-width: 480px) {
     .title {
         margin-bottom: 16px;

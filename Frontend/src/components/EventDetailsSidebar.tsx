@@ -351,10 +351,12 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
             <div className="host-info">
                 <h3>HOSTED BY:</h3>
                 <div className="host-details">
-                <div className="host-text">
-                    <p><strong>{event.host.name}</strong></p>
-                    <p>{event.host.email}</p>
-                </div>
+                <Link to={`/host/${event.host.id}`} className="host-profile-link">
+                    <div className="host-text">
+                        <p><strong>{event.host.name || "Anonymous Host"}</strong></p>
+                        <p>{event.host.email}</p>
+                    </div>
+                </Link>
                 </div>
             </div>
 

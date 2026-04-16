@@ -155,9 +155,6 @@ const MapPage = () => {
 
   return (
     <div className="map-container">
-      <div className="ui-overlay">
-        <Link to="/createEvent" className='create-event'>Create Event</Link>
-      </div>
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
         zoom={13}
