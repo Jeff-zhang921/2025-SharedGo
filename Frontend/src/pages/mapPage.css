@@ -89,7 +89,7 @@
 
 .map-instruction-banner {
   position: absolute;
-  top: 20px;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2000;
@@ -123,6 +123,7 @@
   }
 
   .map-instruction-banner {
+    bottom: 80px;
     font-size: 11px;
     padding: 10px 18px;
     width: 80%;
