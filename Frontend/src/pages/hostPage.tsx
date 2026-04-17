@@ -192,12 +192,21 @@ export default function Host() {
     const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState<HostStats>(EMPTY_STATS);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const tabs = [
         { label: "Upcoming events", count: upcomingEvents.length },
         { label: "Past events",     count: pastEvents.length },
-        { label: "Review" },
+     //   { label: "Review" },
+     //No backend for reviews yet, can be implemented in future
     ];
+
+    //Checking if mobile view
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const fetchHostData = async () => {
@@ -335,44 +344,38 @@ export default function Host() {
                 </div>
             </div>
 
-            {/* ── Three-column content grid ── */}
-            <div style={{ padding: "1rem 1.25rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+            {/* ── Responsive Content Grid ── */}
+            <div style={{ 
+                padding: "1rem 1.25rem", 
+                display: "grid", 
+                //Dynamic columns based on screen size
+                gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", 
+                gap: "1rem" 
+            }}>
 
-                {selectedTab < 2 ? (
-                    <>
-                        {/* Col 1: first half of event list */}
-                        <div>
-                            {currentEvents
-                                .slice(0, Math.ceil(currentEvents.length / 2))
-                                .map((c, i) => <EventCard key={i} card={c} />)}
-                        </div>
-                        {/* Col 2: second half of event list */}
-                        <div>
-                            {currentEvents
-                                .slice(Math.ceil(currentEvents.length / 2))
-                                .map((c, i) => <EventCard key={i} card={c} />)}
-                        </div>
-                    </>
-                ) : (
-                    /* Review tab: full-width review list */
-                    <div style={{ gridColumn: "span 2" }}>
-                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
-                    </div>
-                )}
-
-                {/* Col 3: reviews panel – always visible on events tabs, only show review tab if there is a review */}
-                {selectedTab < 2 && reviews.length > 0 && (
-                    <div style={{
-                        backgroundColor: "white",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "0.75rem",
-                        padding: "0.875rem 0.875rem 0.25rem",
-                        alignSelf: "start",
-                    }}>
-                        {reviews.map((r) => <ReviewCard key={r.id} review={r} />)}
-                    </div>
+            {isMobile ? (
+                /* On Mobile have everything stacked on top of each other in one go */
+                <div>
+                    {currentEvents.map((c, i) => (
+                        <EventCard key={i} card={c} />
+                    ))}
+                </div>
+            ) : (
+            /* On desktop keep 2-column split */
+            <>
+                <div>
+                    {currentEvents
+                        .slice(0, Math.ceil(currentEvents.length / 2))
+                        .map((c, i) => <EventCard key={i} card={c} />)}
+                </div>
+                <div>
+                    {currentEvents
+                        .slice(Math.ceil(currentEvents.length / 2))
+                        .map((c, i) => <EventCard key={i} card={c} />)}
+                </div>
+            </>
                 )}
             </div>
-        </div>
-    );
+                    </div>
+                );
 }
