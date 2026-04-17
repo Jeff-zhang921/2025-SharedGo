@@ -369,6 +369,72 @@ router.post("/email/verify", async (req, res) => {
 });
 
 
+router.post("/events/:eventId/participants/email", async (req, res) => {
+  const sessionUser = req.session.user;
+
+  if (!sessionUser) {
+    res.status(401).json({ message: "Not authenticated." });
+    return;
+  }
+
+  const eventId = Number(req.params.eventId);
+
+  if (!Number.isInteger(eventId) || eventId <= 0) {
+    res.status(400).json({ message: "Valid event id is required." });
+    return;
+  }
+
+  if (!mailer) {
+    res.status(500).json({ message: "Email login is not configured." });
+    return;
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      startsAt: true,
+      hostId: true,
+      participants: {
+        orderBy: { joinedAt: "asc" },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!event) {
+    res.status(404).json({ message: "Event not found." });
+    return;
+  }
+
+  if (event.hostId !== sessionUser.id) {
+    res.status(403).json({ message: "Only the event organizer can email the participant list." });
+    return;
+  }
+
+  await sendParticipantListEmail(
+    sessionUser.name ?? "Organizer",
+    sessionUser.email,
+    event.title,
+    event.location,
+    event.startsAt,
+    event.participants.map((participant) => participant.user.email),
+  );
+
+  res.json({
+    message: "Participant list emailed.",
+    recipient: sessionUser.email,
+    participantCount: event.participants.length,
+  });
+});
 
 // Endpoint to get current user info
 router.get("/me", (req, res) => {
