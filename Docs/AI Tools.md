@@ -15,18 +15,21 @@ All uses of AI have been thoroughly checked by the programmers to avoid any erro
 
 ## Specifics per person
 
-### Jeff: 
+### Jingxiang Zhang (Jeff)
 
 **Tools used**
 
 - ChatGPT
 - Gemini
+- codex
 
 #### Where did you use AI tools and why 
 
 Research and architecture best practices - AI was useful for shaping the overall SharedGo structure, especially email verification login flow, session-based auth, and the chat architecture using REST plus Socket.IO. It helped compare approaches quickly and highlight tradeoffs before implementation.
 
 Frontend - I mainly used AI for debugging React/TypeScript issues and UI fixes. and ask what tool can i use in reack. Typical use cases were navigation state between pages, useEffect behavior, socket lifecycle issues, and CSS layout problems (avatar/button alignment, responsive spacing, input behavior). It also helped with frontend best-practice checks.
+
+Frontend logic flow checking with Playwright - I use Playwright to verify frontend logic flows directly in the browser, including button actions, navigation, state changes, and whether the correct backend requests happen at the right time. After checking the flow, I summarise the result clearly. This improves efficiency during integration work and helps detect logic bugs and regressions earlier.
 
 Backend - I used AI to support route and data-layer work in Express + Prisma. This included endpoint validation/error handling patterns, query structure, relation includes, and session-protected route logic. It was also useful for troubleshooting backend errors and refining implementations.
 
