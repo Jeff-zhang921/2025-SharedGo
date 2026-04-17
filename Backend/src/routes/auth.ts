@@ -109,6 +109,97 @@ await mailer.sendMail({
 
 }
 
+async function sendParticipantListEmail(
+  name: string,
+  email: string,
+  eventTitle: string,
+  location: string,
+  startsAt: Date,
+  participantEmails: string[],
+) {
+  if (!mailer) {
+    throw new Error("Email login is not configured.");
+  }
+
+  const formattedDate = startsAt.toLocaleString("en-GB", { dateStyle: "full", timeStyle: "short" });
+
+  const subject = `NO-REPLY-SharedGo participant list for ${eventTitle}`;
+
+  const textParticipants = participantEmails.length
+    ? participantEmails.map((participantEmail) => `[ ] ${participantEmail}`).join("\n")
+    : "No participants have joined this event yet.";
+
+  const htmlParticipants = participantEmails.length
+    ? participantEmails
+        .map((participantEmail, index) => `
+          <tr>
+            <td style="width:40px;padding:8px;border-bottom:1px solid #e5e7eb;text-align:center;">
+              <input type="checkbox" />
+            </td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#111827;">
+              ${index + 1}. ${participantEmail}
+            </td>
+          </tr>
+        `)
+        .join("")
+    : `
+        <tr>
+          <td colspan="2" style="padding:12px;color:#4b5563;text-align:center;">
+            No participants have joined this event yet.
+          </td>
+        </tr>
+      `;
+  
+  const text = `Hello ${name},
+
+Here is the participant list for your SharedGo event.
+
+Event: ${eventTitle}
+When: ${formattedDate}
+Location: ${location}
+
+${textParticipants}
+
+If you didn't request this email, you can ignore it.`;
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#111827;">
+      <div style="max-width:640px;margin:0 auto;border:1px solid #ffffff;border-radius:12px;padding:20px;">
+        <h2 style="margin:0 0 12px;">SharedGo participant list</h2>
+        <p style="margin:0 0 12px;">Hello ${name},</p>
+        <p style="margin:0 0 16px;">
+          <strong>${eventTitle}</strong><br />
+          ${formattedDate}<br />
+          ${location}
+        </p>
+        <p style="margin:0 0 12px;color:#4b5563;">Tick the box as each person arrives.</p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="width:40px;padding:8px;border-bottom:1px solid #e5e7eb;"></th>
+                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;color:#374151;">
+                  Participant Emails
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${htmlParticipants}
+            </tbody>
+          </table>
+        <p style="margin:12px 0 0;font-size:12px;color:#6b7280;">
+          If you didn't request this email, you can ignore it.
+        </p>
+        </div>
+      </div>
+  `;
+  await mailer.sendMail({
+    from: SMTP_FROM,
+    to: email,
+    subject,
+    text,
+    html,
+  });
+}
+
 
 // Endpoint to start email login (sends code)
 router.post("/email/start", async (req, res) => {
@@ -276,6 +367,7 @@ router.post("/email/verify", async (req, res) => {
     },
   });
 });
+
 
 
 // Endpoint to get current user info
