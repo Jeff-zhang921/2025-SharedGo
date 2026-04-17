@@ -47,6 +47,7 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching
   const [currentUser, setCurrentUser] = useState<User | null>(null) //Enables us to see who is logged-in to show the Delete Event button to host only
   const [isJoining, setIsJoining] = useState(false)
+  const [isSendingParticipantList, setIsSendingParticipantList] = useState(false)
 
   //Code for actually fetching the data from the backend
   useEffect(() => {
@@ -170,6 +171,36 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
         alert("Please enable location permissions to get directions.");
       }
     );
+  };
+
+  const handleSendParticipantList = async () => {
+    if (!eventId) return;
+
+    const backendBaseURL = import.meta.env.VITE_API_URL;
+    const backendUrl = `${backendBaseURL}/auth/events/${eventId}/participants/email`;
+
+    try {
+      setIsSendingParticipantList(true);
+
+      const response = await fetch(backendUrl, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        alert(data.message || "Failed to send participant list.");
+        return;
+      }
+
+      alert(data.message || "Participant list sent.");
+    } catch (sendError) {
+      console.error("Send participant list error:", sendError);
+      alert("Something went wrong.");
+    } finally {
+      setIsSendingParticipantList(false);
+    }
   };
 
   const handleJoin = async () => {
@@ -370,6 +401,11 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
                   <Link to="/chat" state={{ hostId: event.host.id }} className="btn-join">Chat with host</Link>
                 )}
                 {/* If hostId matches event host, then show "delete event" button */}
+                {isHost && (
+                    <button onClick={handleSendParticipantList} disabled={isSendingParticipantList} className="btn-join">
+                    {isSendingParticipantList ? "Sending..." : "Send Participant List"}
+                    </button>
+                )}
                 {isHost && (
                     <button onClick={handleDelete} disabled={isLoading} className="btn-join"> 
                     {isLoading ? "Deleting...":"Delete Event"}
