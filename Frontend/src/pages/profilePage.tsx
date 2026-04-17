@@ -158,9 +158,8 @@ export default function ProfilePage() {
   }
 
   if (error) {
-    return (
-        navigate("/")
-    );
+    navigate("/")
+    return null;
   }
 
   // Default user data (fallback)
