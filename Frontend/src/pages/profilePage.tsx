@@ -217,6 +217,28 @@ export default function ProfilePage() {
     );
   };
 
+  const handleEditProfile = async () => {
+    const newName = prompt("Enter your new name:");
+    if (!newName) return;
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/profile/me`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: newName }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setProfileData(prev => prev ? { ...prev, user: data.user } : prev);
+    } else {
+      alert(data.message);
+    }
+  };
+
 
 
 
@@ -226,7 +248,15 @@ export default function ProfilePage() {
         {/* Header Navigation Bar */}
         <div className="header">
           <div className="title">My profile</div>
-              <p className="user-email">{user.email}</p>
+
+          <div className="user-info">
+            <h2 className="user-name">{user.name || "No name set"}</h2>
+            <p className="user-email">{user.email}</p>
+
+            <button className="edit-profile" onClick={handleEditProfile}>
+              {user.name ? "Edit profile name" : "Add profile name"}
+            </button>
+          </div>
         </div>
 
         {/* User/Host Role Tags */}

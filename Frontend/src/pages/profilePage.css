@@ -28,6 +28,13 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    white-space: nowrap;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .title {
@@ -60,9 +67,10 @@ html, body {
 
 .user-name {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    color: black;
+    color: #5C2BE2;
+    white-space: nowrap;
 }
 
 .user-email {
@@ -80,6 +88,9 @@ html, body {
     cursor: pointer;
     color: #5C2BE2;
     font-weight: bold;
+    white-space: nowrap;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .conversations {
@@ -174,7 +185,9 @@ html, body {
     flex: 1;
     width: 100%;
     border: 1px solid #ddd;
+    white-space: nowrap;
 }
+
 .toggle-tabs .active {
     background: black;
     color: white;
