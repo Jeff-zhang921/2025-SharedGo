@@ -166,7 +166,10 @@ const MapPage = () => {
 
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
+        minZoom={3} //Stops people infinitely zooming out
         zoom={13}
+        maxBounds={[[-90, -180], [90, 180]]} //Stops user scrolling too far left or right out of map
+        maxBoundsViscosity={1.0}
         zoomControl={false} //Users can still zoom in and out using trackpad
         ref={setMap}
         style={{ height: "100vh", width: "100vw" }} //Takes up whole page
@@ -174,6 +177,7 @@ const MapPage = () => {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
+          noWrap={true}
         />
         <MapEventsHandler />
 
