@@ -13,6 +13,67 @@
   z-index: 1; /* Map below everything else */
 }
 
+.map-search-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+}
+
+.map-search-panel.is-open,
+.map-search-toggle {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.map-search-panel.is-open {
+  gap: 15px;
+  flex-wrap: wrap;
+  max-width: calc(100% - 40px);
+  padding: 10px 12px;
+}
+
+.map-search-toggle {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.map-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.map-search-input-shell {
+  display: flex;
+  align-items: center;
+  min-width: 220px;
+  padding: 0 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.map-search-input {
+  min-width: 180px;
+  border: none;
+  padding-left: 0;
+}
+
+.map-filter-select {
+  min-width: 180px;
+}
+
 .event-circle-marker {
   cursor: pointer;
   text-decoration: none;
@@ -75,6 +136,38 @@
 
 
 @media (max-width: 768px) {
+  .map-search-panel {
+    top: 12px;
+    left: 12px;
+  }
+
+  .map-search-panel.is-open {
+    right: 12px;
+    max-width: none;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .map-search-controls {
+    width: 100%;
+  }
+
+  .map-search-input-shell,
+  .map-search-input,
+  .map-filter-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .map-date-range-group {
+    width: 100%;
+    padding-left: 0;
+    padding-top: 10px;
+    border-left: none;
+    border-top: 1px solid #eee;
+    justify-content: space-between;
+  }
+
   .map-instruction-banner {
     bottom: 80px;
     font-size: 11px;
