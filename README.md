@@ -136,6 +136,9 @@
 ## Chat logic workflow
 ![chat system](Docs/Workflow/Chat%20Workflow.png)
 
+## Event board workflow
+![event board](Docs/Workflow/EventBoard.png)
+
 ## Flow Steps
 * #### Individual user
      1. Register and log in
