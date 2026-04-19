@@ -15,6 +15,8 @@ This section documents the endpoints used by **Frontend**
   - [0.1 Start Email Login](#01-start-email-login)
   - [0.2 Verify Email Code](#02-verify-email-code)
   - [0.3 Current User](#03-current-user)
+  - [0.4 Send Participant List Email](#04-send-participant-list-email)
+  - [0.5 Logout](#05-logout)
 - [1. Event Endpoints](#1-event-endpoints)
   - [1.0 List Events (Nearby / All)](#10-list-events-nearby--all)
   - [1.1 Create Event](#11-create-event)
@@ -108,6 +110,60 @@ This section documents the endpoints used by **Frontend**
 **Notes**
 
 - Requires the session cookie set by `/auth/email/verify`.
+
+---
+
+### 0.4 Send Participant List Email
+
+**POST** `/auth/events/:eventId/participants/email`
+
+Send the participant email list for one specific event to the logged-in host.
+
+**URL params**
+
+| Param     | Type   | Required | Notes    |
+|-----------|--------|----------|----------|
+| `eventId` | number | yes      | Event ID |
+
+**Auth / Rules**
+
+- Requires the session cookie from `/auth/email/verify`.
+- Only the organizer of that event can use this route.
+- The email is sent to the logged-in organizer's own email address.
+
+**Response**
+
+```json
+{
+  "message": "Participant list emailed.",
+  "recipient": "host@example.com",
+  "participantCount": 4
+}
+```
+
+**Common error responses**
+
+- `400` `{ "message": "Valid event id is required." }`
+- `401` `{ "message": "Not authenticated." }`
+- `403` `{ "message": "Only the event organizer can email the participant list." }`
+- `404` `{ "message": "Event not found." }`
+- `500` `{ "message": "Email login is not configured." }`
+
+---
+
+### 0.5 Logout
+
+**POST** `/auth/logout`
+
+Destroys the current session.
+
+**Response**
+
+- `204 No Content`
+
+**Common error responses**
+
+- `500` `{ "message": "Failed to log out." }`
 
 ---
 ## 1. Event Endpoints
@@ -225,6 +281,21 @@ Includes:
 **Response**
 
 - Joined attendee: `{ id, name, email, joinedAt }`
+
+**Leave Event**
+
+**DELETE** `/events/:id/join`
+
+**Request body (JSON)**
+
+| Field   | Type   | Required | Notes |
+|---------|--------|----------|-------|
+| `email` | string | yes      | Email of the attendee leaving the event |
+
+**Response**
+
+- `{ message: "Left the event successfully." }`
+- If the user was not joined: `{ message: "You have not joined this event." }`
 
 ---
 
