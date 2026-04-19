@@ -124,8 +124,8 @@ const MapPage = () => {
 
   // Circle Icons
   const createEventIcon = (title: string) => {
-    const size = Math.max(20, Math.pow(zoomLevel, 1.8) / 1.3); //Exponential scaling to make icons grow larger or smaller dependant on zoom
-    const fontSize = size * 0.13;
+    const size = Math.max(20, Math.pow(zoomLevel, 1.6) / 1.3); //Exponential scaling to make icons grow larger or smaller dependant on zoom
+    const fontSize = size * 0.15;
     return new L.DivIcon({
       className: 'custom-div-icon',
       html: `<div class="event-circle-marker" style="width: ${size}px; height: ${size}px;">
@@ -158,13 +158,18 @@ const MapPage = () => {
       {/* Banner to inform user how to make an event */}
       {!selectedEventId && !tempMarker && (
         <div className="map-instruction-banner">
-          📍 Tap anywhere on the map to create an event
+          {zoomLevel < 12 
+            ? "🔍 Zoom in to see events" 
+            : "📍 Tap anywhere to create an event"}
         </div>
       )}
 
       <MapContainer
         center={[51.5, -2.6]} //Centre of bristol
+        minZoom={3} //Stops people infinitely zooming out
         zoom={13}
+        maxBounds={[[-90, -180], [90, 180]]} //Stops user scrolling too far left or right out of map
+        maxBoundsViscosity={1.0}
         zoomControl={false} //Users can still zoom in and out using trackpad
         ref={setMap}
         style={{ height: "100vh", width: "100vw" }} //Takes up whole page
@@ -172,6 +177,7 @@ const MapPage = () => {
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" //Nicer looking map
           attribution='&copy; OpenStreetMap contributors'
+          noWrap={true}
         />
         <MapEventsHandler />
 
@@ -190,7 +196,7 @@ const MapPage = () => {
           </Popup>
         )}
 
-          {filteredEvents.map((event) => (
+          {zoomLevel >= 12 && filteredEvents.map((event) => (
             <Marker 
               key={event.id} 
               position={[event.latitude, event.longitude]} 
