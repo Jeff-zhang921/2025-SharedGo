@@ -10,7 +10,7 @@ services:
   frontend:
     image: 588738568626.dkr.ecr.eu-north-1.amazonaws.com/sharedgo_frontend:latest
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
       - backend
     networks:
