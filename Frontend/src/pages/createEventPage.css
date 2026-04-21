@@ -94,10 +94,6 @@ input:focus, textarea:focus, select:focus {
     margin-top: 40px;
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
 .select-wrapper select {
     border-radius: 5px;
     border: 1px solid #ccc;

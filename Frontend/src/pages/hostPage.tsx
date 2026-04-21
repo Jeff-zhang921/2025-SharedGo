@@ -140,7 +140,7 @@ const EventCard = ({ card }: { card: CardItem }) => (
         marginBottom: "0.625rem",
     }}>
         <img
-            src={card.image || "https://images.unsplash.com/photo-1574226516831-e1dff420e562?w=120&q=80"}
+            src={card.image || "/image-placeholder.png"}
             alt={card.title}
             style={{ width: "72px", height: "72px", borderRadius: "0.5rem", objectFit: "cover", flexShrink: 0 }}
         />
