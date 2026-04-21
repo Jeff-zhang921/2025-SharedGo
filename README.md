@@ -128,7 +128,10 @@
 ![MVParchitecture (1)](https://github.com/spe-uob/2025-SharedGo/blob/main/Docs/Architecture/MVParchitecture.jpg) -->
 
 ### Architecture diagram
-![Architecture](Docs/Architecture/Architecture2.0.png)
+![Architecture](Docs/Architecture/architecture_final.png)
+
+### Database diagram
+![Database](Docs/database/database_final.png)
 
 ## CI/CD diagram
 ![CI/CD Diagram](Docs/Architecture/ci_cd_2.png)
@@ -139,32 +142,6 @@
 ## Event board workflow
 ![event board](Docs/Workflow/EventBoard.png)
 
-## Flow Steps
-* #### Individual user
-     1. Register and log in
-     2. Grant location access to see nearby events
-     3. Browse events by filter (interest and time)
-     4. Tap an event pin to see details
-     5. Click "join"
-     6. Receive confirmation
-     7. Added to the schedule and access group chat
-     
-        
-* #### Host
-     1. Log in with a verified host account
-     2. Click "create event"
-     3. Fill in event details (title, time, location, capacity)
-     4. Click "publish"
-     5. Event appears on the map, chat is created
-
-* #### Friend group & Societies
-     1. Click "create private event"
-     2. Fills in event details (title, time, location, capacity)
-     3. Chooses friends from contacts/app list to invite
-     4. Click "create & send invites"
-     5. The event is created but only visible to invited users
-     6. Invited users receive notification
-     7. Accepted users added to group chat
 
 ## User Instructions
 
