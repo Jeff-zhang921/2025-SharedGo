@@ -134,7 +134,7 @@ async function sendParticipantListEmail(
         .map((participantEmail, index) => `
           <tr>
             <td style="width:40px;padding:8px;border-bottom:1px solid #e5e7eb;text-align:center;">
-              <input type="checkbox" />
+              &#9744;
             </td>
             <td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#111827;">
               ${index + 1}. ${participantEmail}
@@ -420,14 +420,20 @@ router.post("/events/:eventId/participants/email", async (req, res) => {
     return;
   }
 
-  await sendParticipantListEmail(
-    sessionUser.name ?? "Organizer",
-    sessionUser.email,
-    event.title,
-    event.location,
-    event.startsAt,
-    event.participants.map((participant) => participant.user.email),
-  );
+  try {
+    await sendParticipantListEmail(
+      sessionUser.name ?? "Organizer",
+      sessionUser.email,
+      event.title,
+      event.location,
+      event.startsAt,
+      event.participants.map((participant) => participant.user.email),
+    );
+  } catch (error) {
+    console.error("Failed to send participant list email:", error);
+    res.status(500).json({ message: "Failed to send participant list." });
+    return;
+  }
 
   res.json({
     message: "Participant list emailed.",
