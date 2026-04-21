@@ -13,24 +13,65 @@
   z-index: 1; /* Map below everything else */
 }
 
-/* Display buttons above map */
-.ui-overlay {
+.map-search-panel {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* Stops overlay blocking clicks */
-  z-index: 1000; /* Stays above map */
+  top: 20px;
+  left: 20px;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
 }
 
-/* Allow clicks for buttons */
-.ui-overlay a, 
-.ui-overlay button, 
-.home-btn,
-.profile-page,
-.create-event {
-  pointer-events: auto;
+.map-search-panel.is-open,
+.map-search-toggle {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.map-search-panel.is-open {
+  gap: 15px;
+  flex-wrap: wrap;
+  max-width: calc(100% - 40px);
+  padding: 10px 12px;
+}
+
+.map-search-toggle {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.map-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.map-search-input-shell {
+  display: flex;
+  align-items: center;
+  min-width: 220px;
+  padding: 0 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.map-search-input {
+  min-width: 180px;
+  border: none;
+  padding-left: 0;
+}
+
+.map-filter-select {
+  min-width: 180px;
 }
 
 .event-circle-marker {
@@ -69,24 +110,6 @@
   text-overflow: ellipsis;
 }
 
-.create-event {
-  position: fixed;
-  bottom: 50px;
-  right: 50px;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background-color: black;
-  color: white;
-  padding: 18px 40px;
-  font-size: 18px;
-  font-weight: 700;
-  text-decoration: none;
-  border-radius: 50px; /*Rounded shape*/
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
 .map-instruction-banner {
   position: absolute;
   bottom: 40px;
@@ -112,14 +135,37 @@
 }
 
 
-@media (max-width: 768px) { /* Create event button for mobile */
-  .create-event {
-    top: 20px;
-    bottom: auto;
-    right: 20px;
-    padding: 12px 24px; /* Smaller button for mobile */
-    font-size: 15px;
-    gap: 8px;
+@media (max-width: 768px) {
+  .map-search-panel {
+    top: 12px;
+    left: 12px;
+  }
+
+  .map-search-panel.is-open {
+    right: 12px;
+    max-width: none;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .map-search-controls {
+    width: 100%;
+  }
+
+  .map-search-input-shell,
+  .map-search-input,
+  .map-filter-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .map-date-range-group {
+    width: 100%;
+    padding-left: 0;
+    padding-top: 10px;
+    border-left: none;
+    border-top: 1px solid #eee;
+    justify-content: space-between;
   }
 
   .map-instruction-banner {
@@ -130,13 +176,6 @@
     text-align: center;
     white-space: normal;
   }
-}
-
-.create-event:hover {
-  transform: translateY(-3px); /*Lifts up slightly*/
-  background-color: #222;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
 }
 
 .profile-page {
