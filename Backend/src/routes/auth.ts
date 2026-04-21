@@ -56,6 +56,18 @@ function hashCode(code: string): string {
   return crypto.createHmac("sha256", LOGIN_CODE_SECRET).update(code).digest("hex");
 }
 
+function sanitizeMailHeaderValue(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+function formatEventDateForEmail(date: Date): string {
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
+  return `${date.toISOString().slice(0, 16).replace("T", " ")} UTC`;
+}
+
 
 async function sendLoginCode(name: string, email: string, code: string) {
 if (!mailer) {
@@ -121,9 +133,10 @@ async function sendParticipantListEmail(
     throw new Error("Email login is not configured.");
   }
 
-  const formattedDate = startsAt.toLocaleString("en-GB", { dateStyle: "full", timeStyle: "short" });
+  const safeEventTitle = sanitizeMailHeaderValue(eventTitle) || "event";
+  const formattedDate = formatEventDateForEmail(startsAt);
 
-  const subject = `NO-REPLY-SharedGo participant list for ${eventTitle}`;
+  const subject = `NO-REPLY-SharedGo participant list for ${safeEventTitle}`;
 
   const textParticipants = participantEmails.length
     ? participantEmails.map((participantEmail) => `[ ] ${participantEmail}`).join("\n")
@@ -167,7 +180,7 @@ If you didn't request this email, you can ignore it.`;
         <h2 style="margin:0 0 12px;">SharedGo participant list</h2>
         <p style="margin:0 0 12px;">Hello ${name},</p>
         <p style="margin:0 0 16px;">
-          <strong>${eventTitle}</strong><br />
+          <strong>${safeEventTitle}</strong><br />
           ${formattedDate}<br />
           ${location}
         </p>
