@@ -25,6 +25,13 @@ type EventForm = {
   averageRating?: number | null;
 };
 
+const BLOCKED_TERMS = ["drug","narcotics","cannabis", "marijuana", "cocaine","heroin", "methamphetamine","fentanyl","ecstasy","mdma","lsd","psychedelic","weed","pot","grass","420","snow", "blow","ice", "crystal", "meth", "molly", "shrooms", "magic mushrooms", "loud", "plug", "dealer", "buy weed", "terrorism", "terrorist", "isis", "isil", "al-qaeda", "al qaeda", "taliban", "jihad", "white supremacy", "neo-nazi", "neo nazi", "kkk", "bomb making", "how to make a bomb", "ied", "explosives", "molotov cocktail", "ricin", "sarin gas", "beheading", "execution video", "mass shooting", "manifesto", "buy gun no background check", "untraceable ghost gun", "3d printed gun", "nigger", "nigga", "chink", "gook", "spic", "wetback", "kike", "raghead","faggot", "fag","tranny", "dyke", "kill all", "eradicate","exterminate", "gas the", "suicide", "kill myself","kms", "end my life", "hang myself", "overdose","painless death", "cut myself", "self-harm", "cutting","bleeding", "scam", "ponzi", "pyramid scheme","phishing", "money laundering", "stolen credit card", "fullz","cvv dumps", "fake id", "fake passport", "counterfeit money","how to hack", "ddos attack", "botnet", "malware","ransomware", "spyware",];
+
+const hasBlockedTerm = (text: string) => {
+  const normalized = text.toLowerCase();
+  return BLOCKED_TERMS.some((term) => normalized.includes(term));
+};
+
 const CreateEventPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,6 +76,11 @@ const CreateEventPage = () => {
   // handle submition of the form
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const combinedText = `${form.title ?? ""} ${form.description ?? ""}`.trim();
+    if (hasBlockedTerm(combinedText)) {
+      setStatus("Title/description contains restricted words.");
+      return;
+    }
     setLoading(true);
     setStatus("");
     
