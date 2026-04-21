@@ -27,6 +27,7 @@ export function initSocket(server: HttpServer) {
 //io is the single Socket.IO server instance in your backend(everyone share only one)
 //socket is one client connection. user a, b, c has different socket
   const io = new Server(server, {
+    path: "/socket.io/",
     cors: {
       origin: frontendOrigin,
       credentials: true,
