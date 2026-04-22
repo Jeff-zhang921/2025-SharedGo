@@ -254,7 +254,7 @@ const MapPage = () => {
               <br />
               <button 
                 onClick={() => navigate('/createEvent', { state: { lat: tempMarker.lat, lng: tempMarker.lng } })}
-                style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer' }}
+                style={{ marginTop: '10px', padding: '5px 10px', cursor: 'pointer', border: '2px solid #5C2BE2', borderRadius: '6px',}}
               >
                 Add Event Here
               </button>

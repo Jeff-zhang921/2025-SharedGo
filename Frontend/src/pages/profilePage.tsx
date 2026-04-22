@@ -52,12 +52,6 @@ interface CardItem {
   image?: string;
 }
 
-interface ReviewItem {
-  id: number;
-  userName: string;
-  msg: string;
-}
-
 // Date formatting tool function: Converts ISO time to a friendly prompt (such as "Starts in 3 days")
 const formatEventDate = (isoDateString: string): string => {
   try {
@@ -90,12 +84,6 @@ export default function ProfilePage() {
   // User/Host toggle status
   const [toggleArr] = useState<string[]>(["Events joined", "Events created"]);
   const [selectedToggle, setSelectedToggle] = useState<number>(0);
-
-  // Static comment data (which can be retrieved from the API later)
-  const reviewList: ReviewItem[] = [
-    { id: 1, userName: "User1", msg: "Great event experience!" },
-    { id: 2, userName: "User2", msg: "Highly recommended to attend!" },
-  ];
 
   // Asynchronous acquisition of personal profile data
   useEffect(() => {
@@ -192,7 +180,7 @@ export default function ProfilePage() {
         {cards.map((card) => (
           <div key={card.id} className="event-card">
             <img
-              src={card.image || "/home.svg"}
+              src={card.image || "/image-placeholder.png"}
               alt={card.title}
               className="event-card-img"
             />
@@ -246,16 +234,16 @@ export default function ProfilePage() {
       <div className="profile-page">
         {/* Header Navigation Bar */}
         <div className="header">
-          <div className="title">My profile</div>
-
-          <div className="user-info">
-            <h2 className="user-name">{user.name || "No name set"}</h2>
-            <p className="user-email">{user.email}</p>
-
-            <button className="edit-profile" onClick={handleEditProfile}>
-              {user.name ? "Edit profile name" : "Add profile name"}
-            </button>
-          </div>
+            <div className="user-info">
+              <div className="title">My profile</div>
+              <div className="name-row">
+                <h2 className="user-name">{user.name || "Add profile name: "}</h2>
+                <button className="edit-profile" onClick={handleEditProfile}>
+                  <img src="/edit.svg"/>
+                </button>
+              </div>
+              <p className="user-email">{user.email}</p>
+            </div> 
         </div>
 
         {/* User/Host Role Tags */}
@@ -345,16 +333,6 @@ export default function ProfilePage() {
             />
           </div>
         )}
-
-        {/* Reviews Section */}
-        {/* {selectedTag === 2 && (
-          <div className="card-list">
-            <EventList
-              cards={[]}
-              emptyMessage="No reviews found"
-            />
-          </div>
-        )} */}
       </div>
     </div>
   );
