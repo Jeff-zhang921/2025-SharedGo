@@ -56,19 +56,6 @@ function hashCode(code: string): string {
   return crypto.createHmac("sha256", LOGIN_CODE_SECRET).update(code).digest("hex");
 }
 
-function sanitizeMailHeaderValue(value: string): string {
-  return value.replace(/[\r\n]+/g, " ").trim();
-}
-
-function formatEventDateForEmail(date: Date): string {
-  if (Number.isNaN(date.getTime())) {
-    return "Date unavailable";
-  }
-
-  return `${date.toISOString().slice(0, 16).replace("T", " ")} UTC`;
-}
-
-
 async function sendLoginCode(name: string, email: string, code: string) {
 if (!mailer) {
   throw new Error("Email login is not configured.");
@@ -133,8 +120,10 @@ async function sendParticipantListEmail(
     throw new Error("Email login is not configured.");
   }
 
-  const safeEventTitle = sanitizeMailHeaderValue(eventTitle) || "event";
-  const formattedDate = formatEventDateForEmail(startsAt);
+  const safeEventTitle = eventTitle.replace(/[\r\n]+/g, " ").trim() || "event";
+  const formattedDate = Number.isNaN(startsAt.getTime())
+    ? "Date unavailable"
+    : `${startsAt.toISOString().slice(0, 16).replace("T", " ")} UTC`;
 
   const subject = `NO-REPLY-SharedGo participant list for ${safeEventTitle}`;
 
