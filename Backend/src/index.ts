@@ -52,6 +52,16 @@ app.use("/api", apiRouter);
 if (require.main === module) {
   const server = http.createServer(app);
   initSocket(server);
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE") {
+      console.error(
+        `Port ${PORT} is already in use. Stop the existing backend process or set PORT to a different value.`,
+      );
+    } else {
+      console.error("Failed to start backend server.", error);
+    }
+    process.exit(1);
+  });
   // the server now contain both express and socket.io
   server.listen(PORT, () => {
     console.log(`running on port ${PORT} `);
