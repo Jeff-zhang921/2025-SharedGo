@@ -31,7 +31,7 @@
     /* Module behaviour */
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
-    "isolatedModules": false,
+    "isolatedModules": true,
 
     /* JSX (ignored, just disables React mode) */
     "jsx": "preserve"
