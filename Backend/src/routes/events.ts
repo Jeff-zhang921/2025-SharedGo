@@ -503,8 +503,9 @@ router.post("/:id/join", requireSession, async (req, res) => {
 
 
 
-// Allow attendees to leave an event they previously joined.
-router.delete("/:id/join", requireSession, async (req, res) => {
+// Shared handler so both the legacy DELETE route and the POST fallback
+// can remove an attendee using the authenticated session user.
+async function leaveEventHandler(req: Request, res: Response) {
   const idText = req.params.id;
   const eventId = Number(idText);
 
@@ -553,7 +554,11 @@ router.delete("/:id/join", requireSession, async (req, res) => {
   });
 
   res.json({ message: "Left the event successfully." });
-});
+}
+
+// Allow attendees to leave an event they previously joined.
+router.delete("/:id/join", requireSession, leaveEventHandler);
+router.post("/:id/leave", requireSession, leaveEventHandler);
 
 
 // Allow attendees to create or update a review for an event (and host).
