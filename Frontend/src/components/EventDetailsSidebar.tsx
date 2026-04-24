@@ -263,20 +263,14 @@ const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) 
     }
 
     const backendBaseURL = import.meta.env.VITE_API_URL;
-    const backendUrl = `${backendBaseURL}/events/${eventId}/join`;
+    const backendUrl = `${backendBaseURL}/events/${eventId}/leave`;
 
     try {
       setIsJoining(true);
 
       const response = await fetch(backendUrl, {
-        method: "DELETE",
+        method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: currentUser.email,
-        }),
       });
 
       const data = await response.json().catch(() => ({}));
