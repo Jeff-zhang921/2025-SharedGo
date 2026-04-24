@@ -262,7 +262,7 @@ const MapPage = () => {
           </Popup>
         )}
 
-          {zoomLevel >= 12 && filteredEvents.map((event) => (
+          {zoomLevel >= 7 && filteredEvents.map((event) => (
             <Marker 
               key={event.id} 
               position={[event.latitude, event.longitude]} 
