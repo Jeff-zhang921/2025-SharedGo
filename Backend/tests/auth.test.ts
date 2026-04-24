@@ -33,11 +33,13 @@ jest.mock("@prisma/client", () => ({
     Category: {},
 }));
 
-jest.mock("nodemailer", () => ({
-    createTransport: jest.fn().mockReturnValue({
-        sendMail: jest.fn().mockResolvedValue(true)
-    })
-}));
+jest.mock("nodemailer", () => {
+    const mockSendMail = jest.fn().mockResolvedValue(true);
+    const mockTransport = { sendMail: mockSendMail };
+    return {
+        createTransport: jest.fn(() => mockTransport)
+    };
+});
 
 jest.mock("../src/middleware/requireSession", () => ({
   requireSession: (req: Request, res: Response, next: NextFunction) => next(),
@@ -53,7 +55,6 @@ app.use(session({
     resave: false
 }));
 
-let setSessionUser: (user: { id: number; email: string; name: string; provider: "email" }) => void;
 let sessionSetter: { id: number; email: string; name: string; provider: "email" } | undefined = { 
   id: 123, 
   email: "test@example.com", 
@@ -245,10 +246,10 @@ describe("Auth Routes", () => {
         expect(res.body.message).toBe("Not authenticated.");
     });
     it("should return user info if authenticated", async () => {
-        sessionSetter = { id: "1", email: "test@gmail.com", name: "Tester" };
+        sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
         const res = await request(app).get("/auth/me");
         expect(res.status).toBe(200);
-        expect(res.body.user).toEqual({ id: "1", email: "test@gmail.com", name: "Tester" });
+        expect(res.body.user).toEqual({ id: 1, email: "test@gmail.com", name: "Tester", provider: "email" });
         sessionSetter = undefined;
     });
     it("should successfully log out", async () => {
@@ -264,11 +265,6 @@ describe("Auth Routes", () => {
     describe("POST /auth/events/:eventId/participants/email", () => {
         const mockEventId = 123;
 
-        beforeEach(() => {
-            sessionSetter = undefined; // Default to no session
-            setSessionUser = (user) => { sessionSetter = user; };
-        });
-
         it("should return 401 if user is not in session", async () => {
             // sessionSetter is undefined
             const res = await request(app).post(`/auth/events/${mockEventId}/participants/email`);
@@ -276,10 +272,10 @@ describe("Auth Routes", () => {
         });
 
         it("should return 403 if user is not the host", async () => {
-            sessionSetter = { id: "2", email: "other@gmail.com", name: "Other" };
+            sessionSetter = { id: 2, email: "other@gmail.com", name: "Other", provider: "email" };
             mockPrisma.event.findUnique.mockResolvedValue({
                 id: mockEventId,
-                hostId: "999", // Different ID
+                hostId: 999, // Different ID
             });
 
             const res = await request(app)
@@ -289,14 +285,14 @@ describe("Auth Routes", () => {
         });
 
         it("should send participant list successfully", async () => {
-            sessionSetter = { id: "1", email: "test@gmail.com", name: "Tester" };
+            sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
             const mockStartsAt = new Date();
             mockPrisma.event.findUnique.mockResolvedValue({
                 id: mockEventId,
                 title: "Test Event",
                 location: "Test Venue",
                 startsAt: mockStartsAt,
-                hostId: "1", // Matches session user
+                hostId: 1, // Matches session user
                 participants: [
                     { user: { email: "p1@test.com" } },
                     { user: { email: "p2@test.com" } }
@@ -311,13 +307,13 @@ describe("Auth Routes", () => {
         });
 
         it("should handle empty participant list", async () => {
-            sessionSetter = { id: "1", email: "test@gmail.com", name: "Tester" };
+            sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
             mockPrisma.event.findUnique.mockResolvedValue({
                 id: mockEventId,
                 title: "Empty Event",
                 location: "Nowhere",
                 startsAt: new Date(),
-                hostId: "1",
+                hostId: 1,
                 participants: []
             });
 
@@ -325,27 +321,27 @@ describe("Auth Routes", () => {
             expect(res.status).toBe(200);
         });
         it("should return 400 for invalid event id", async () => {
-            setSessionUser({ id: "1", email: "test@gmail.com", name: "Tester" });
+            sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
             const res = await request(app).post(`/auth/events/invalid/participants/email`);
             expect(res.status).toBe(400);
         });
 
         it("should return 404 if event not found", async () => {
-            setSessionUser({ id: "1", email: "test@gmail.com", name: "Tester" });
+            sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
             mockPrisma.event.findUnique.mockResolvedValue(null);
             const res = await request(app).post(`/auth/events/999/participants/email`);
             expect(res.status).toBe(404);
         });
 
         it("should return 500 if sending participant email fails", async () => {
-            setSessionUser({ id: "1", email: "test@gmail.com", name: "Tester" });
+            sessionSetter = { id: 1, email: "test@gmail.com", name: "Tester", provider: "email" };
             const mockStartsAt = new Date();
             mockPrisma.event.findUnique.mockResolvedValue({
                 id: mockEventId,
                 title: "Test Event",
                 location: "Test Venue",
                 startsAt: mockStartsAt,
-                hostId: "1",
+                hostId: 1,
                 participants: []
             });
             const transport = nodemailer.createTransport();
