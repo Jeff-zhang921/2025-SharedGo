@@ -138,10 +138,7 @@ return mapped
 useEffect(()=>{
   const q=searchTerm.trim()
  
-  if(!q){
-    setDbUsers([])
-    return
-  }
+  if(!q) return;
 //this is debounce command
   const timer=setTimeout(async()=>{
 const res=await fetch(`${BACKEND_URL}/chat/users?query=${q}`,

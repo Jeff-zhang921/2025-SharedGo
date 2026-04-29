@@ -159,6 +159,7 @@ socketRef.current=socket
       socketRef.current = null;
      }
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
 
