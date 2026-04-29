@@ -118,8 +118,12 @@ const CreateEventPage = () => {
         }
       });
       //navigate(`/eventDetails/${createdEvent.event.id}`);
-    } catch (err: any) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("An unknown error occurred", err);
+      }
       setStatus("Failed to create event");
     } finally {
       setLoading(false);
