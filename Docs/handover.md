@@ -246,7 +246,7 @@ Key subdirectories:
 
 Key files:
 
-- `Docs/database_setup.md`: EC2 + PostgreSQL setup notes
+- `Docs/database_setup.md`: neon + PostgreSQL setup notes
 - `Docs/AI Tools.md`: project AI-usage documentation
 - `Docs/testing_day_survey.pdf`: testing feedback artifact
 
@@ -474,7 +474,7 @@ Container behavior:
 ### Database Hosting
 The repository documentation currently points to PostgreSQL being hosted separately from the app containers.
 
-- `Docs/database_setup.md` documents a PostgreSQL-on-EC2 setup
+- `Docs/database_setup.md` documents a neon setup
 - The database is therefore external to `docker-compose.yml`
 - The backend relies on `DATABASE_URL` to reach that database
 
@@ -484,7 +484,7 @@ The deployment flow currently depends on:
 - GitHub Actions secrets for AWS credentials
 - GitHub Actions secret `EC2_SSH_KEY`
 - GitHub Actions secrets `VITE_API_URL` and `VITE_SOCKET_URL` for the frontend image build
-- A backend `.env` file or equivalent environment injection on the EC2 host for database, SMTP, auth, and upload settings
+- A backend `.env` file or equivalent environment injection on the neon host for database, SMTP, auth, and upload settings
 
 > [!IMPORTANT]
 > The frontend Docker image bakes `VITE_API_URL` and `VITE_SOCKET_URL` at build time. Changing API or socket endpoints requires rebuilding and republishing the frontend image.
@@ -505,7 +505,7 @@ Current operational constraints worth knowing:
 | `README.md` | Main project overview |
 | `Backend/API_README.md` | Endpoint-level backend API reference |
 | `Backend/DEVELOPER_README.md` | Backend setup notes |
-| `Docs/database_setup.md` | PostgreSQL and EC2 setup notes |
+| `Docs/database_setup.md` | PostgreSQL and neon setup notes |
 | `Docs/AI Tools.md` | AI tool usage documentation |
 | `Docs/Architecture/architecture_final.png` | Main architecture diagram |
 | `Docs/Architecture/ci_cd_2.png` | CI/CD diagram |
