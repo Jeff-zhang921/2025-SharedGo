@@ -64,7 +64,7 @@ const formatEventDate = (isoDateString: string): string => {
     if (diffDays === 0) return 'Starts today';
     if (diffDays === 1) return 'Starts tomorrow';
     return `Starts in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-  } catch (err) {
+  } catch {
     return 'Date unavailable';
   }
 };
@@ -153,7 +153,6 @@ export default function ProfilePage() {
   // Default user data (fallback)
   const fallbackUser = { id: 0, name: "Unknown User", email: "no-email@example.com" };
   const user = profileData?.user || fallbackUser;
-  const stats = profileData?.stats || { upcomingCount: 0, pastCount: 0 };
 
   const upcomingJoinedCount =
   profileData?.upcomingEvents.filter(e => e.isAttendee).length || 0;
@@ -168,9 +167,9 @@ export default function ProfilePage() {
       cards, emptyMessage, onButtonClick, buttonLabel
     }: {
       cards: CardItem[];
-      emptyMessage: String;
+      emptyMessage: string;
       onButtonClick?: (id: number) => void;
-      buttonLabel?: String;
+      buttonLabel?: string;
     }) => {
       if (cards.length === 0) {
         return <p className="empty-text">{emptyMessage}</p>;

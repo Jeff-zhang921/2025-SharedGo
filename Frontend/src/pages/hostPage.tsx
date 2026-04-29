@@ -102,17 +102,6 @@ const attachImagesFromEventDetails = async (events: HostOverviewEvent[]): Promis
     return withImages;
 };
 
-const StarRating = ({ rating = 4 }: { rating?: number }) => (
-    <div style={{ display: "flex", gap: "2px" }}>
-        {[1, 2, 3, 4, 5].map((s) => (
-            <svg key={s} width="14" height="14" viewBox="0 0 24 24"
-                fill={s <= rating ? "#FBBF24" : "none"}
-                stroke="#FBBF24" strokeWidth="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-        ))}
-    </div>
-);
 
 const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
     <div style={{
@@ -153,34 +142,6 @@ const EventCard = ({ card }: { card: CardItem }) => (
     </div>
 );
 
-const ReviewCard = ({ review }: { review: ReviewItem }) => (
-    <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.75rem",
-        padding: "0.625rem 0",
-        borderBottom: "1px solid #f3f4f6"
-    }}>
-        <div style={{
-            width: "2.25rem", height: "2.25rem", borderRadius: "50%",
-            backgroundColor: review.avatar ? "transparent" : "#d1d5db",
-            overflow: "hidden", flexShrink: 0,
-        }}>
-            {review.avatar
-                ? <img src={review.avatar} alt={review.userName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <div style={{ width: "100%", height: "100%", backgroundColor: "#6b7280" }} />
-            }
-        </div>
-        <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#111827" }}>{review.userName}</div>
-                <StarRating rating={review.rating ?? 4} />
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "2px" }}>{review.msg}</div>
-        </div>
-    </div>
-);
-
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const navigate = useNavigate();
@@ -189,7 +150,6 @@ export default function Host() {
     const [selectedTab, setSelectedTab] = useState<number>(0);
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>([]);
     const [pastEvents, setPastEvents] = useState<CardItem[]>([]);
-    const [reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState<HostStats>(EMPTY_STATS);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -233,19 +193,12 @@ export default function Host() {
 
                 setUpcomingEvents(upcomingWithDetails.map(mapEventToCard));
                 setPastEvents(pastWithDetails.map(mapEventToCard));
-                setReviews(Array.isArray(data.reviews) ? data.reviews : []);
             } catch (err) {
                 console.error("Failed to fetch host:", err);
                 setHost({ id: 0, name: "Name", email: "email@domain.com" });
                 setStats(EMPTY_STATS);
                 setUpcomingEvents([]);
                 setPastEvents([]);
-                setReviews([
-                    { id: 1, userName: "Name", msg: "review", rating: 4 },
-                    { id: 2, userName: "Name", msg: "review", rating: 4 },
-                    { id: 3, userName: "Name", msg: "review", rating: 4 },
-                    { id: 4, userName: "Name", msg: "review", rating: 4 },
-                ]);
             } finally {
                 setIsLoading(false);
             }
@@ -254,12 +207,6 @@ export default function Host() {
         if (hostId) fetchHostData();
         else {
             setHost({ id: 0, name: "Name", email: "email@domain.com" });
-            setReviews([
-                { id: 1, userName: "Name", msg: "review", rating: 4 },
-                { id: 2, userName: "Name", msg: "review", rating: 4 },
-                { id: 3, userName: "Name", msg: "review", rating: 4 },
-                { id: 4, userName: "Name", msg: "review", rating: 4 },
-            ]);
             setIsLoading(false);
         }
     }, [hostId]);

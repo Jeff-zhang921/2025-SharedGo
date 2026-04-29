@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import './EventDetailsSidebar.css';
 
 interface User {
@@ -41,7 +41,6 @@ interface EventSidebarProps {
 
 
 const EventSidebar = ({ eventId, onClose, onDeleteSuccess }: EventSidebarProps) => {
-  const navigate = useNavigate();
   const [event, setEvent]  = useState<EventData | null>(null) //Store actual event data from backend, setting initial value to null
   const [isLoading, setIsLoading] = useState(true) //Enables us to show a "loading" message to user
   const [error, setError] = useState<string | null>(null) //Store error messages during data fetching

@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect,useMemo,useRef,useState} from 'react';
+import {ChangeEvent, useEffect,useRef,useState} from 'react';
 import{useLocation,useNavigate}from"react-router-dom";
 import{io,Socket}from "socket.io-client"
 import"./chatPage.css"
@@ -159,6 +159,7 @@ socketRef.current=socket
       socketRef.current = null;
      }
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
 
@@ -378,7 +379,7 @@ const handleSendMessage=()=>{
             <div>Start a conversation</div>
           )}
           
-          {message.map((msg, index) => {
+          {message.map((msg) => {
             const isMe = msg.senderId === me?.id;
             const isImageMessage = msg.body.startsWith(IMAGE_PREFIX);
             //"Start at the character position equal to the length of the prefix, and give me everything from there until the very end."

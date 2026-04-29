@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import "./loginPage.css" //Same css file for consistency
 import { useLocation, useNavigate } from "react-router-dom";
 //import App from '../App';
@@ -54,7 +54,7 @@ const CreateVerifyPage = () => {
             } else {
                 setStatus(data.message || "Invalid code.");
             }
-        } catch (err) {
+        } catch {
             setStatus("Error connecting to server.");
         }
     };
