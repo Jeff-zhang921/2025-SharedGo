@@ -153,34 +153,6 @@ const EventCard = ({ card }: { card: CardItem }) => (
     </div>
 );
 
-const ReviewCard = ({ review }: { review: ReviewItem }) => (
-    <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.75rem",
-        padding: "0.625rem 0",
-        borderBottom: "1px solid #f3f4f6"
-    }}>
-        <div style={{
-            width: "2.25rem", height: "2.25rem", borderRadius: "50%",
-            backgroundColor: review.avatar ? "transparent" : "#d1d5db",
-            overflow: "hidden", flexShrink: 0,
-        }}>
-            {review.avatar
-                ? <img src={review.avatar} alt={review.userName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <div style={{ width: "100%", height: "100%", backgroundColor: "#6b7280" }} />
-            }
-        </div>
-        <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontWeight: "600", fontSize: "0.875rem", color: "#111827" }}>{review.userName}</div>
-                <StarRating rating={review.rating ?? 4} />
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "2px" }}>{review.msg}</div>
-        </div>
-    </div>
-);
-
 export default function Host() {
     const { hostId } = useParams<{ hostId: string }>();
     const navigate = useNavigate();
@@ -189,7 +161,7 @@ export default function Host() {
     const [selectedTab, setSelectedTab] = useState<number>(0);
     const [upcomingEvents, setUpcomingEvents] = useState<CardItem[]>([]);
     const [pastEvents, setPastEvents] = useState<CardItem[]>([]);
-    const [reviews, setReviews] = useState<ReviewItem[]>([]);
+    const [_reviews, setReviews] = useState<ReviewItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState<HostStats>(EMPTY_STATS);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
