@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "./mapPage.css"
 import { useLocation, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import { useSearch } from './../searchFile';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
